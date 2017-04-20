@@ -1,3 +1,6 @@
+eztfl-html5 diary			Alistair Mann
+=================================================================
+
 20 April 2017
 
 Upto 1430
@@ -6,12 +9,23 @@ todo list. On reflection, it warrants a new project so here we go.
 1430
 Decide the itch to be scratched. Namely, a site that looks at where
  I am, where I'm going, and where I'll be, then use that info to
- offer bus stop suggestions. 
+ offer bus stop suggestions.
 Decide new project name, eztfl-html5
 Decide do it "publicly", maybe even youtube aspects later
 Decision to create as website rather than app
 Introducing TFL.
 Introducing me as dev and the tools I'll use.
 HTTPS as a mandatory constraint
+2045
 The neccessity for github
 Migrate existing two files to https://github.com/Csi18nAlistairMann/eztfl-html5
+Rearrange authentication from un/pw to public key
+2144
+Create a file to track resources used (docs/Resources)
+1136x640 as a voluntary constraint on the CSS displayport
+Create a file to track project objectives (docs/Goals)
+Move eztfl-html5\ diary to docs/Diary
+Move eztfl-html5\ thoughts to docs/Thoughts
+Introduce the project is at immediate risk for reasons we don't yet know
+What constitutes project success?
+List Known Unknowns that need to be addressed befor project starts

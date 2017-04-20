@@ -1,0 +1,251 @@
+eztfl-html5 thoughts			Alistair Mann
+==============================================================================
+
+2017-04-20 14:30
+Following on from the eztfl website (http://eztfl.pectw.net) where I recreated
+the original TFL Countdown benefits in a pure html site, I discover another
+scratch to itch: I want the site to tell me what bus stops are in front of me
+given my position and location.
+
+The original site was specifically created to be purely server-side but
+particularly fast. However geolocation - the technology required to for
+this new purpose - is client-side; further, the user would be specifically
+trading processing speed for application intelligence: he wants to know
+what his options Will Be, not What They Are. As this is diametrically
+opposed to the original site's design goals, it's warranted we start an
+whole new project instead.
+
+The second thing a project needs, after the itch to scratch, is a name. The
+original name was "eztfl", the new project will rely on html5 principles,
+so how about we use eztfl-html5. There! That took all of a few seconds.
+
+It looks like I'll be doing this publically as well, so I'll start recording
+development (in this file, "eztfl-html5 thoughts") and a diary ("eztfl-html5
+diary")
+
+Project goals in depth.
+eztfl.pectw.net answers the question: "I'm at bus stop X. What are my options?"
+eztfl-html5 is to answer the question: "I'm at X, Y walking in direction Z. What
+are my options?"
+I'm interested in creating this not as an app (of which there are plenty) but
+as a website. This has a far lower barrier to entry than creating apps (Which
+includes $100+ for distributing Android or iOS apps, plus cost of powerful
+machinery; where website development & distribution can be free.) More
+importantly, support for browsers would logically be more extensive than
+support for apps: an old and cheap phone would likely support html and
+javascript better than it could support a modern app.
+
+2017-04-20 14:55
+Introducing TFL.
+The task here is about London, England and her famous red buses. Public
+transport is handled by TFL - Transport for London - who have a very
+enlightened approach to their data, including a RESTful API for obtaining
+"Countdown" info: which buses are arriving at any given bus stop in the
+next 30 minutes.
+
+Introducing me as dev and the tools I'll use.
+I've been programming since 1979 including games, financial sector software
+and business software. I find myself in posession of a public-facing website,
+domains, DNS control and SSL certificates which means I can put most things
+up. I've written server-side software before, more recently using PHP. I've
+also written websites in html and html5, and client-side software most
+recently using Javascript. I've connected the client-side to the server-side
+and back again using AJAX principles. I've also connected clients to servers
+using RESTful principles, although I may not need them here. Finally, I've
+also done some work in securing software, so I'll look to bake that in as
+we go.
+
+So we'll see a 'stack' that looks like this:
+
+client: HTML5/CSS
+	JavaScript
+	    ^
+	    | (Maybe RESTful)
+	    V
+Server: PHP
+	    ^
+	    | (Definitely RESTful)
+	    V
+TFL:    API
+
+Constraint: HTTPS
+I happen to know beforehand that geolocation requires the use of HTTPS from
+Chrome v50 released around April 2016. I'll look to honour that even if the
+browser used is not Chrome, so using HTTPS is an immediate constraint.
+2017-04-20 15:18
+
+2017-04-20 20:45
+As I'm wanting to do this publicaly, it's appropriate to put this stuff on
+github. I already have one, so what I got so far can go there
+
+2017-04-20 21:00
+That only took a few minutes :-) Existing project now found at:
+     https://github.com/Csi18nAlistairMann/eztfl-html5
+Upto the github migration I was the Kate Editor
+(https://kate-editor.org/about-kate/) for basic text editing. Now I'm in a
+local repository of this as github project, I'm using emacs on the command
+line - my usual preference when programming.
+     I'm not used to github. In fact I'm not used to much of git, so spent
+some faffing these documents into an acceptable upload.
+     Also annoying is having to add un/pw pair for each github exchange. I
+thought I had added my ssh key already? Fix that too. Apparently not, so
+upload muh public key to github, and test.
+       So, even as a technical user, it sitll took me an hour to fully
+migrate from two local files to a github (gh) project largely due to my
+own limited understanding of git and gh
+    1. create repo online
+    2. clone it to local repo
+    3. copy local text files to local repo
+    4. faff with branch to upload
+    5. faff with pull request and merge
+    6. faff with un/pw in favour of key authentication
+    7. faff with pulling back down
+2017-04-20 21:44
+Would be of interest to others to have a resources file. Create one at
+      docs/eztfl-html5\ resources
+
+Target platforms:
+Now I know I mentioned earlier that the target isn't the device but the
+browser. Despite that, it's worth you knowing what I'll be working with
+here. ALL the hardware used for development of this project is old, at
+least 2 years old. Where possible though, they are using the latest
+freely available software. I want to push that one doesn't have to spend
+alot to develop!
+That said, their geolocation capabilities are not yet known. We'll come
+to that shortly.
+
+2017-04-20 22:06
+	  It's worth mentioning that there are some things I don't care
+about for this project. One is the css displayport. It's incidental to
+the purpose of this project that it fits perfectly on the screens of
+arbitrary devices. As such, I'll assume a resolution of 1136x640.
+	  It's also obvious now that I'm building a picture of What
+The Project will look like, and that's in part dependent on what I have
+to hand, and what I know. A new file is coming that describes that
+at that date, rather than the organic description in here. We'll call it
+docs/Goals
+	I'll also rename this, the diary and the resources file. Having
+eztfl-html5 in the name is redundant.
+2017-04-20 22:34
+
+Time for a tea.
+
+2017-04-20 22:46
+We aren't sure the project is achievable:
+   At this point I don't know if my devices have hardware capable of
+supporting success; I don't know if they do but lack JavaScript facilities
+to assist. But then someone else doing exactly the same thing might
+not have known geolocation wouldn't work without an https facility
+so may fail because he couldn't afford/ configure one.
+   The point is, there is a high degree of risk the project will have
+to be abandoned. This is ameliorated by some research that will happen
+first.
+
+What constitutes project success?
+     To start with, it may seem weird to define what success is when we
+don't yet know whether we have what we need to reach the goal. However the
+definition of success is plastic: when we know more about the goal, we can
+in future what defines success. This is similar to a long drive: we might
+choose to visit Alice & Bob and start by getting to their city before we
+redefine success to getting to their neighbourhood, street and door. If
+on the way we learn they're in the middle of Zombie outbreak, we might
+reasonably redefine success to mean we'll visit Carol & David in a
+different city instead. The trip will be a success, even if we don't end
+up exactly where we first hoped.
+
+   Consider the following diagram:
+
+		   ._uvvvvnc,
+		 _uv!~     ^?nc.
+	       .ue~          -"S;
+	      _d^ __i__.        4c.
+	     <2~<oY^^"!1o,       "6.
+	    .2<2"`      -Ya.      )c
+	   .Jh?`          )nc      4;
+	   )#^.___,         4;     -n.
+	  .dCu3!""Yn;       =o.     )c
+	  )#d^      4;       )c      S.
+	  d#^       -4c       S.     );
+	 _Q(          4;      )c     :C
+	 ]F___,       :C       C      v
+	 jk^ .";       n.      n.     3;
+	 Q'    -c      );      );     =;
+	 W      <      =;      =;     );
+   A->Z  W  B   )  C    );  D   ); E   =;
+	 W      )      =;      =;     =(
+	 Q/    _^      j'      );     );
+	 ]k,.._+      .z       v`     v`
+	 ]m+""~       )(      .o     .o
+	 -Wa.        =2       )(     =(
+	  426.      <2`      .2      j'
+	  =m)o_.  _se        )(     :e
+	   3L-!1vn?^        :2      j'
+	   :Q/             .J'     =e
+	    )&a.          =d^     :2`
+	     32nc.      _uY      .d'
+	      ?u!1a___az?~      <2^
+	       )o,~"""^       .<2
+		-Ya_.       _v2"`
+		  -!1o___i<z?^
+		     ~""""^
+
+In my mind, I have a user at position X, Y (A) walking in direction Z. In
+a minute he'll be somewhere within range of B. A minute later, he could be
+anywhere in range of C. After four minutes he could be anywhere in the
+circle marking the range of E.
+
+Knowing the location and radius of B, C, D, and E I imagine discovering
+the bus stops within each and obtaining some basic data about them such
+as direction of travel and bus routes stopping by, I then imagine
+presenting these to the user in a list ordered by distance from A.
+
+I imagine that this would answer the question above: "I'm at X, Y walking
+in direction Z. What are my options?", and answering that question
+constitutes project success.
+
+There are degrees of leeway. What if I can't do circles, but can do pie
+segments? That might be good enough. What if I can't calculate direction
+can I take user guesses? (Think: "Are you moving North at 3mph?") That
+might also be good enough. As I understand the technology further we may
+redefine what consitutes project success.
+
+2017-04-20 23:31
+
+Is this project even possible?
+
+A reasonable person should be able to look within themselves and identify
+Known Knowns and Known Unknowns, in Donald Rumsfelds immortal words.
+(https://en.wikipedia.org/wiki/There_are_known_knowns) It's a known that
+I know html, php, ssh etcetera. It's an unknown that my equipment can
+handle the project. Unknown Unknowns just have to await uncovering.
+
+So the task is to list Known Unknowns for the first stage of the project:
+Make the Unknowns Known, and adjust the project to suit. For eztfl-html5
+my Known Unknowns are:
+
+1. Can I have JavaScript capture:
+   a: position
+   b: direction of travel
+   c: speed of travel
+2. Can this capturing work on available devices:
+   a. LG G2
+   b. iPhone 5s
+   c. iPad Air 2
+   d. a standard desktop browser
+3. Can this data be used to calculate likely ranges for future positions
+4. Can these ranges be used to interrogate the TFL API
+5. Given the above, should project goals be revisited?
+
+2017-04-20 23:45
+
+Notice that so far I have written:
+   31    71   513 Resources
+   31   186  1253 Diary
+  239  1696 10397 Thoughts
+   21   114   731 Goals
+    1     1     3 .gitignore
+  323  2068 12897 total
+
+12kb of files, including 2000 words across 323 lines with ZERO code.
+
+2017-04-20 23:54

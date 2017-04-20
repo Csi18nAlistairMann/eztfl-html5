@@ -1,0 +1,21 @@
+eztfl-html5 goals
+
+Target question:
+Given that I'm in London, England and walking down the road, use
+the TFL Open Data API to answer the question: "I'm at X, Y walking
+in direction Z. What are my bus stop options?"
+
+Target devices:
+Any compliant browser on any compliant device.
+    + OS-dependent Apps are specifically avoided
+    + Compliant devices will have location and direction available
+    + Compliant browsers will have access to same via JavaScript
+
+Target Screen resolution:
+Assume all devices have a CSS displayport resolution of 1136x640
+       + Other resolutions are a NICE2HAVE
+
+Constraints:
+HTTPS to be used between client and project
+Make as much available as possible via github
+Use old hardware, free software
