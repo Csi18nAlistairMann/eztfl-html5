@@ -38,3 +38,24 @@ Resolve Unknown Unknown #1: which email address subdomain admin for
 	apache
 Discover Unknown Unknown #2: How to get site to pull only parts of
 	 the gh repo
+1119
+Add JavaScript page at /uu2.html that displays position, accuracy
+    speed and heading
+Add docs/UnknownUnknowns to track unexpected workloads
+Discover Unknown Unknown #3: accuracy is also available, which could
+	 feed into processing decisions
+Investigate whether devices can report speed/heading data
+Investigate whether that's my bad interpretation by contrast with newer
+	    devices
+Discover Unknown Unknown #4: data could be returned yet not available
+	 Look into what null, undefined might mean
+Discover Unknown Unknown #5: That speed/heading can be manually
+	 calculated
+Discover Unknown Unknown #6: that iOS gives a 65m accuracy is a known
+	 problem with a known solution
+Discover Unknown Unknown #7: a decision to code for or abandon older
+	 devices that don't offer speed/heading
+Manual code for calculating bearing taken from StackExchange
+Manual code for calculating distance taken from StackExchange
+Prove we can obtain data from hardware via OS. Now also prove
+      we can calculate missing heading and speed if necessary.

@@ -1,0 +1,40 @@
+eztfl-html5				Alistair Mann
+=====================================================
+
+Unknown Unknowns
+
+These items were unexpected at the beginning of the project and
+either caused immediate workload before it could be passed, or
+could cause potential workload in later improving the project.
+
+20 April 2017
+1. An admin email address for configuring Apache for subdomain
+   [closed]
+
+21 April 2017
+2. What configuration sees the server only retrieve certain files
+   from github
+   [ ]
+
+3. Accuracy is available as well as position, speed and heading.
+   This info might impact how we calculate things
+   [ ]
+
+4. "null", "undefined" and "0" having specific meanings
+   null = "I know what you mean but its not available"
+   undefined = "I don't know what you mean"
+   [closed]
+
+5. Speed and heading could be manually calculated from a timed
+   series of positions, where the data isn't otherwise available.
+   [closed]
+
+6. iPhone/iPad wouldn't give an accuracy below 65m in a test.
+   Also see
+   http://stackoverflow.com/questions/25504378/phonegap-3-3-ios-geolocation-accuracy-always-65
+   [closed]
+
+7. Older devices do not have speed/heading: continuing means
+   writing code specifically to estimate both where the device
+   cannot give it, or abandoning old devices altogether.
+   [closed] decide to write code

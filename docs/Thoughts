@@ -234,7 +234,7 @@ my Known Unknowns are:
    d. a standard desktop browser
 3. Can this data be used to calculate likely ranges for future positions
 4. Can these ranges be used to interrogate the TFL API
-5. Given the above, should project goals be revisited?
+5. Given the answers above, should project goals be revisited?
 
 2017-04-20 23:45
 
@@ -287,13 +287,195 @@ Plan for handling Known Unknowns.
    [ ] How to interrogate above
 6. [ ] Reassess project in light of above answers.
 
-Unknown Unknown #1: To set up Apache properly, I have to provide a server
+Unknown Unknown #1: To set up Apache properly, I had to provide a server
 admin email address.
 
 2017-04-21 00:51
 
-Unknown Unknown #2: I have put a hello world page at
+[ ] Unknown Unknown #2: I have put a hello world page at
 https://eztfl-html5.mpsvr.com but it will shortly contain code: how does
 one handle that I want it to contain code that will be published at gh?
 Can one set up a pull of only certain parts of the tree? How? Something
 for tomorrow!
+
+2017-04-21 11:19
+
+Known Unknown #2: We now want JavaScript to indicate position, heading
+and speed in a browser. We will also want to see that change as we go, so
+the page will follow the three over time.
+[x] Prove that we can obtain the data.
+  We'll do this by copying in the example code.
+	[x] Code with lat and lon works fine on G2
+	[x] Extend to include accuracy, speed and heading
+	Unknown Unknown #3: accuracy is available too
+	[x] Speed and heading are both "null" on portable devices.
+	    This may be because I'm walking around a room, but why is
+	    it not "0"? Anwser: because the speed is not available at
+	    all, not 0 because of an error
+
+[x] Prove that we can follow the data. This is a trivial task so
+    doesn't need proving.
+
+Unknown unknown #4: "null" means not available, "undefined" is used for
+	mispellings
+	IDK if "null" also used for 0 speed and in what circumstances
+
+2017-04-21 11:43
+
+All these unknown unknowns might also be useful at other points in
+the project as they're revealing behaviour that might fuel later
+changes. To that end I've started collecting them in
+docs/UnknownUnknowns
+
+Unknown unknown #5: documentation and testing thus far suggests that
+speed and heading are not always available. It occurs to me that the
+project could use a timed succession of co-ordinates to extrapolate
+both
+
+2017-04-21 12:11
+
+I'm stymied by the availability or otherwise of actual heading and
+speed data from my devices - they all report null from just walking
+about. So I'm off to sit on a bus and let it do the work.
+
+2017-04-21 13:00
+
+About 15 minutes actual work.
+I didn't get on the bus as the target of the project is users walking
+towards bus stops, so I walked instead of rode.
+None of the portable devices gave heading and speed at any point.
+Unknown unknown #6: The iPhone 5s and iPad did not give an accuracy
+below 65m at any point. Adding credit to it's account made no difference
+too.
+
+It would seem that either:
++ none of my hardware natively reports speed and heading;
++ speed and heading is not reported by the hardware but tracked by
+  the software and uu2.html doesn't activate that feature;
+At worst, I'll still have the manual backup.
+It would seem to be the first. When trying
+https://www.audero.it/demo/geolocation-api-demo.html
+speed and heading are both correct on a borrowed LG LV2 & a
+Samsung Galaxy J5, both recent devices. The same page offers nothing
+for my devices. To proceed, then, means to create the manual alternative
+for my own devices as a fall back for newer devices not being present.
+Unknown unknown #7: code to support old phones, or abandon them.
+
+2017-04-21 13:49
+
+Unknown unknown #7: code to support old phones, or abandon them.
+Knowing that at Time T1 the position was X1, Y1 and at T2 the position
+changed to X2, Y2 what calculation gives us heading and speed?
+Heading - as bearing - seems to be offered at
+http://www.movable-type.co.uk/scripts/latlong.html
+https://math.stackexchange.com/questions/1596513/find-the-bearing-angle-between-two-points-in-a-2d-space/
+The former being more appropriate for huge distances, the second
+better for far smaller distances. Let's calculate what answers we
+should expect.
+Using http://www.geomidpoint.com/destination/ to obtain:
+Highbury & Islington tube station is 51.54647680000001, -0.10431170000003931
+Arsenal's Emirates Stadium is at 51.5548885, -0.10843799999997827
+At https://www.sunearthtools.com/tools/distance.php plugging those
+coords in reports a bearing of 343.04deg.
+Using https://www.google.co.uk to double check, we get a very similar
+angle when looking 'by hand'. So we want:
+bearing(51.54647680000001, -0.10431170000003931, 51.5548885, -0.10843799999997827) {
+  ...
+  return 343.04;
+}
+
+I'll copy uu2.html to uu7.html and modify the javascript to create
+this function. This is pure lazyness - it saves me handling overhead
+programming and coding as I'm reusing uu2.html's overhead. Once
+done, we have code that should manually inform on bearing, proving
+that Unknown Unknown #7 is in part addressable before project continues.
+
+Looking at the code I see a constant TWOPI: 6.2831853071795865. Is this
+number associated with this kind of work? It's certainly PI * 2 and
+googling "6.2831853071795865 bearing" does seem to bring up references
+to this constant for this work. The second constant, RAD2DEG also
+googles up for quite a bit of use with radians and degrees. So I don't
+know how this second constant is arrived at, or how either were
+originally worked out, but I'm happy I don't need to in order to use
+their properties effectively. This completes the due diligence that
+the routine being used is likely to be effective.
+
+At first blush it looks like the code provided accepts coords in the
+double form provided. Let's run and see.
+1. Doesn't work move script to <head /> and retest
+2. Doesn't work. F12 to see error in alert() use. Fix and retest
+3. Doesn't worl. F12 to see atan2 not defined. Change to Math.atan2
+   and retest
+4. Wrong answer: get 63.870066427646954 when expected 343.04. Adding
+   both is 406, so this isn't just going the wrong way around the
+   clock that would be expected if the answer was 360.
+5. Could this be me providing arguments in the wrong order?
+   C++, the example code has atan2 given y, then x.
+   Check shows I've not changed argument order.
+6. I notice warning that in the example, Y increases the further
+   down one goes. Could it be that I need to invert Y?
+   Change sign of both Y arguments and retest. Get result
+   116.12993357235304, so not because Y needed sign changing.
+7. That makes me think that this example code was not appropriate
+   to this task. Either I don't understand the task, or I don't
+   understand the example.
+
+Googling some more I come across:
+https://gis.stackexchange.com/questions/29239/calculate-bearing-between-two-decimal-gps-coordinates
+Using it as a drop-in replacement I get the answer 343.0366983003317
+which is perfect.
+
+What's happened here is that I'm treating the code as a Black Box.
+I don't know, nor need to know how it works (other than due
+diligence that it's not going to be malign), I just need to know
+that it does work when called.
+
+I'll invent a second test.
+Sydney Opera House is at -33.858667, 151.214028 according to
+Wikipedia and confirmed at maps.google.com. The nearby attraction
+Mrs Maquarie's Chair, is at -33.859467, 151.222203. What's the
+bearing? It looks like 120deg to me. Plugging the coords in
+I get 96.72099553985117 which is some way off. Maybe I got the
+coords wrong? No. The coords provided by Wiki are someway South
+and North of what the map appears to show, and 96deg does seem
+accurate. Let's check both back at
+https://www.sunearthtools.com/tools/distance.php where we expect
+a similar answer. We get 96.72deg.
+
+So the code to get the bearing manually, found in uu7.html and
+shamlessly ripped off of Francisco Valdez at the above SE link
+is sufficient to resolve that part of Unknown Unknown #7.
+
+2017-04-21 15:07
+
+The second part is to manually determine speed. There would seem
+to be a very similar algorithm: look at the distance covered by
+the two points then divide by the time taken to travel it. So:
+distance(x1, y1, x2, y2){
+  return meters
+}
+speed(meters, seconds){
+  return meters-per-second
+}
+The first as an SE link at
+http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+
+Dropping it in to uu7.html and with the examples above I get
+a distance of 0.9778843260636695km and 0.7600819724022814km
+respectively when I was expecting a result of 978.2m and 760.3m
+so the code is right on the money again.
+
+Knowing the meters travelled and the seconds taken, it's trivial
+to calculate the meters-per-second for speed so I'll take those
+as given and conside Unknown Unknown #7 addressed.
+
+Unknown Unknown #3 gets an update: we have code to manually
+calculate heading and speed if required.
+
+Unknown Unknown #5 gets an update: we have code to manually
+calculate heading and speed if required.
+
+Unknown Unknown #7 gets an update: we have code to manually
+calculate heading and speed if required.
+
+2017-04-21 15:28
