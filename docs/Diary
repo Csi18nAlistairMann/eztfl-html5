@@ -29,3 +29,12 @@ Move eztfl-html5\ thoughts to docs/Thoughts
 Introduce the project is at immediate risk for reasons we don't yet know
 What constitutes project success?
 List Known Unknowns that need to be addressed befor project starts
+21 April 2017
+0026
+Plan for handling Known Unknowns
+Add DNS entry for eztfl-html5.mpsvr.com
+Add Apache entry for eztfl-html5.mpsvr.com
+Resolve Unknown Unknown #1: which email address subdomain admin for
+	apache
+Discover Unknown Unknown #2: How to get site to pull only parts of
+	 the gh repo

@@ -1,5 +1,6 @@
 3rd party spaces:
 https://github.com/Csi18nAlistairMann/eztfl-html5
+Internet facing server
 
 Devices:
 ye ipad air 2 running iOS 10.3.1
@@ -22,6 +23,8 @@ emacs (on the command line)
 git
 ssh
 gimp (The ASCII circles in docs/Thoughts)
+bind
+Apache
 
 Software technologies:
 CSS
@@ -29,3 +32,6 @@ HTML/HTML5
 JavaScript
 PHP
 JSON
+
+Others:
+SSL certificate

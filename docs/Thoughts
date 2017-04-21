@@ -249,3 +249,51 @@ Notice that so far I have written:
 12kb of files, including 2000 words across 323 lines with ZERO code.
 
 2017-04-20 23:54
+
+Plan for handling Known Unknowns.
+1. Questions of JavaScript capturing geolocation data is already known to be
+   governed by HTTPS on Chrome. So before we issue JavaScript, we need an
+   HTTPS domain to issue it from.
+   Fortunately I have an existing catch-all cert for *.mpsvr.com, so I can
+   start there:
+   [x] Create https://eztfl-html5.mpsvr.com
+     [x] DNS
+     [x] Apache
+2. The JavaScript to be issued appears at
+   https://www.w3schools.com/html/html5_geolocation.asp with a strong
+   suggestion from .latitude, .longitude, .heading and .speed are all
+   available - if allowed on the device, and available from the hardware.
+   [ ] Recreate the JavaScript examples to answer the position, speed and
+       heading question
+3. Using the page just created, examine the response from the various
+   devices to answer the second Known Unknown
+4. What maths is needed to discover a possible position and radius using
+   the above data? My very distant memory of writing 3D games (I never
+   did, only looked into it when Original Doom came out in 1993) was that
+   maths will likely involve sin, cos, tan, radians: trigonometry. Indeed
+   a quick google suggests this might be a common question:
+   http://stackoverflow.com/questions/2187657/calculate-second-point-knowing-the-starting-point-and-distance
+   where we find cos and sin in the first answer.
+	 [ ] Frame the mathematical question for calculating position and
+	     radius from position, speed and bearing
+	 [ ] Get maths
+	 [ ] Is this maths better done client-side or server-side?
+5. Can the TFL API support position and radius for discovering what bus
+   stops are nearby? The docs at:
+   https://api.tfl.gov.uk/swagger/ui/index.html?url=/swagger/docs/v1#!/StopPoint/StopPoint_GetByGeoPoint
+   say "Gets a list of StopPoints within {radius} by the specified criteria"
+   which includes a radius default of 200m from location.lat, location.lon.
+   This seems very likely what is needed.
+   [ ] How to interrogate above
+6. [ ] Reassess project in light of above answers.
+
+Unknown Unknown #1: To set up Apache properly, I have to provide a server
+admin email address.
+
+2017-04-21 00:51
+
+Unknown Unknown #2: I have put a hello world page at
+https://eztfl-html5.mpsvr.com but it will shortly contain code: how does
+one handle that I want it to contain code that will be published at gh?
+Can one set up a pull of only certain parts of the tree? How? Something
+for tomorrow!
