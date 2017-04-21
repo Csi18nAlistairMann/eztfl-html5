@@ -14,11 +14,11 @@ could cause potential workload in later improving the project.
 21 April 2017
 2. What configuration sees the server only retrieve certain files
    from github
-   [ ]
+   [closed] we'll scp from the dev server to the development repo
 
 3. Accuracy is available as well as position, speed and heading.
    This info might impact how we calculate things
-   [ ]
+   [closed] address as part of the review after phase 2
 
 4. "null", "undefined" and "0" having specific meanings
    null = "I know what you mean but its not available"
@@ -38,3 +38,6 @@ could cause potential workload in later improving the project.
    writing code specifically to estimate both where the device
    cannot give it, or abandoning old devices altogether.
    [closed] decide to write code
+
+8. More accurately accounting for location.
+   [closed] to go into docs/Todo

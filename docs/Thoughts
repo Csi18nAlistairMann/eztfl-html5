@@ -263,10 +263,12 @@ Plan for handling Known Unknowns.
    https://www.w3schools.com/html/html5_geolocation.asp with a strong
    suggestion from .latitude, .longitude, .heading and .speed are all
    available - if allowed on the device, and available from the hardware.
-   [ ] Recreate the JavaScript examples to answer the position, speed and
+   [x] Recreate the JavaScript examples to answer the position, speed and
        heading question
 3. Using the page just created, examine the response from the various
-   devices to answer the second Known Unknown
+   devices to answer the second Known Unknown.
+	   This got answered along the way - we know that iOS has the 65m
+   problem, for instance.
 4. What maths is needed to discover a possible position and radius using
    the above data? My very distant memory of writing 3D games (I never
    did, only looked into it when Original Doom came out in 1993) was that
@@ -274,25 +276,25 @@ Plan for handling Known Unknowns.
    a quick google suggests this might be a common question:
    http://stackoverflow.com/questions/2187657/calculate-second-point-knowing-the-starting-point-and-distance
    where we find cos and sin in the first answer.
-	 [ ] Frame the mathematical question for calculating position and
+	 [x] Frame the mathematical question for calculating position and
 	     radius from position, speed and bearing
-	 [ ] Get maths
-	 [ ] Is this maths better done client-side or server-side?
+	 [x] Get maths
+	 [x] Is this maths better done client-side or server-side?
 5. Can the TFL API support position and radius for discovering what bus
    stops are nearby? The docs at:
    https://api.tfl.gov.uk/swagger/ui/index.html?url=/swagger/docs/v1#!/StopPoint/StopPoint_GetByGeoPoint
    say "Gets a list of StopPoints within {radius} by the specified criteria"
    which includes a radius default of 200m from location.lat, location.lon.
    This seems very likely what is needed.
-   [ ] How to interrogate above
-6. [ ] Reassess project in light of above answers.
+   [x] How to interrogate above
+6. [x] Reassess project in light of above answers.
 
 Unknown Unknown #1: To set up Apache properly, I had to provide a server
 admin email address.
 
 2017-04-21 00:51
 
-[ ] Unknown Unknown #2: I have put a hello world page at
+[x] Unknown Unknown #2: I have put a hello world page at
 https://eztfl-html5.mpsvr.com but it will shortly contain code: how does
 one handle that I want it to contain code that will be published at gh?
 Can one set up a pull of only certain parts of the tree? How? Something
@@ -513,3 +515,234 @@ development machine repo -> push to gh.
 
 So let's add the hello world index file and two Unknown Unknowns
 files we've create thus far.
+
+2017-04-21 17:05
+
+One may notice that I've created a bash script to sync the local
+repo with the development server. .gitignore skips it though, as
+it's developer dependent - other devs wouldn't need access to it.
+
+This solves Unknown Unknown #2.
+
+I've now created:
+   64   407  2726 docs/Diary
+   21   114   731 docs/Goals
+   37    79   573 docs/Resources
+  521  3665 22706 docs/Thoughts
+   40   183  1315 docs/UnknownUnknowns
+    7     8    57 server-code/index.html
+    2     4    63 server-code/sync.sh
+   49   125  1284 server-code/uu2.html
+   84   226  1977 server-code/uu7.html
+  825  4811 31432 total
+825 lines and 31kb of text for this project and I've still not
+laid down any code of my own other than a hello world holder
+page. In fact from:
+   7    8   57 index.html
+  49  125 1284 uu2.html
+  84  226 1977 uu7.html
+ 140  359 3318 total
+We see that of the 140 lines of runnable code - as html or javascript,
+almost all of it has been co-opted from examples at Stack Exchange
+with perhaps the odd line or two done by me.
+
+2017-04-21 17:57
+
+Known Unknown #4: frame the maths needed to discover position and
+range. The intent here is that we use the position, heading and speed
+to work out where we'll be in some short period.
+
+One thing to get right to is that logically I no longer need to do
+the very beautiful circles thing above - I only need to solve for
+the final circle, E. By using a function that returns the distance,
+I'm able to solve for E, then use that distance function to work out
+how far each in E is from the starting point, A. By then ordering
+the responses by distance, I answer the question posed as consituting
+project success: "I'm at X, Y walking in direction Z. What are my
+options?"
+
+I only need to solve E. The maths would seem simple: Given my position,
+speed and heading, calculate where I'll be in (say) 90 seconds. Given
+my speed, estimate the distance I could cover in an additonal (say)
+45 seconds.
+
+2017-04-21 19:59
+To calculate likely position I would need to know the heading and
+distance likely travelled from some origin.
+The distance can be discovered from meters-per-second (aka mps, about
+1.3mps according to Google, for the average man.)
+mps can be calculated with the SE code from knowing where we are, and
+where we were.
+Unknown Unknown #8: More accurately accounting for location. Rather
+than taking one reading at start and another at end, take readings all
+along the way? Apply best fit analysis? This technique could be used
+to later improve what we're doing.
+Client opens web site and approves geo use.
+JS obtains readings
+With two or more readings, and using the most recent reading, calculate
+the position we'll reach given existing heading and speed.
+Use distance to establish where we will be
+Use speed to calculate our radius from that point
+
+A ----> B -----> C -----> D
+
+A = Page is opened, first position obtained (x1, y1)
+B = Most recent reading (x2, y2)
+C = Guess of where we'll be in (90) seconds (x3, y3)
+D = Guess how far we can travel in (30) seconds (in meters)
+
+In particular note that C = guessFrom(A, B) is not to suggest guessFrom
+should ONLY be using two values, rather that A, B forms an array of
+two or more values. So: C = guessFrom(AB[A, a1, a2, a3, ..., an, B])
+
+The remainder of this looks trivial, so I'm going close the first two
+Known Unknown #4 elements off.
+
+Is this maths better done client-side or server-side? Client-side, it must
+be: with JavaScript heralded as a games platform, with devices using 3D
+rendering, the cost of sending maths off-device must be enormous and only
+getting worse.
+
+Note: this question only rises because I have little idea about the maths
+involved in the SE code and its relative processing expense. What I do
+have insight about is the processing expense of network connections
+(>Thousands of times slower) and floating point work (about 10x worse than
+equivalent ints if I remember my 80386 clock cycles correctly.) As the
+SE code chains 10-15 maths functions together, then on the face of it
+even "150x slower" vs ">1000s" slower still makes more sense.
+
+So: this maths is better done client-side. How much better is less
+important.
+
+2017-04-21 20:49
+Known Unknown #5: can the TFL API support position and radius for
+discovering what stops are nearby? Yes: taking lat, lon and radius.
+https://api.tfl.gov.uk/swagger/ui/index.html?url=/swagger/docs/v1#!/StopPoint/StopPoint_GetByGeoPoint
+A GET request to the given URL returns a JSON response which on the
+example I've seen does return data about bus stops.
+
+This only took a few mins to write, but I knew the above link from
+a while back - indeed, it was one of the reasons I thought this
+project might already be a goer. If I hadn't know about it, it might
+have taken some time to discover it.
+
+2017-04-21 20:59
+Known Unknown #6: Reassess project in light of answers to
+known unknowns and unknown unknowns.
+
+I started yesterday with an idea: that I want a site to give me bus
+stop options on my way towards a location.
+
+I start off with a certain variety of resources both public and personal,
+physical and intangible. It most certainly helps that I have equipment
+and skills, and that I've already much of the overhead work when
+creating my original eztfl.pectw.net site.
+
+In the first phase I got down some description of what the idea is
+about, how it would likely work, and what would constitute success.
+
+In the second phase I started looking instead at what I didn't know:
+the Known Unknowns - Things that I know I don't know, such as whether
+my equipment is up to the job - and Unknown Unknowns - Things that
+will impact the project but I haven't guessed ahead of time. Knowing
+these are vital to reducing the risk associated with timing: the more
+I know about what I'm doing, the less likely I'll be suprised.
+
+In order to address these Unknowns, I formed lists of both as I went
+along, and addressed each in turn until a short while ago all
+outstanding points had been examined.
+
+In proceding, some considerable overhead work has been started anyway:
+Starting a github resource where what I've done so far can be found;
+setting up DNS and Apache to support HTTPS connections; IRL work
+walking around examining what devices were reporting. It'd be fair
+to guess I've spent a bit more than a day of time investihating the
+Unknowns, setting things up to answer them - things which are
+identical to those I might have later done had I plunged in without
+this preliminary work. So far I've spent no money (or at least, no
+money I wouldn't have spent anyway) so the investment is minor.
+
+In investigating the Unknown Unknowns I recognise that some aspects
+of how I imagined the project need modifying. These are:
+
+1. [x] Accuracy is an input into the site. I may choose that the
+   site does different things at a lower accuracy than ideal. This
+   can safely left to the Todo.
+
+2. That older equipment doesn't offer heading and speed, however
+   both those can be calculated by the project rather than obtained
+   from the hardware via the OS.
+   This will add a small amount of more time, but not much.
+
+3. That the stack changes to:
+
+client: HTML5/CSS <---(Definitely RESTful)-------> TFL: API
+	JavaScript
+	     ^   |
+	     |  ++--------------------------------------
+	     | / |(Maybe RESTful)
+	     V | V
+Server: PHP +--+                      Optional to implementation
+	   / ^
+----------+  |(Definitely RESTful)
+	     V
+TFL:    API
+
+	Where note the client can themselves directly obtain such data
+as they require from TFL. This would obviously be faster (as not
+intermediated through my server) on the upside. On the downside, such
+connections are more heavily shaped given it would be sans the APIKey.
+There's the option of implementing via the server but I can't
+immediately think of a reason why I'd want to.
+	    This informs where the work is done. Answer: in the
+browser.
+
+4. That instead of seeking responses from increasing circles drawn
+around where the user will likely be, it'll be sufficient to draw
+from the largest of them and order by distance from the origin:
+
+				    \
+[A1, A2, A3, ..., An] -----> B --C--->
+				    /
+
+Where:
+[A1 to An] are two or more sets of lat, lon coords in an array
+    of readings of the position since the page was open
+B is the lat, lon position those readings suggest the user will
+  arrive at (docs suppose 90 seconds time, but that can be a choice
+  left til later)
+C is the radius in meters from B the user can get to given a certain
+  amount (docs suppose 45 seconds) of time
+
+  This informs the design of the program in terms of collecting
+data and using it from history rather than naively using first and
+whatever last lat, lon was and is.
+
+Given these four, the definition of project success doesn't need
+to be changed from "I'm at X, Y walking in direction Z. What are my
+options?"
+
+2017-04-21 22:16
+Phase 3: implementation.
+
+Now we know that the idea is doable with a much lowered risk that
+something unknown will cause problems, it's time to consider what
+to code.
+
+Before we start note that:
+   73   457  3065 Diary
+   21   114   731 Goals
+   37    79   573 Resources
+  732  5191 31686 Thoughts
+   12    84   534 Todo
+   42   211  1500 UnknownUnknowns
+  917  6136 38089 total
+I have written 917 lines, 6000 words and 38kb on the project and
+ZERO CODE code except to test
+   7    8   57 index.html
+   2    4   63 sync.sh
+  49  125 1284 uu2.html
+  84  226 1977 uu7.html
+ 142  363 3381 total
+142 lines of code taken from Stack Exchange. A considerable amount
+of knowledge has gone into configuring things, however.

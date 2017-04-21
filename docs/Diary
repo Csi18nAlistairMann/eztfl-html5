@@ -59,3 +59,16 @@ Manual code for calculating bearing taken from StackExchange
 Manual code for calculating distance taken from StackExchange
 Prove we can obtain data from hardware via OS. Now also prove
       we can calculate missing heading and speed if necessary.
+1742
+Solve Unknown unknown #2 by scping from 'live' machine to local repo
+Add first three files of actual code, plagiarised as they are.
+Decide the maths should be client-side not server-side
+Decide the TFL API will support position and radius for searching
+       bus stop locations
+Reassess project in light of answers to known unknowns and
+	 unknown unknowns and conclude no need to change what
+	 constitutes success.
+Create docs/Todo
+
+2216
+Consider phase 3: implementation
