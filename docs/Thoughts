@@ -479,3 +479,37 @@ Unknown Unknown #7 gets an update: we have code to manually
 calculate heading and speed if required.
 
 2017-04-21 15:28
+
+2017-04-21 15:45
+Unknown Unknown #2: What configuration sees the server only
+retrieve certain files from github
+
+My objective here is that the files on the server are also
+available through gh. However, I do not want any but specific
+files to be available. What to do?
+
+2017-04-21 15:50
+
+2017-04-21 17:05
+
+In the normal course of events, I would hold the development tree
+on a development machine. Updates would be run through unit tests
+and once accepted pushed out to a Gold machine with a non-visible
+account and a batch file that copies live code from the repo
+into place in the visible account.
+
+This is not that kind of a project though. Instead, I'll copy
+live code on the server into test file and edit it in updates
+there. Should the edits be good, the files get swapped around.
+If not, they get deleted.
+
+This can be done because the project is not "live" in the sense
+the public is using it.
+
+As development is being done on a live server, even if not the
+final live server, the connection to gh can be done instead as a
+pull: develop on the server -> test on a device -> scp files to
+development machine repo -> push to gh.
+
+So let's add the hello world index file and two Unknown Unknowns
+files we've create thus far.
