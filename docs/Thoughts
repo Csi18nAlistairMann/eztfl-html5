@@ -793,5 +793,7 @@ we can see things are progressing (although we could equally use
 the developer tools, they're less convenient on portable devices
 which is - after all - the target market.)
 
-
-
+We have enough now to get going. We'll call this 
+server-code/a.html
+1. Get an empty HTML5 present
+2. Get JavaScript running at start up
