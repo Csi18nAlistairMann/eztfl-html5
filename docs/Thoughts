@@ -746,3 +746,52 @@ ZERO CODE code except to test
  142  363 3381 total
 142 lines of code taken from Stack Exchange. A considerable amount
 of knowledge has gone into configuring things, however.
+
+What will the code Look Like? If we wanted a vehicle, we might fit
+what we bought to the purpose: an 18 wheeler to haul vegetables,
+a 1969 Dodge Charger to haul ass. Likewise with source: ours is not
+going to be the earnest mouse of a batch script conveying an input
+through to output. Nor is ours to be the matador of a RESTful server
+dancing to avoid the garbage anyone from anywhere could be driving
+at it. Nope: eztfl-html5 will be most like a computer game: it
+starts when it does, it ends when it does, and between the two it
+will thump away like a factory, updating, sending to screen, and
+repeat.
+
+Like a computer game, we'll have a Main Loop to which control 
+always eventually returns. Before the Main Loop is always such set
+up as is needed. There'll be nothing after the Main Loop, as 
+there is no "after" that needs to be addressed: once the browser
+window is closed, the browser itself will handle such clean ups
+as are needed.
+
+The Main Loop in this project is passed as a callback to 
+geolocation.watchPosition() - whenever the position updates, the
+Main Loop is restarted. (This neatly avoids using GOTO start!)
+
+This represents the core of the project. We now proceed to define
+what the Main Loop should do each time its run.
+
+The Main Loop should retrieve the current geolocation data and
+store it. When two or more are available, they are used to make a
+prediction about the future. When a prediction is available and
+different to the last prediction, it's used to update the display.
+The Main Loop then ends.
+
+Notice we don't say anything here about the user interface, or the
+user experience. That's because at this point, it doesn't actually
+matter. We might just put straightfoward text. We might have 
+rambling zombie icons on the screen. We might demonstrate what we
+have as a colour map. None of these choices need be made yet (or
+even by us, in larger projects.) Our purpose for the moment is
+simply to correctly process the input such that output has 
+something to work with.
+
+We do want to know that things are working, however, so we'll add
+a debug facilty in: we'll print out the inbound data, so as user
+we can see things are progressing (although we could equally use
+the developer tools, they're less convenient on portable devices
+which is - after all - the target market.)
+
+
+
