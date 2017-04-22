@@ -3,10 +3,28 @@
 */
 
 //
+// Constants
+//
+const NUM_TRACKED_COORD_PAIRS = 10;
+
+
+//
+// Globals
+//
+var tracked_coord_pairs = [];
+
+//
 // setup helpers
 //
 function eztflHtml5_setup() {
-    getLocationSetup()
+    getLocationSetup();
+    setup_tracked_coord_pairs(NUM_TRACKED_COORD_PAIRS);
+}
+
+function setup_tracked_coord_pairs(num_pairs) {
+    for(var a = 0; a < num_pairs; a++) {
+	tracked_coord_pairs[a] = null;
+    }
 }
 
 //
@@ -23,9 +41,25 @@ function getLocationSetup() {
 
 //-------------------------------------------------------------
 //
+// other helpers
+//
+
+//
+// handling the stack of tracked coords
+//
+function coordsPush(num_pairs, position) {
+    for (var a = 0; a < num_pairs - 1; a++) {
+	tracked_coord_pairs[a] = tracked_coord_pairs[a + 1];
+    }
+    tracked_coord_pairs[num_pairs - 1] = [position.coords.latitude,
+					  position.coords.longitude];
+}
+
+//-------------------------------------------------------------
+//
 // mainLoop
 //
 function mainLoop(position) {
-    alert('Latitude: ' + position.coords.latitude +
-	  'Longitude: ' + position.coords.longitude);
+    coordsPush(NUM_TRACKED_COORD_PAIRS, position);
+    alert(tracked_coord_pairs.toString());
 }

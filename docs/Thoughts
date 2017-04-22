@@ -758,14 +758,14 @@ starts when it does, it ends when it does, and between the two it
 will thump away like a factory, updating, sending to screen, and
 repeat.
 
-Like a computer game, we'll have a Main Loop to which control 
+Like a computer game, we'll have a Main Loop to which control
 always eventually returns. Before the Main Loop is always such set
-up as is needed. There'll be nothing after the Main Loop, as 
+up as is needed. There'll be nothing after the Main Loop, as
 there is no "after" that needs to be addressed: once the browser
 window is closed, the browser itself will handle such clean ups
 as are needed.
 
-The Main Loop in this project is passed as a callback to 
+The Main Loop in this project is passed as a callback to
 geolocation.watchPosition() - whenever the position updates, the
 Main Loop is restarted. (This neatly avoids using GOTO start!)
 
@@ -780,11 +780,11 @@ The Main Loop then ends.
 
 Notice we don't say anything here about the user interface, or the
 user experience. That's because at this point, it doesn't actually
-matter. We might just put straightfoward text. We might have 
+matter. We might just put straightfoward text. We might have
 rambling zombie icons on the screen. We might demonstrate what we
 have as a colour map. None of these choices need be made yet (or
 even by us, in larger projects.) Our purpose for the moment is
-simply to correctly process the input such that output has 
+simply to correctly process the input such that output has
 something to work with.
 
 We do want to know that things are working, however, so we'll add
@@ -793,7 +793,10 @@ we can see things are progressing (although we could equally use
 the developer tools, they're less convenient on portable devices
 which is - after all - the target market.)
 
-We have enough now to get going. We'll call this 
+We have enough now to get going. We'll call this
 server-code/a.html
 1. Get an empty HTML5 present
 2. Get JavaScript running at start up
+3. Have setup handle for watchPosition() changes
+4. Have mainLoop dump those changes into an array as they come
+   in. Let's assume, for now, we'll follow the most recent 10.
