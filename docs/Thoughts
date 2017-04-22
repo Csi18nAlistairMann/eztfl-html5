@@ -800,3 +800,11 @@ server-code/a.html
 3. Have setup handle for watchPosition() changes
 4. Have mainLoop dump those changes into an array as they come
    in. Let's assume, for now, we'll follow the most recent 10.
+5. Now branch if the prediction changes
+
+I've been testing as I go. The faked prediction is different until
+the tracked coords stack is full, and then doesn't change. Both
+desktop and iOS reflect that only showing alerts while nulls
+remain in the stack as it fills.
+
+2017-04-22 02:37
