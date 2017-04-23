@@ -39,11 +39,11 @@ function getLocationSetup() {
     }
 }
 
-function getSpeed(position1, position2, distance) {
+function getSpeedInMetersPerSecond(position1, position2, distance_in_meters) {
     var seconds;
     var mseconds;
 
-    if (distance == 0)
+    if (distance_in_meters == 0)
 	return 0;
 
     mseconds = position2.timestamp - position1.timestamp;
@@ -56,7 +56,7 @@ function getSpeed(position1, position2, distance) {
     if (seconds == 0)
 	return 0;
 
-    return distance * 1000 / seconds;
+    return distance_in_meters / seconds;
 }
 
 //
@@ -97,11 +97,12 @@ function se_getAngle(startLat, startLong, endLat, endLong) {
     return (se_rad2deg(Math.atan2(dLong, dPhi)) + 360.0) % 360.0;
 }
 
-function getDistance(position1, position2) {
-    return se_getDistanceFromLatLonInKm(position1.coords.latitude,
+function getDistanceInMeters(position1, position2) {
+    return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
 					position1.coords.longitude,
 					position2.coords.latitude,
-					position2.coords.longitude);
+					position2.coords.longitude)
+	    * 1000);
 }
 
 function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -150,9 +151,9 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
     // take first and last coord in stack, ignore rest
     var early_coord = [];
     var latest_coord = [];
-    var distance;
+    var distance_in_meters;
     var angle;
-    var speed;
+    var speed_in_meters_per_second;
 
     if (num_coords_tracked < 2)
 	return ['Waiting for more data'];
@@ -161,12 +162,14 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 				      -  num_coords_tracked];
     latest_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS - 1];
 
-    distance = getDistance(early_coord, latest_coord);
+    distance_in_meters = getDistanceInMeters(early_coord, latest_coord);
     angle = getAngle(early_coord, latest_coord);
-    speed = getSpeed(early_coord, latest_coord, distance);
+    speed_in_meters_per_second = getSpeedInMetersPerSecond(early_coord,
+							   latest_coord,
+							   distance_in_meters);
 
-    return ['prediction: d=' + distance + ' a=' + angle
-	   + ' s=' + speed];
+    return ['prediction: d=' + distance_in_meters + ' a=' + angle
+	    + ' s=' + speed_in_meters_per_second];
 }
 
 //
