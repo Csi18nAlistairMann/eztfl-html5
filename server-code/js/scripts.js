@@ -141,7 +141,7 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 	return ['Waiting for more data'];
 
     early_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS
-				      -  num_coords_tracked - 1];
+				      -  num_coords_tracked];
     latest_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS - 1];
 
     distance = getDistance(early_coord, latest_coord);
