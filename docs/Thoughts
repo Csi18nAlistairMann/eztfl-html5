@@ -1118,9 +1118,13 @@ I prefer them there because searching on \n{ is more likely to get
 me a function start than searching on ) { which would get hits on
 conditionals too. I'll make that change now.
 
+	     Lastly in this section I'm going to look at the
+names I've given to stuff, and improve them. For instance, the
+tracked_coord_pairs array no longer does: it tracks the position
+object provided by the OS.
+
 
 
 Upcoming:
 Start considering phase 4: UI
-forgot my style is now function brace on new line :-(
 rename tracked_coord_pairs

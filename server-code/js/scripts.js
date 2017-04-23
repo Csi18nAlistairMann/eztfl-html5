@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const NUM_TRACKED_COORD_PAIRS = 10;
+const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
 const EARTH_RADIUS_IN_KM = 6371;
 const EARLIEST_TIMESTAMP_EVAH = 1; // 1970-01-01T00:00:00.000Z
@@ -21,7 +21,7 @@ const STR_GEOLOC_WAITING = 'Waiting for more data';
 //
 // Globals
 //
-var tracked_coord_pairs = [];
+var tracked_positions = [];
 var last_prediction = [null];
 
 //
@@ -30,13 +30,13 @@ var last_prediction = [null];
 function eztflHtml5_setup()
 {
     getLocationSetup();
-    setup_tracked_coord_pairs(NUM_TRACKED_COORD_PAIRS);
+    setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
-function setup_tracked_coord_pairs(num_pairs)
+function setup_tracked_positions(num_positions)
 {
-    for(var a = 0; a < num_pairs; a++) {
-	tracked_coord_pairs[a] = null;
+    for(var a = 0; a < num_positions; a++) {
+	tracked_positions[a] = null;
     }
 }
 
@@ -119,9 +119,9 @@ function se_getAngle(startLat, startLong, endLat, endLong)
 function getDistanceInMeters(position1, position2)
 {
     return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
-					position1.coords.longitude,
-					position2.coords.latitude,
-					position2.coords.longitude)
+					 position1.coords.longitude,
+					 position2.coords.latitude,
+					 position2.coords.longitude)
 	    * 1000);
 }
 
@@ -163,17 +163,17 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 
 //
-// handling the stack of tracked coords
+// handling the stack of tracked positions
 //
-function coordsPush(num_pairs, position)
+function positionPush(num_positions, position)
 {
     var count = 0;
-    for (var a = 0; a < num_pairs - 1; a++) {
-	tracked_coord_pairs[a] = tracked_coord_pairs[a + 1];
-	if (tracked_coord_pairs[a] != null)
+    for (var a = 0; a < num_positions - 1; a++) {
+	tracked_positions[a] = tracked_positions[a + 1];
+	if (tracked_positions[a] != null)
 	    count++
     }
-    tracked_coord_pairs[num_pairs - 1] = position;
+    tracked_positions[num_positions - 1] = position;
 
     return ++count;
 }
@@ -181,52 +181,52 @@ function coordsPush(num_pairs, position)
 //
 // prediction helpers
 //
-function coordsGetPrediction(num_coords_tracked)
+function positionsGetPrediction(num_positions_tracked)
 {
-    return coordsGetPredictionSimplest(num_coords_tracked);
+    return positionsGetPredictionSimplest(num_positions_tracked);
 }
 
-function coordsGetPredictionSimplest(num_coords_tracked)
+function positionsGetPredictionSimplest(num_positions_tracked)
 {
     // take first and last coord in stack, ignore rest
-    var early_coord = [];
-    var latest_coord = [];
+    var early_position = [];
+    var latest_position = [];
     var distance_in_meters;
     var angle;
     var speed_in_meters_per_second;
 
-    if (num_coords_tracked < 2)
+    if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
 
-    early_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS
-				      -  num_coords_tracked];
-    latest_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS - 1];
+    early_position = tracked_positions[NUM_TRACKED_POSITIONS
+				       -  num_positions_tracked];
+    latest_position = tracked_positions[NUM_TRACKED_POSITIONS - 1];
 
-    distance_in_meters = getDistanceInMeters(early_coord, latest_coord);
-    angle = getAngle(early_coord, latest_coord);
-    speed_in_meters_per_second = getSpeedInMetersPerSecond(early_coord,
-							   latest_coord,
+    distance_in_meters = getDistanceInMeters(early_position, latest_position);
+    angle = getAngle(early_position, latest_position);
+    speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
+							   latest_position,
 							   distance_in_meters);
 
-    return ['Origin: ' + early_coord.coords.latitude + ','
-	    + early_coord.coords.longitude
+    return ['Origin: ' + early_position.coords.latitude + ','
+	    + early_position.coords.longitude
 	    + ' angle: ' + angle + ' '
 	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
-	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_coord.timestamp - early_coord.timestamp)
+	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_position.timestamp - early_position.timestamp)
 					 / 1000))
 	    + ' speed in m/s: ' + speed_in_meters_per_second
-	    + ' newPos from: ' + latest_coord.coords.latitude,
-	    latest_coord.coords.longitude
+	    + ' newPos from: ' + latest_position.coords.latitude,
+	    latest_position.coords.longitude
 	    + ' predicts: ' +
-	    calculateNewPostionFromBearingDistance(latest_coord.coords.latitude,
-						   latest_coord.coords.longitude,
+	    calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+						   latest_position.coords.longitude,
 						   angle,
 						   (speed_in_meters_per_second
 						    * DEFAULT_LOOKAHEAD_SECS
 						   ).toString()) +
 	    ' radius: ' + speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
-							- ((latest_coord.timestamp
-							   - early_coord.timestamp)
+							- ((latest_position.timestamp
+							    - early_position.timestamp)
 							   / 1000))];
 }
 
@@ -296,13 +296,13 @@ function checkPositionValues(position)
 //
 function mainLoop(position)
 {
-    var num_coords_tracked = 0;
+    var num_positions_tracked = 0;
     var prediction = []
 
     position = checkPositionValues(position);
-    num_coords_tracked = coordsPush(NUM_TRACKED_COORD_PAIRS, position);
+    num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
 
-    prediction = coordsGetPrediction(num_coords_tracked);
+    prediction = positionsGetPrediction(num_positions_tracked);
 
     if (!isArrayEqual(prediction, last_prediction)) {
 	alert(prediction.toString());
