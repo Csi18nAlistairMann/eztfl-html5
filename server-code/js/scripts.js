@@ -17,8 +17,9 @@ var last_prediction = [null];
 // setup helpers
 //
 function eztflHtml5_setup() {
-    getLocationSetup();
-    setup_tracked_coord_pairs(NUM_TRACKED_COORD_PAIRS);
+    alert(calculateNewPostionFromBearingDistance(55.7539303,37.6186063, 189.56, 10230).toString());
+    // getLocationSetup();
+    // setup_tracked_coord_pairs(NUM_TRACKED_COORD_PAIRS);
 }
 
 function setup_tracked_coord_pairs(num_pairs) {
@@ -116,6 +117,22 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c; // Distance in km
     return d;
+}
+
+//lat, lng in degrees. Bearing in degrees. Distance in Km
+function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance) {
+    var R = 6371; // Earth Radius in Km
+
+    var lat2 = Math.asin(Math.sin(Math.PI / 180 * lat) * Math.cos(distance / R)
+			 + Math.cos(Math.PI / 180 * lat) * Math.sin(distance / R)
+			 * Math.cos(Math.PI / 180 * bearing));
+    var lon2 = Math.PI / 180 * lng + Math.atan2(Math.sin(Math.PI / 180 * bearing)
+						* Math.sin(distance / R)
+						* Math.cos(Math.PI / 180 * lat ),
+						Math.cos(distance / R)
+						- Math.sin(Math.PI / 180 * lat)
+						* Math.sin(lat2));
+    return [180 / Math.PI * lat2 , 180 / Math.PI * lon2];
 }
 
 //-------------------------------------------------------------
