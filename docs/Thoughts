@@ -1083,6 +1083,28 @@ constants are being calculated. Let's handle thuse.
 
 There are unecessary comments. Remove those too.
 
+Next up, security. While I'm not taking in user input just yet,
+there's still the opportunity for me to be fooled by the OS
+giving me unexpected data. For instance, it turns out that
+the timestamp /could/ be NaN because that's a number type. I've
+already handled it with:
+
+if (!(old_ts >= FIRST_TIMESTAMP_EVAH && old_ts <= LAST_TIMESTAMP_EVAH))
+instead of
+if (old_ts < FIRST_TIMESTAMP_EVAH || old_ts > LAST_TIMESTAMP_EVAH)
+
+because I can't guess if NaN shows up as less than or greater than.
+According to the docs at
+http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.1,
+a Timestamp could be NaN. I'm going to guess that it could be null
+as well. So basically any retrieval of a timestamp from the OS has
+to be checked, and if in error, gets washed to a 1.
+   I now go on to look at others: are coords.latitude and longitude
+both always returned?
+https://www.w3schools.com/html/html5_geolocation.asp says "yes".
+
+
+
 
 Upcoming:
 lok at unexpected input from the OS

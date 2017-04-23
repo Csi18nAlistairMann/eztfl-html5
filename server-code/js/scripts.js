@@ -233,6 +233,14 @@ function checkPositionValues(position) {
     var new_ts = Date.now();
 
     // the timestamp should reflect a date between 1970 and 9999AD
+    if (typeof(new_ts !== 'number')) {
+	new_ts = EARLIEST_TIMESTAMP_EVAH;
+
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
+		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
+	new_ts = EARLIEST_TIMESTAMP_EVAH;
+    }
+
     if (typeof(old_ts !== 'number')) {
 	position.timestamp = new_ts;
 
