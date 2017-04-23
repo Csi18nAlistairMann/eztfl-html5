@@ -56,7 +56,7 @@ function getSpeed(position1, position2, distance) {
     if (seconds == 0)
 	return 0;
 
-    return seconds / distance;
+    return (distance / 1000) / seconds;
 }
 
 //
