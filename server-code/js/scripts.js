@@ -189,8 +189,8 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 	    + early_coord.coords.longitude + ' angle: '
 	    + angle + ' 90s distance: ' + speed_in_meters_per_second
 	    * 90 + ' predicts: ' +
-	    calculateNewPostionFromBearingDistance(early_coord.coords.latitude,
-						   early_coord.coords.longitude,
+	    calculateNewPostionFromBearingDistance(latest_coord.coords.latitude,
+						   latest_coord.coords.longitude,
 						   angle,
 						   (speed_in_meters_per_second
 						    * 90).toString()) +
