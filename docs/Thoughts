@@ -1127,5 +1127,26 @@ object provided by the OS.
 
 Unknown unknown #13: Should we handle sanity failures differently?
 
-Upcoming:
+We now have:
+   96   583  3940 Diary
+   21   114   731 Goals
+   37    79   573 Resources
+ 1131  8214 50131 Thoughts
+   23   134   882 Todo
+   61   298  2090 UnknownUnknowns
+ 1369  9422 58347 total
+1369 lines of documentation, 58kb altogether.
+
+And:
+19	37	405	a.html
+7	8	57	index.html
+2	6	72	sync.sh
+49	125	1284	uu2.html
+84	226	1977	uu7.html
+311	861	7949	js/scripts.js
+472	1263	11744	total
+472 lines of code, of which 142 was from stack exchange but has
+now been edited down and adapted to suit.
+
 Start considering phase 4: UI
+2017-04-23 21:42
