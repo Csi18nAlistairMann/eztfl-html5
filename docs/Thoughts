@@ -932,10 +932,154 @@ wise: the first reading /couldn't/ have those values added. This
 again feeds my thought there's an object lurking here. Add this
 question to ToDo.
 
-2017-04-23 10:26
+2017-04-23 13:23
+
+We should now have the code give us a faked prediction based on
+the values of distance, speed and angle from north (whichever
+north the OS and hardware is observing, ie magnetic vs true.)
+Time to Test!
+Correct for typos etc
+     correct ts to old_ts
+     correct calculating which is earliest available position
+     correct for thinking I was pushing positions to the stack,
+when I'm actually pushing the lat, lon. Correct by changing the
+stack behaviour to take positions instead. Notice that I comment
+out the previous code and will only remove once I'm sure I won't
+go back to the previous store lat, lon method.
+   correct not changing all deg2rad stack exchange calls
+Correct for logic etc
+Findings:
+	First alert is blank
+	Second alert offers d=0 a=0 s=infinity (!)
+	Don't get a third alert.
+Correction: a prediction on one reading is actually handled so
+	    remove the conditional protecting it
+	On the desktop the first and second readings do not
+diverge, so it's correct that distance = 0 and angle = 0.
+However the speed should also be zero, not infinity! Detect for
+zero distance and zero time taken and response with speed = 0
+     Look through code for any other obvious divide by zero
+issues. Not touching the se code here.
+	Third prediction sees d = 0.00556009374253594,
+a = 34.719661589330144 and s = 4972.757885083675 just from
+walking through the house. Reasonable numbers? Code suggests
+d is in Kilometers which suggest I moved 5.5m. I think I moved
+a bunch further than that - about 30m - but of course IDK when
+the calc was started. 34deg seems reasonable. 4972 is wrong
+because the distance is calculated as km, and is reversed
+anyway.
+	After correcting, set up to try again outside walking
+along a known path visible from maps.google.com. I expect
+an a = 201.06, and a more reasonable s around 1.4m/s
+   Test again: d = 0.028 (28 meters), a = 193 (very good!) and
+s = 5.3.
+  Intriguingly on the way back, got a s = 0.00000017 suggesting
+the speed calc is still bad. Distance going negative too? 5.3m
+a second is excessive. Nah, bad calc again. Fix, retest, and
+all good.
+    Now here's trouble: I mix microseconds and seconds, meters
+and kilometers. Reassess with a view to using the first of each
+internally.
+
+2017-04-23 15:41
+
+We're now sure that the prediction routine, currently providing
+faked data, is receiving the data it should do in order to make a
+proper prediction of location.
+
+Our next move is to have the prediction alert to a) where we
+currently are, b) where we're likely to be in 90s, c) the
+distance in meters we're likely to get in the following 30s.
+
+To start, we need something that looks like
+x2,y2 = getLocationForm(position1, angle, speed, timetaken). As
+that looks like it'll be very mathy again, I'll see if it's already
+done like the earlier stack exchange cribs.
+http://stackoverflow.com/questions/19352921/how-to-use-direction-angle-and-speed-to-calculate-next-times-latitude-and-longi
+Looks like it has it but replacing speed and time with distance.
+Fairynuff, we know that too. We'll test it to make sure we get
+what we think we should.
+Test 1: In NYC's Battery Park we have the
+SeaGlass Carousel at 40.7015166,-74.016529 and a
+WW2 memorial at 40.7016833,-74.0160355 a short distance away.
+I make the distance 80, at a bearing about 85deg from true north.
+In theory, calling the routine with 40.7016833, -74.0160355, 85, 80
+should get us very close to the second lat, lon. We get the
+answer 40.76052701040655,-73.0697842978443 which looks reasonable.
+Plugging that new lat, lon into maps.google.com sees us turn up
+some considerable distance away in Long Island.
+     test: The angle was right but the scale is wrong. Km vs m
+again? Yes. Still wrong, but after correcting my own errors
+reading from maps.google.com, the destinations is correct. Let's try
+another test.
+	Moscow's "Red Square" is at 55.7539303, 37.6186063. The
+Southernmost tip of South Africa is at -34.8329779,20.0002739.
+The two are around 10,232km apart, and it looks like an angle
+of 190deg from true. Now bearing in mind that bearings over
+larger distances can diverge, let's see what the formal site
+at sunearthtools.com says: 10213km and 189.56deg. So what does
+the stack exchange code predict? A point roughly 536km due ESE.
+This is probably good enough for the scales I'm intending to
+use.
+	Notice that I tested it by temporarily changing the code
+page to just run the test and terminate.
+     Now remove the test and rewrite to use meters internally.
+
+Looking at a proper test wandering about the house looks reasonable.
+Lets try again outside.
+     Looking at the results, it's clear the prediction is very
+likely showing me the last position, not an actual prediction.
+Sure enough, I'm starting from the earliest available reading when
+it should be the latest. Rewrite again.
+   Test. Much better!
+
+   That said, while the algorithm worked, the assumptions about the
+constants involved may be wrong. It took walking about 45 seconds
+to obtain 10 readings. 90s is basically predicting where I'll be if
+I walk that far again. Instead we'll use 180s: Where I can get to
+in 3mins. 30s as a radius is also too small. It looks like it
+should be 180s minus the seconds I've walked thus far. In this
+manner, a bus stop I've just arrived at while walking would also
+be included.
+   I already know that distance_in_meters is the distance I've
+already travelled, and speed_in_meters_per_second is how fast I
+did it. I can calculate that radius is:
+
+speed_in_meters_per_second * 180 - ((latest.ts - earliest.ts) * speed_in_meters_per_second)
+
+So if I walk at 1.5m/s, and it takes me 45s to get to the edge
+of the radius, then the radius
+
+1.5 * 180 - ((45 - 0) * 1.5)
+270 - (45 * 1.5)
+270 - 67.5
+= 202.5
+
+That can be nicely simplified too:
+speed_in_meters_per_second * (180 - (latest.ts - earliest.ts))
+1.5 * (180 - time so far)
+
+Test this about the house: Radius of -2761. Not useful. Where
+the maths wrong? I forgot the timestamps are milliseconds. Fix
+and try again. 41 meter radius is reasonable from two readings
+walking around the house. Looks good. Try walking up the road
+and ten readings.
+    Still doesn't look right.
+Better. But sufficient?
+Origin is right
+newPos is right
+Angle is right
+Projected distance at 500m is about right for 3mins/180s but
+ fails to include I already walked some of that
+Speed is 2.8, but was down at 0.6?
+radius at 379 is right.
+       So correct for adding 180 second onto walking time already.
+try again. ALOT better.
+
+2017-04-23 19:47
 
 Upcoming:
-replace the faked prediction with the real one
+constants
 lok at unexpected input from the OS
 Start considering phase 4: UI
 forgot my style is now function brace on new line :-(

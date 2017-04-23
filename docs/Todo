@@ -14,6 +14,7 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 
 3. Improve handling of milliseconds timestamp being divided by
    1000 to discover seconds
+   [closed] using mseconds except as needed 23 april 2017 1953
 
 4. Where's the object? Pushing the position on to the stack
    automatically updating the various others, rather than processing

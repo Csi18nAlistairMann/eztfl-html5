@@ -190,8 +190,8 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 	    + early_coord.coords.longitude
 	    + ' angle: ' + angle + ' '
 	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
-	    * (DEFAULT_LOOKAHEAD_SECS
-	       - ((latest_coord.timestamp - early_coord.timestamp) / 1000))
+	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_coord.timestamp - early_coord.timestamp)
+					 / 1000))
 	    + ' speed in m/s: ' + speed_in_meters_per_second
 	    + ' newPos from: ' + latest_coord.coords.latitude,
 	    latest_coord.coords.longitude
