@@ -173,7 +173,7 @@ function checkPositionValues(position) {
     var new_ts = Date.now();
 
     // the timestamp should reflect a date between 1970 and 9999AD
-    if (typeof(ts !== 'number')) {
+    if (typeof(old_ts !== 'number')) {
 	position.timestamp = new_ts;
 
     } else if (!(old_ts >= 1 && old_ts <= 253402300799999)) {
