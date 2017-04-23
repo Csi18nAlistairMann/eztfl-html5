@@ -847,6 +847,40 @@ it sufficient that any arbitrary UX implementation could be considered.
    9. Unknown unknown #11: is the position.timestamp available at all
    and if not, what would I need to store instead?
 
+2017-04-23 11:25
+Unknown unknown #9: are heading and bearing interchangable? No,
+according to:
+https://english.stackexchange.com/questions/54657/in-navigation-whats-the-difference-between-bearing-heading-direction-and-co
+http://forums.groundspeak.com/GC/index.php?showtopic=137469
+Bearing as the direction to the target, regardless what traveller is
+doing. Heading as what the traveller is doing, regardless of where
+the target is. The two can have the same value by coincidence.
+
+I particularly like example at:
+http://forums.groundspeak.com/GC/index.php?s=6cfc9af9a0d03709e9c028fe4594fec7&showtopic=137469&view=findpost&p=2324816
+"Your GPS says the cache is on a bearing of 180 from you (south). You
+might be facing or slowly walking east, or west or north, but the BEARING
+to the cache is still south, despite where you are currently HEADING.
+   Now, you start walking south. For the moment, both the BEARING and
+your HEADING are the same.
+	As you get closer, you continue walking on a due south HEADING but
+you miss going directly to the cache because you angled off a wee bit. The
+"GoTo" needle nows swings over until it is pointing east. Your heading did
+not change, but you have a new bearing."
+
+What does this mean for this project? The intent is that the browser
+reports on options that lie ahead of the user. Thus, when the user changes
+direction, the target changes too, so heading and bearing values are one
+and the same.
+
+Back to the code, the name heading or bearing applies, if at all, to what
+the result is used for - the function is identical in either case. So what
+word do we have to encompass both heading and bearing? hearing? beading?
+After reading https://en.wikipedia.org/wiki/Bearing_(navigation) I think
+I'll use 'angle' and save heading/bearing as names for later.
+
+
+
 Upcoming:
 replace the faked prediction with the real one
 lok at unexpected input from the OS

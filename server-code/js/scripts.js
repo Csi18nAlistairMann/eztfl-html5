@@ -55,14 +55,14 @@ function se_rad2deg(n) {
     return n * (180 / Math.PI);
 }
 
-function getHeading(position1, position2) {
-    return se_getBearing(position1.coords.latitude,
-			 position1.coords.longitude,
-			 position2.coords.latitude,
-			 position2.coords.longitude);
+function getAngle(position1, position2) {
+    return se_getAngle(position1.coords.latitude,
+		       position1.coords.longitude,
+		       position2.coords.latitude,
+		       position2.coords.longitude);
 }
 
-function se_getBearing(startLat, startLong, endLat, endLong) {
+function se_getAngle(startLat, startLong, endLat, endLong) {
     startLat = se_deg2rad(startLat);
     startLong = se_deg2rad(startLong);
     endLat = se_deg2rad(endLat);
@@ -134,7 +134,7 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
     var early_coord = [];
     var latest_coord = [];
     var distance;
-    var heading;
+    var angle;
     var speed;
 
     if (num_coords_tracked < 2)
@@ -145,10 +145,10 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
     latest_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS - 1];
 
     distance = getDistance(early_coord, latest_coord);
-    heading = getHeading(early_coord, latest_coord);
+    angle = getAngle(early_coord, latest_coord);
     speed = getSpeed(early_coord, latest_coord, distance);
 
-    return ['prediction: d=' + distance + ' h=' + heading
+    return ['prediction: d=' + distance + ' a=' + angle
 	   + ' s=' + speed];
 }
 

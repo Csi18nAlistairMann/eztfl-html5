@@ -76,3 +76,5 @@ Implement core: receive data and process it ready for output
 
 23 April 2017
 Replace faked prediction with actual prediction
+Discover Unknown Unknown #8: Use of term Heading vs Bearing, resolve
+	 by using "Angle" instead
