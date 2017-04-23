@@ -117,8 +117,10 @@ function coordsPush(num_pairs, position) {
 	if (tracked_coord_pairs[a] != null)
 	    count++
     }
-    tracked_coord_pairs[num_pairs - 1] = [position.coords.latitude,
-					  position.coords.longitude];
+    // tracked_coord_pairs[num_pairs - 1] = [position.coords.latitude,
+    // 					  position.coords.longitude];
+    tracked_coord_pairs[num_pairs - 1] = position;
+
     return ++count;
 }
 
