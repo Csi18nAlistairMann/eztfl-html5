@@ -879,7 +879,37 @@ word do we have to encompass both heading and bearing? hearing? beading?
 After reading https://en.wikipedia.org/wiki/Bearing_(navigation) I think
 I'll use 'angle' and save heading/bearing as names for later.
 
+Unknown unknown #10: Is the position.timestamp in seconds?
+Adapting
+https://www.w3schools.com/html/tryit.asp?filename=tryhtml5_geolocation_watchposition
+to suit certainly sees a unix timestamp come back. As another check the
+APIs formal documentation at https://dev.w3.org/geo/api/spec-source.html
+says the timestamp is of type DOMTimeStamp, which is formally noted
+at https://www.w3.org/TR/WebIDL-1/#common-DOMTimeStamp as being a
+millisecond timestamp (TS).
+I almost missed that millisecond reference! I got a TS of 1492946407618
+and almost missed it being longer than the unix timestamp 1492946317
 
+So, no: position.timestamp is in milliseconds since epoch. Code would
+need to divide by 1000 (or ignore last three chars) to reach the
+seconds since epoch.
+
+Correct existing code to account for milliseconds with massively
+inefficient division by 1000 then shunt off improving to the Todo doc.
+Why? Because the goal right now is to get the code behaviour effective,
+not efficient.
+
+Effective vs Efficient
+Code is effective if it accomplishes the goals laid out for it.
+Code is more efficient when the same behaviour is obtained with fewer
+     processing cycles.
+The project being Effective is desirable before Efficiency is
+    looked at.
+We want something to sell before we want something fast to sell.
+Effective doesn't come at the expense of security, however. Nor does
+it prevent us using efficient solutions if one is immediately to
+hand. Effective before Efficient only demands we don't spend /extra/
+time at this stage improving something that has yet to be finished!
 
 Upcoming:
 replace the faked prediction with the real one

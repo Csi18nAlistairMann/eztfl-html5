@@ -76,5 +76,8 @@ Implement core: receive data and process it ready for output
 
 23 April 2017
 Replace faked prediction with actual prediction
-Discover Unknown Unknown #8: Use of term Heading vs Bearing, resolve
+Discover Unknown Unknown #9: Use of term Heading vs Bearing, resolve
 	 by using "Angle" instead
+Discover Unknown Unknown #10: position.timestamp is milliseconds since
+	 epoch.
+Effective vs efficient code

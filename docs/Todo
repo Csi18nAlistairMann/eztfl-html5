@@ -11,3 +11,6 @@ I'll be and go right ahead to discovering bus stops in the nearest
 1400m.
 Or, could tell user to wait until accuracy is better.
 Or if 65m AND iOS, suggest user looks at location services allowed
+
+3. Improve handling of milliseconds timestamp being divided by
+   1000 to discover seconds
