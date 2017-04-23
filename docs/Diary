@@ -72,3 +72,7 @@ Create docs/Todo
 
 2216
 Consider phase 3: implementation
+Implement core: receive data and process it ready for output
+
+23 April 2017
+Replace faked prediction with actual prediction

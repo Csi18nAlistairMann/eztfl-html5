@@ -41,3 +41,14 @@ could cause potential workload in later improving the project.
 
 8. More accurately accounting for location.
    [closed] to go into docs/Todo
+
+9. Are "heading" and "bearing" interchangable? Reassess and if
+   required, rewrite to use just one term
+   [ ]
+
+10. Is the position.timestamp in seconds?
+    [ ]
+
+11. Handle of the position.timestamp is not present in the
+    position
+    [ ]

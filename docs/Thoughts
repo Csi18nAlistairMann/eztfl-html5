@@ -808,3 +808,46 @@ desktop and iOS reflect that only showing alerts while nulls
 remain in the stack as it fills.
 
 2017-04-22 02:37
+
+2017-04-23 10:26
+Continuing coding of the core processing.
+As reminder, I'm looking only to bring in data from the OS and process
+it sufficient that any arbitrary UX implementation could be considered.
+
+6. Replace faked prediction with an actual prediction
+   Notice that I've reworked the code from stack exchange above to fit
+   this project.
+   1. I've cleaned up the presentation to match my own style (spaces
+   after commas, for instance)
+   2. I've renamed functions to express more about what they do and
+   prefixed "se_" to indicate the code's source
+   3. I removed a function that duplicated another
+   4. I added a function to translate our own use of the geolocation
+   position as the fundamental unit to the lat/lon the stack exchnage
+   code is expecting.
+   This /could/ be done by rewriting the stack exchange code, but my
+   preference is to minimise changes to code I didn't myself write and
+   known I don't fully understand.
+   5. Unknown unknown #9: are "heading" and "bearing" interchangeable?
+   Reassess code in light of answer. If poss, write to use only one
+   term: programmers should be consistent in names used for single
+   purposes.
+   6. Not comfortable with getSpeed() providing distance in additon to
+   two positions as that possibly allows an error: what if position1
+   and position2 change from when distance was originally calculated?
+   This adds more weight to my feeling I should process all this once
+   and store in an object or array, rather than process them
+   consecutively.
+   7. Also not comfortable with the naming just yet: getSpeed() here
+   is assessing the speed manually, not from an accelerometer. I will
+   need to distinguish between the two.
+   8. Unknown unknown #10: is the position.timestamp in seconds? It
+   should be. However https://www.w3schools.com/html/html5_geolocation.asp
+   defines it as The "date/time of the response"
+   9. Unknown unknown #11: is the position.timestamp available at all
+   and if not, what would I need to store instead?
+
+Upcoming:
+replace the faked prediction with the real one
+lok at unexpected input from the OS
+Start considering phase 4: UI
