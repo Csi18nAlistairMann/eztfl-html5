@@ -7,6 +7,12 @@
 //
 const NUM_TRACKED_COORD_PAIRS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
+const EARTH_RADIUS_IN_KM = 6371;
+const EARLIEST_TIMESTAMP_EVAH = 1; // 1970-01-01T00:00:00.000Z
+const LAST_TIMESTAMP_EVAH = 253402300799999; // 9999-12-31T23:59:59.999Z
+
+const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
+const STR_GEOLOC_WAITING = 'Waiting for more data';
 
 //
 // Globals
@@ -36,7 +42,7 @@ function getLocationSetup() {
 	navigator.geolocation.watchPosition(mainLoop);
 
     } else {
-	alert('Geolocation is not supported by this browser.');
+	alert(STR_GEOLOC_NOT_SUPPORTED);
     }
 }
 
@@ -107,7 +113,7 @@ function getDistanceInMeters(position1, position2) {
 }
 
 function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Radius of the earth in km
+    var R = EARTH_RADIUS_IN_KM;
     var dLat = se_deg2rad(lat2 - lat1);  // deg2rad below
     var dLon = se_deg2rad(lon2 - lon1);
     var a =
@@ -120,7 +126,7 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 }
 
 function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters) {
-    var R = 6371; // Earth Radius in Km
+    var R = EARTH_RADIUS_IN_KM;
 
     var distance_in_kilometers = distance_in_meters / 1000;
 
@@ -174,7 +180,7 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
     var speed_in_meters_per_second;
 
     if (num_coords_tracked < 2)
-	return ['Waiting for more data'];
+	return [STR_GEOLOC_WAITING];
 
     early_coord = tracked_coord_pairs[NUM_TRACKED_COORD_PAIRS
 				      -  num_coords_tracked];
@@ -232,7 +238,8 @@ function checkPositionValues(position) {
     if (typeof(old_ts !== 'number')) {
 	position.timestamp = new_ts;
 
-    } else if (!(old_ts >= 1 && old_ts <= 253402300799999)) {
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
+		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
 	position.timestamp = new_ts;
     }
 

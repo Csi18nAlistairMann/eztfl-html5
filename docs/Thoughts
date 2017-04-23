@@ -1078,6 +1078,9 @@ try again. ALOT better.
 
 2017-04-23 19:47
 
+Code hygiene. Looking through, there are a number of places where
+constants are being calculated. Let's handle thuse.
+
 Upcoming:
 constants
 lok at unexpected input from the OS
