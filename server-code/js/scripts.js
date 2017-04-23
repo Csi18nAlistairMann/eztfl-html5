@@ -185,8 +185,18 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 							   latest_coord,
 							   distance_in_meters);
 
-    return ['prediction: d=' + distance_in_meters + ' a=' + angle
-	    + ' s=' + speed_in_meters_per_second];
+    return ['Origin: ' + early_coord.coords.latitude + ','
+	    + early_coord.coords.longitude + ' angle: '
+	    + angle + ' 90s distance: ' + speed_in_meters_per_second
+	    * 90 + ' predicts: ' +
+	    calculateNewPostionFromBearingDistance(early_coord.coords.latitude,
+						   early_coord.coords.longitude,
+						   angle,
+						   (speed_in_meters_per_second
+						    * 90).toString()) +
+	    ' 30s radius: ' + speed_in_meters_per_second
+	    * 30];
+
 }
 
 //
