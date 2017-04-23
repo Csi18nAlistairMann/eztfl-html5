@@ -27,12 +27,14 @@ var last_prediction = [null];
 //
 // setup helpers
 //
-function eztflHtml5_setup() {
+function eztflHtml5_setup()
+{
     getLocationSetup();
     setup_tracked_coord_pairs(NUM_TRACKED_COORD_PAIRS);
 }
 
-function setup_tracked_coord_pairs(num_pairs) {
+function setup_tracked_coord_pairs(num_pairs)
+{
     for(var a = 0; a < num_pairs; a++) {
 	tracked_coord_pairs[a] = null;
     }
@@ -41,7 +43,8 @@ function setup_tracked_coord_pairs(num_pairs) {
 //
 // geolocation helpers
 //
-function getLocationSetup() {
+function getLocationSetup()
+{
     if (navigator.geolocation) {
 	navigator.geolocation.watchPosition(mainLoop);
 
@@ -50,7 +53,8 @@ function getLocationSetup() {
     }
 }
 
-function getSpeedInMetersPerSecond(position1, position2, distance_in_meters) {
+function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
+{
     var seconds;
     var mseconds;
 
@@ -73,22 +77,26 @@ function getSpeedInMetersPerSecond(position1, position2, distance_in_meters) {
 //
 // trigonometry helpers
 //
-function se_deg2rad(deg) {
+function se_deg2rad(deg)
+{
     return deg * (Math.PI / 180)
 }
 
-function se_rad2deg(n) {
+function se_rad2deg(n)
+{
     return n * (180 / Math.PI);
 }
 
-function getAngle(position1, position2) {
+function getAngle(position1, position2)
+{
     return se_getAngle(position1.coords.latitude,
 		       position1.coords.longitude,
 		       position2.coords.latitude,
 		       position2.coords.longitude);
 }
 
-function se_getAngle(startLat, startLong, endLat, endLong) {
+function se_getAngle(startLat, startLong, endLat, endLong)
+{
     startLat = se_deg2rad(startLat);
     startLong = se_deg2rad(startLong);
     endLat = se_deg2rad(endLat);
@@ -108,7 +116,8 @@ function se_getAngle(startLat, startLong, endLat, endLong) {
     return (se_rad2deg(Math.atan2(dLong, dPhi)) + 360.0) % 360.0;
 }
 
-function getDistanceInMeters(position1, position2) {
+function getDistanceInMeters(position1, position2)
+{
     return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
 					position1.coords.longitude,
 					position2.coords.latitude,
@@ -116,7 +125,8 @@ function getDistanceInMeters(position1, position2) {
 	    * 1000);
 }
 
-function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
+{
     var R = EARTH_RADIUS_IN_KM;
     var dLat = se_deg2rad(lat2 - lat1);
     var dLon = se_deg2rad(lon2 - lon1);
@@ -129,7 +139,8 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     return d;
 }
 
-function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters) {
+function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters)
+{
     var R = EARTH_RADIUS_IN_KM;
 
     var distance_in_kilometers = distance_in_meters / 1000;
@@ -154,7 +165,8 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // handling the stack of tracked coords
 //
-function coordsPush(num_pairs, position) {
+function coordsPush(num_pairs, position)
+{
     var count = 0;
     for (var a = 0; a < num_pairs - 1; a++) {
 	tracked_coord_pairs[a] = tracked_coord_pairs[a + 1];
@@ -169,11 +181,13 @@ function coordsPush(num_pairs, position) {
 //
 // prediction helpers
 //
-function coordsGetPrediction(num_coords_tracked) {
+function coordsGetPrediction(num_coords_tracked)
+{
     return coordsGetPredictionSimplest(num_coords_tracked);
 }
 
-function coordsGetPredictionSimplest(num_coords_tracked) {
+function coordsGetPredictionSimplest(num_coords_tracked)
+{
     // take first and last coord in stack, ignore rest
     var early_coord = [];
     var latest_coord = [];
@@ -219,7 +233,8 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 //
 // array comparison
 //
-function isArrayEqual(arr1, arr2) {
+function isArrayEqual(arr1, arr2)
+{
     if (arr1.length != arr2.length)
 	return false;
     for(var a = 0; a < arr1.length; a++) {
@@ -232,7 +247,8 @@ function isArrayEqual(arr1, arr2) {
 //
 // sanity checks for the position, also replace bad/missing vals
 //
-function checkPositionValues(position) {
+function checkPositionValues(position)
+{
     var old_ts = position.timestamp;
     var new_ts = Date.now();
 
@@ -278,7 +294,8 @@ function checkPositionValues(position) {
 //
 // mainLoop
 //
-function mainLoop(position) {
+function mainLoop(position)
+{
     var num_coords_tracked = 0;
     var prediction = []
 

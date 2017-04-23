@@ -1108,7 +1108,15 @@ function checkPositionValues(), because it's the position abject
 that's the one new input each time the Main Loop starts. We'll
 later add speed, accuracy and other checks, but not just yet as
 we don't actually use them just yet.
-
+   A point of style is that I fallen into the bad habit of putting
+function open braces on the same line as the function when I prefer
+to see them at the start of the next line
+function() {   // nope
+function()     // yep
+{
+I prefer them there because searching on \n{ is more likely to get
+me a function start than searching on ) { which would get hits on
+conditionals too. I'll make that change now.
 
 
 
