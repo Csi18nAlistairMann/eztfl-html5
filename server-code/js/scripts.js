@@ -196,9 +196,7 @@ function mainLoop(position) {
     position = checkPositionValues(position);
     num_coords_tracked = coordsPush(NUM_TRACKED_COORD_PAIRS, position);
 
-    if (num_coords_tracked > 1) {
-	prediction = coordsGetPrediction(num_coords_tracked);
-    }
+    prediction = coordsGetPrediction(num_coords_tracked);
 
     if (!isArrayEqual(prediction, last_prediction)) {
 	alert(prediction.toString());
