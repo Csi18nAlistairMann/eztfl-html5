@@ -911,7 +911,31 @@ it prevent us using efficient solutions if one is immediately to
 hand. Effective before Efficient only demands we don't spend /extra/
 time at this stage improving something that has yet to be finished!
 
+Unknown unknown #11: handle if position.timestamp is not present.
+There's no documentation on what value position.timestamp has when
+the ts is not available. Probably null. Instead, I'm going to test
+if the value is /reasonable/, and if not, replace it with a self-
+generated value. The TS is reasonable if it is a integer > 0. If
+not an integer, or <= 0, then it's not reasonable. Similarly, we
+don't want a number larger than the ts for 9999-12-31 23:59:59,
+253402300799000.
+
+Unknown unknown #12. Can JS safely process 253402300799000?
+1.7976931348623157e+308 is apparently the largest number that can
+be held so I'm well within bounds.
+
+Should we use this opportunity to handle .speed and .heading not
+being present? Not yet: we already handle them in the code so
+we're effective. "Handling" here would mean getting .speed and
+.heading replaced in the position object. I'm not sure that's
+wise: the first reading /couldn't/ have those values added. This
+again feeds my thought there's an object lurking here. Add this
+question to ToDo.
+
+2017-04-23 10:26
+
 Upcoming:
 replace the faked prediction with the real one
 lok at unexpected input from the OS
 Start considering phase 4: UI
+forgot my style is now function brace on new line :-(

@@ -165,6 +165,24 @@ function isArrayEqual(arr1, arr2) {
     return true;
 }
 
+//
+// sanity checks for the position, also replace bad/missing vals
+//
+function checkPositionValues(position) {
+    var old_ts = position.timestamp;
+    var new_ts = Date.now();
+
+    // the timestamp should reflect a date between 1970 and 9999AD
+    if (typeof(ts !== 'number')) {
+	position.timestamp = new_ts;
+
+    } else if (!(old_ts >= 1 && old_ts <= 253402300799999)) {
+	position.timestamp = new_ts;
+    }
+
+    return position;
+}
+
 //-------------------------------------------------------------
 //
 // mainLoop
@@ -173,6 +191,7 @@ function mainLoop(position) {
     var num_coords_tracked = 0;
     var prediction = []
 
+    position = checkPositionValues(position);
     num_coords_tracked = coordsPush(NUM_TRACKED_COORD_PAIRS, position);
 
     if (num_coords_tracked > 1) {

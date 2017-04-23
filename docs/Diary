@@ -80,4 +80,9 @@ Discover Unknown Unknown #9: Use of term Heading vs Bearing, resolve
 	 by using "Angle" instead
 Discover Unknown Unknown #10: position.timestamp is milliseconds since
 	 epoch.
+Discover Unknown Unknown #11: handling timestamp not available
+Discover Unknown Unknown #12: Can JS handle the number 253402300799000
+	 which representst the millisecond time for 9999-12-31
+	 23:59:59
 Effective vs efficient code
+Consider that there's an object lurking here

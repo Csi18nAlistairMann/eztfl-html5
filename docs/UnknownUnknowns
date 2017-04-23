@@ -51,4 +51,7 @@ could cause potential workload in later improving the project.
 
 11. Handle of the position.timestamp is not present in the
     position
-    [ ]
+    [x] Unless a reasonable value, replace with own ts
+
+12. Can JS safely store and process 253402300799000?
+    [x] yes: JS will go to 1.7976931348623157e+308
