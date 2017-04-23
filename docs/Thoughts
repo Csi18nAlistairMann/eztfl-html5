@@ -1081,8 +1081,10 @@ try again. ALOT better.
 Code hygiene. Looking through, there are a number of places where
 constants are being calculated. Let's handle thuse.
 
+There are unecessary comments. Remove those too.
+
+
 Upcoming:
-constants
 lok at unexpected input from the OS
 Start considering phase 4: UI
 forgot my style is now function brace on new line :-(

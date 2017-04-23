@@ -114,7 +114,7 @@ function getDistanceInMeters(position1, position2) {
 
 function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
     var R = EARTH_RADIUS_IN_KM;
-    var dLat = se_deg2rad(lat2 - lat1);  // deg2rad below
+    var dLat = se_deg2rad(lat2 - lat1);
     var dLon = se_deg2rad(lon2 - lon1);
     var a =
 	Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -157,8 +157,6 @@ function coordsPush(num_pairs, position) {
 	if (tracked_coord_pairs[a] != null)
 	    count++
     }
-    // tracked_coord_pairs[num_pairs - 1] = [position.coords.latitude,
-    // 					  position.coords.longitude];
     tracked_coord_pairs[num_pairs - 1] = position;
 
     return ++count;
