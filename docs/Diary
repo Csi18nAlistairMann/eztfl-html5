@@ -91,3 +91,6 @@ Practice some code hygiene
 	 - constants
 	 - comments
 	 - misunderstanding input from OS
+	 - rename to reflect new understanding and use
+Discover Unknown Unknown #13: Should we handle sanity failures of
+	 position differently? Right now we zero and carry on

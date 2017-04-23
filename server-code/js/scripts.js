@@ -106,7 +106,7 @@ function se_getAngle(startLat, startLong, endLat, endLong)
 
     var dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0)
 			/ Math.tan(startLat / 2.0 + Math.PI / 4.0));
-    if (Math.abs(dLong) > Math.PI){
+    if (Math.abs(dLong) > Math.PI) {
 	if (dLong > 0.0)
 	    dLong = -(2.0 * Math.PI - dLong);
 	else
@@ -270,7 +270,7 @@ function checkPositionValues(position)
     }
 
     // the latitude and longitude should be values between
-    // 0 and 360
+    // -90 & +90, -180 & +180 respectively
     if (typeof(position.latitude !== 'number')) {
 	position.latitude = 0;
 

@@ -1123,8 +1123,9 @@ names I've given to stuff, and improve them. For instance, the
 tracked_coord_pairs array no longer does: it tracks the position
 object provided by the OS.
 
+2017-04-23 21:17
 
+Unknown unknown #13: Should we handle sanity failures differently?
 
 Upcoming:
 Start considering phase 4: UI
-rename tracked_coord_pairs
