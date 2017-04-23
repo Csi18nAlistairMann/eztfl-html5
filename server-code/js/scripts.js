@@ -10,6 +10,10 @@ const DEFAULT_LOOKAHEAD_SECS = 180;
 const EARTH_RADIUS_IN_KM = 6371;
 const EARLIEST_TIMESTAMP_EVAH = 1; // 1970-01-01T00:00:00.000Z
 const LAST_TIMESTAMP_EVAH = 253402300799999; // 9999-12-31T23:59:59.999Z
+const LOWEST_LATITUDE = -90.0;
+const HIGHEST_LATITUDE = 90.0;
+const LOWEST_LONGITUDE = -180.0;
+const HIGHEST_LONGITUDE = 180.0;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -247,6 +251,24 @@ function checkPositionValues(position) {
     } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
 		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
 	position.timestamp = new_ts;
+    }
+
+    // the latitude and longitude should be values between
+    // 0 and 360
+    if (typeof(position.latitude !== 'number')) {
+	position.latitude = 0;
+
+    } else if (!(position.latitude >= LOWEST_LATITUDE
+		 && position.latitude <= HIGHEST_LATITUDE)) {
+	position.latitude = 0;
+    }
+
+    if (typeof(position.longitude !== 'number')) {
+	position.longitude = 0;
+
+    } else if (!(position.longitude >= LOWEST_LONGITUDE
+		 && position.longitude <= HIGHEST_LONGITUDE)) {
+	position.longitude = 0;
     }
 
     return position;

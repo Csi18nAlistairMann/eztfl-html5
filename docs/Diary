@@ -88,3 +88,6 @@ Effective vs efficient code
 Consider that there's an object lurking here
 Complete work effecting a real prediction
 Practice some code hygiene
+	 - constants
+	 - comments
+	 - misunderstanding input from OS

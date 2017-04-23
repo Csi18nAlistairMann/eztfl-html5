@@ -1101,12 +1101,18 @@ as well. So basically any retrieval of a timestamp from the OS has
 to be checked, and if in error, gets washed to a 1.
    I now go on to look at others: are coords.latitude and longitude
 both always returned?
-https://www.w3schools.com/html/html5_geolocation.asp says "yes".
+https://www.w3schools.com/html/html5_geolocation.asp says "yes". I
+check them out too.
+      In fact, all the readings from the OS pass through the early
+function checkPositionValues(), because it's the position abject
+that's the one new input each time the Main Loop starts. We'll
+later add speed, accuracy and other checks, but not just yet as
+we don't actually use them just yet.
 
 
 
 
 Upcoming:
-lok at unexpected input from the OS
 Start considering phase 4: UI
 forgot my style is now function brace on new line :-(
+rename tracked_coord_pairs
