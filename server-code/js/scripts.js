@@ -6,6 +6,7 @@
 // Constants
 //
 const NUM_TRACKED_COORD_PAIRS = 10;
+const DEFAULT_LOOKAHEAD_SECS = 180;
 
 //
 // Globals
@@ -186,17 +187,25 @@ function coordsGetPredictionSimplest(num_coords_tracked) {
 							   distance_in_meters);
 
     return ['Origin: ' + early_coord.coords.latitude + ','
-	    + early_coord.coords.longitude + ' angle: '
-	    + angle + ' 90s distance: ' + speed_in_meters_per_second
-	    * 90 + ' predicts: ' +
+	    + early_coord.coords.longitude
+	    + ' angle: ' + angle + ' '
+	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
+	    * (DEFAULT_LOOKAHEAD_SECS
+	       - ((latest_coord.timestamp - early_coord.timestamp) / 1000))
+	    + ' speed in m/s: ' + speed_in_meters_per_second
+	    + ' newPos from: ' + latest_coord.coords.latitude,
+	    latest_coord.coords.longitude
+	    + ' predicts: ' +
 	    calculateNewPostionFromBearingDistance(latest_coord.coords.latitude,
 						   latest_coord.coords.longitude,
 						   angle,
 						   (speed_in_meters_per_second
-						    * 90).toString()) +
-	    ' 30s radius: ' + speed_in_meters_per_second
-	    * 30];
-
+						    * DEFAULT_LOOKAHEAD_SECS
+						   ).toString()) +
+	    ' radius: ' + speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
+							- ((latest_coord.timestamp
+							   - early_coord.timestamp)
+							   / 1000))];
 }
 
 //
