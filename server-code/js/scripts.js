@@ -40,7 +40,22 @@ function getLocationSetup() {
 }
 
 function getSpeed(position1, position2, distance) {
-    var seconds = (position2.timestamp - position1.timestamp) / 1000;
+    var seconds;
+    var mseconds;
+
+    if (distance == 0)
+	return 0;
+
+    mseconds = position2.timestamp - position1.timestamp;
+
+    if (mseconds == 0)
+	return 0;
+
+    seconds = mseconds / 1000;
+
+    if (seconds == 0)
+	return 0;
+
     return seconds / distance;
 }
 
