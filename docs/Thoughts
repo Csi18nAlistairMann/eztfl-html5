@@ -1148,5 +1148,265 @@ And:
 472 lines of code, of which 142 was from stack exchange but has
 now been edited down and adapted to suit.
 
-Start considering phase 4: UI
+Shortly: Start considering phase 4: UI
 2017-04-23 21:42
+2017-04-23 21:51
+Time to reflect on a few things.
+First, my source thus far is very much an example of procedural programming.
+However there's very clearly a role of an Object-oriented approach
+particularly surrounding the tracked_positions variable. For example, it
+would be effective to arrange that whenever tracked_positions receives
+a new reading from the OS, there's a cascade of effects including the
+sanity check and speed right down to the prediction to be offered. Such an
+approach would see the Main Loop, right now, become one line long.
+
+So why didn't I choose to solve it with an object? This has to be because
+I didn't see the problem as an object at the beginning, I saw it as a
+question of coordinates as reflected by the original tracked_coords_pairs
+name used for the same purpose. It could be I didn't see it that way
+because I didn't fully appreciate the objectness of JavaScript, and that
+might because I originally learned in the structure programming style. It
+could well be that a different programmer would have gone straight to
+objects. Neither approach is wrong, if both approaches result in
+effective code.
+
+Now that the approach has been laid down as a procedural program, could
+a refactoring into the object-oriented style work? The answer has to be
+"yes". Indeed it may also be preferable that it does, given we have made
+no demands yet on it from a UI point of view, and the UI itself would be
+more than happy to treat the current State of all these positions as an
+object whose results can be exposed by methods.
+
+That said, I mentioned earlier that efficient code in general should be
+for further down the line: it's more important to get good code out now
+than to get perfect code out but later.
+
+Refactoring to use the object oriented style goes into the Todo.
+
+Second, Now there's implementation I can forsee a number of problems on
+the horizon.
+1. The effect of the predict and radius implementation is that it'll
+   change every 4 or 5 seconds so if the users' actions change (for
+   instance by slowing down) then the predict and radius is likely
+   to change too, potentially seeing bus stops come into and leave
+   range.
+   Not that there's anything wrong with that. But this does suggest a
+   new layer between processing inputs and handling outputs where we
+   slow down how fast changes are propagated. For instance, by
+   maintaining observations on results that may previouslt have left
+   range; or by supplying a "stop updating" button.
+2. Second, We could possibly look again at the bubbles we invented then
+   discarded earlier: if the radius encompasses the user's face but
+   not the back of his head, then the response may not include the bus
+   stop the user is currently standing at, Thus we should at least
+   consider a second bubble with a radius matching the other side of
+   the road. Thus:
+
+		     _aQQQQQ6a
+		   _jQP?   )?QQa
+		  _QP'        ?Q6
+		 _QP           )W6
+		 QP             )Wf
+		]Q               ]Q
+		Qf                Qf
+	       _Q                 ]6
+	       ]P                 )W
+	       ]f        C         Q
+	       ]6aaa/              Q
+	      _QQP?4QQ/            Q
+	     _QQQ    4Q/          ]Q
+	    _QP Q/    4Q/         jf
+	    ]P  46     4f        _Q'
+	    Qf  )      ]Q        jP
+	    Q     B     Q       jQ'
+	    Q       /   Q      jQ'
+	    Qf     4Q6/]Q    aQQ'
+	    ]6      )4QQ6aajQQ?
+	    )W6       jQ????'
+	     )W6     jQ'
+	      )WW6ajQQ'
+		)???'
+	  A
+
+  We see the user start moving at A, There's enough data to make a first
+  prediction at B so then we conduct a search within C - where the user
+  could be, but now also in B - what's immediately behind the user too.
+  We can already solve this algorithm: B is the latest_position and it's
+  radius should cross the road: 20m should do it.
+
+Start considering phase 4: UI
+   I've made no decisions about how things look to the user just yet. In
+   fact all the browser will do is show the occasional alert() as little
+   more than a budget debugger. That's on purpose: the presentation of
+   data has nothing to do with the collection and processing of that
+   data. It's directly equivalent to games programming: the players and
+   npc's all have their moves dealt with independent of the presentation
+   as a 3D shoot-em-up, 2D side-scroller, or isometric card game.
+
+   Now that the input processing has created a model of the world I want
+   the output layer to use, and acknowledging that as yet I don't know
+   the data involved - just that I can get it from TFL - what to do?
+
+   How about this: screen shows an overhead view with user at bottom in
+   the pink-ball spot: in a minor rectangle around him he sees upcoming
+   bus stops. In the major rectangle around that formed by the screen
+   edge, he sees the major distant locations the local stops can serve.
+   In between the two rectangles, a line connecting the stop to the
+   destination, with the line marked by the bus number.
+
+-------------------------------------------------
+|		barnet			enfield	|
+|		    \			lock	|
+|		     \		       /	|
+|		      43    ---121----/		|
+|		       \   /			|
+|			\ /			|
+|			AB			|
+|wood						|
+|green\						|
+|      \			Z--123		|
+|	141			      \		|
+|	   \----T		       tottenham|
+|				       hale	|
+|					/	|
+|				       /	|
+|				CD--N73		|
+|				  \		|
+|finsbury			   30		|
+|pk   \--236---CM		     \---dalston|
+|						|
+|						|
+|						|
+|						|
+|						|
+|                  you are here			|
+|						|
+|						|
+|						|
+|						|
+|						|
+|						|
+-------------------------------------------------
+
+   In this manner I can see what my options are in pretty short
+   order!
+   The location of the bus stop letters around the square gives
+   me a visual cue of how far I need to walk to get there. The
+   bus numbers give me something I can recognise even if the dest
+   is unknown to me. And the destination of course gives me a cue
+   as to more distant exchanges.
+
+   Observations:
+   1. One could swipe the map around beyond the above bringing
+   even further stops into view.
+   2. Ditto but with a +/- to zoom out further
+   3. It would be interesting if the stops could be linked
+   together if they're server by the same bus rather than have
+   sucessive stops separately connect to the destination
+   4. Clicking on the stop letter brings up the usual countdown
+   with minutes per next route.
+   5. Clicking on the route number brings up its time to arrive
+   at related stops.
+   6. Unlike the work thus far, modelling the stops and routes
+   this way can be done entirely on a desktop as we can fake a
+   prediction, so I won't have to do much walking to test
+
+It looks like processing would happen this way:
+1. With prediction and radius (potentially multiple bubbles) get
+   a list of all bus stops in area and file them
+2a. With each bus stop get the major destinations
+3. Get the list of buses and link to that major dest
+   (this is taking dest from stop)
+OR
+2. With each bus get the routes and from the routes get the dest
+3.
+   (this is taking dest from bus)
+4. Solve the problem of multiple buses from one stop to one dest
+   overlapping each other by having an intermediate rectangle
+   with occupiable points along it. If point in use, get next one
+   above or below
+5. pass them on for drawing in the next phase
+
+   In this phase, we're going to see adding in calls from the
+   device direct to the TFL API, that is, without assistance
+   from the original server. As a direct call, obviously I won't
+   be adding my own API details in. That means individual
+   instances may be traffic shaped from TFL. That /should/ be
+   okay seeing as there's a limited amount of traffic expected
+   from each instance, but it does create a Known Unknown: we
+   can't tell at what point TFLs system might block the access,
+   if they can determine it at all. A solution should therefore
+   include detecting that block on the device.
+
+   This divides the UI work in two. I previously took the
+   location data and formed a catchment area. This UI work sees
+   that catchment area used to form a model of what's in it
+   suitable for the likely UI use. The next stage will be to
+   take that model and represent it on screen.
+
+   Before coding, let's see what happens manually. Assume that
+   I'm at Parson's Green tube station at 51.475189, -0.200757,
+   I have a predicted location of 51.473840, -0.200628, and a
+   radius of 322m. That creates an API request of
+   wget "https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
+
+   The JSON response says there are eight stoppoints nearby.
+   I don't recognise some of them, but two related stops are
+   are Stop X (Naptan 490015575X, @51.472873, -0.199248) and
+   Stop GM (490005156W, @51.473532, -0.197034). Both of those
+   check out accoding the maps.google.com. The first has sms
+   code 53001 with 3 arrivals expected in next 20, the second
+   has sms code 54445 with 6 expected imminently.
+   I notice the JSON also provides a distance but no bearing.
+   We also get in additionalProperties Towards = Chelsea
+   which matches the bus stop sign from google streetview.
+
+Option 1: per bus stop info
+   So with just that one JSON, we can tell the big red and
+   white bus stop letter "X", we know the major local
+   destination "Chelsea", we know the bus routes (lines) that
+   serve the stop "22" and "N22" and so can connect that
+   route to that destination, with just the one call. We
+   cannot determine the next or previous stop (which is right
+   because next and previous refer to the bus route, not the
+   bus stop.)
+
+Option 2: per bus route info
+   If we do a further lookup using that naptan code to
+   wget "https://api.tfl.gov.uk/StopPoint/490015575X/arrivals"
+   then we get further get the ultimate destination. That's
+   probably less helpful. But we do get the countdown.
+
+   Can't link stoppoints one to the next it would seem: can
+   get a list of stops for the route but they don't appear
+   to be in order. Further, they don't exclude previous
+   stoppoints.
+
+   This all suggests that we can do exactly what we thought
+   we could above with the API, without futher reassessment
+   of difficulties. Having the stops nearby link to each
+   other is a Todo for later.
+
+2017-04-24 13:29
+   Now we we've considered the direction for the UI to go, and
+   what that means in terms of API calls, and then in terms of
+   data that we receive, it's time to look at how the code
+   can give effect to what we want.
+
+   The first thing I want to bring back is that I earlier
+   considered what should be done about the drift, and that a
+   solution is an intermediate stage between receiving data
+   and drawing it to screen. Here's the first consequence of
+   that: when data is received about the bus stop it should be
+   used to fill an array of things to be considered for
+   drawing, and that stack persists that bus stop's presence
+   *even if* drift later sees it vanish.
+
+   So make the request, fill the stack; make a second request
+   and add to the stack leaving existing entries alone. This
+   is trivial to implement so lets move it on.
+
+   What's not trivial to implement is the code to request
+   data, so I'm going to copy it off an old project. And we'll
+   set it up to test that it actually works before we start
+   plumbing it in.

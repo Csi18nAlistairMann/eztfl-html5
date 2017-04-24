@@ -94,3 +94,11 @@ Practice some code hygiene
 	 - rename to reflect new understanding and use
 Discover Unknown Unknown #13: Should we handle sanity failures of
 	 position differently? Right now we zero and carry on
+2151
+Consider that I've used procedural programming when I could have used
+	 object-oriented
+Consider how to handle drift when the user changes direction or speed
+	 also to look into the predicted area and 20m behind
+
+24 April 2017
+Phase 4: Start considering the UI

@@ -29,8 +29,10 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
-    getLocationSetup();
-    setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    sendGetToTfl();
+
+    // getLocationSetup();
+    // setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
 function setup_tracked_positions(num_positions)
