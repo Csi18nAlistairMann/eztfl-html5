@@ -39,7 +39,7 @@ function handler_uber(this1, name)
 
 	$json_o = this1.response;
 	if (window.ie !== false)
-	    $json_o = JSON.parse($json_o);
+	    $json_o = JSON.stringify($json_o);
 	alert($json_o);
 
     } else {

@@ -1540,3 +1540,9 @@ ProxyPassReverse "/" "https://eztfl-html5.mpsvr.com/"   RewriteEngine ON
 wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
    We can (after changing the credents in the config) get
    the JS using it.
+
+2017-04-24 04:12
+   Next issue up: while we ask for json, and we get json back,
+   the javascript chokes on printing out for us because it's
+   converted internally to an Object. Nothing wrong with that,
+   as long as we know. Fixed
