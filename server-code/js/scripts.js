@@ -21,9 +21,9 @@ const MINIMUM_RADIUS_TO_LOOK = 200;
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
 
-const RPROXY_URL_BUSSTOPS = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram";
-const RPROXY_URL_COUNTDOWN_PRE = "https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/";
-const RPROXY_URL_COUNTDOWN_POST = "/arrivals";
+const RPROXY_URL_BUSSTOPS = 'https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram';
+const RPROXY_URL_COUNTDOWN_PRE = 'https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/';
+const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 
 const HTTP_200 = 200;
 //
@@ -67,19 +67,19 @@ function cannotWatchPosition(positionError)
 
     switch(positionError.code) {
     case error.PERMISSION_DENIED:
-	    msg = "User denied the request for Geolocation."
+	    msg = 'User denied the request for Geolocation.'
 	break;
     case error.POSITION_UNAVAILABLE:
-	    msg = "Location information is unavailable."
+	    msg = 'Location information is unavailable.'
 	break;
     case error.TIMEOUT:
-	    msg = "The request to get user location timed out."
+	    msg = 'The request to get user location timed out.'
 	break;
     case error.UNKNOWN_ERROR:
-	    msg = "An unknown error occurred."
+	    msg = 'An unknown error occurred.'
 	break;
     }
-    alert("Failed to start geolocation. Error:\"" + msg + "\"");
+    alert('Failed to start geolocation. Error:"' + msg + '"');
 }
 
 function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
@@ -253,7 +253,7 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 
     radius = Math.round(radius);
 
-    url = RPROXY_URL_BUSSTOPS + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
+    url = RPROXY_URL_BUSSTOPS + '&radius=' + radius + '&lat=' + pair[0] + '&lon=' + pair[1];
     handler = receiveNewBusStops;
     sendGetCore(url, handler);
 

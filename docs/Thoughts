@@ -1658,6 +1658,8 @@ RewriteRule ^/mirror/bar/StopPoint/(.+)/arrivals "https://api.tfl.gov.uk/StopPoi
 https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/490015575X/arrivals
    Works first time. How often does that happen?
 
+Working on the UI elements
+
 
 
 
