@@ -1564,3 +1564,28 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    the latter can look at the name of handler_task_1 and so
    do work according to that. Versus seeing handler_task_2
    and doing something else.
+
+2017-04-24 04:42
+   Now we can have the bus stops in the predicted area, we want
+   to persist them in the program. We can then return to connect
+   the code that persists with the code that gets.
+
+   Our objective with persisting the bus stop data is that we
+   put it somewhere we can re-use *even if* the bus stop itself
+   drifts out of range. We dont want to keep it forever though.
+   So we obtain the data, extract the bus stop, and check
+   through the existing stops for it. If we see an expired stop
+   (ie, "Not seen in ten minutes") then we delete it. If we do
+   see it, then we refresh the timestamp we last saw it. If we
+   don't see it, we add it. As we want to persist this data
+   even if the browser closes for a short while, we'll keep
+   track of them in localstorage.
+
+   I start with rewriting the prediction code to construct the
+   url and then ... everything goes pear-shaped. Desktop browser
+   reports "Network location provider at
+   'https://www.googleapis.com/' : Returned error code 403.".
+   ios safari reports Error : "Operation could not be completed
+   (KCLErrorDomain error 0)". Similar problems with Android.
+   Geolocation seems to be bad, even to a machine I remoted
+   into.

@@ -18,6 +18,8 @@ const HIGHEST_LONGITUDE = 180.0;
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
 
+const RPROXY_URL = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram";
+
 //
 // Globals
 //
@@ -46,11 +48,32 @@ function setup_tracked_positions(num_positions)
 function getLocationSetup()
 {
     if (navigator.geolocation) {
-	navigator.geolocation.watchPosition(mainLoop);
+	navigator.geolocation.watchPosition(mainLoop, cannotWatchPosition);
 
     } else {
 	alert(STR_GEOLOC_NOT_SUPPORTED);
     }
+}
+
+function cannotWatchPosition(positionError)
+{
+    var msg;
+
+    switch(positionError.code) {
+    case error.PERMISSION_DENIED:
+	    msg = "User denied the request for Geolocation."
+	break;
+    case error.POSITION_UNAVAILABLE:
+	    msg = "Location information is unavailable."
+	break;
+    case error.TIMEOUT:
+	    msg = "The request to get user location timed out."
+	break;
+    case error.UNKNOWN_ERROR:
+	    msg = "An unknown error occurred."
+	break;
+    }
+    alert("Failed to start geolocation. Error:\"" + msg + "\"");
 }
 
 function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
@@ -154,7 +177,7 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 						Math.cos(distance_in_kilometers / R)
 						- Math.sin(Math.PI / 180 * lat)
 						* Math.sin(lat2));
-    return [180 / Math.PI * lat2 , 180 / Math.PI * lon2];
+    return [180 / Math.PI * lat2, 180 / Math.PI * lon2];
 }
 
 //-------------------------------------------------------------
@@ -194,6 +217,8 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     var distance_in_meters;
     var angle;
     var speed_in_meters_per_second;
+    var url;
+    var handler;
 
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
@@ -207,27 +232,46 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
+    var pair = calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+						      latest_position.coords.longitude,
+						      angle,
+						      speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
-    return ['Origin: ' + early_position.coords.latitude + ','
-	    + early_position.coords.longitude
-	    + ' angle: ' + angle + ' '
-	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
-	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_position.timestamp - early_position.timestamp)
-					 / 1000))
-	    + ' speed in m/s: ' + speed_in_meters_per_second
-	    + ' newPos from: ' + latest_position.coords.latitude,
-	    latest_position.coords.longitude
-	    + ' predicts: ' +
-	    calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
-						   latest_position.coords.longitude,
-						   angle,
-						   (speed_in_meters_per_second
-						    * DEFAULT_LOOKAHEAD_SECS
-						   ).toString()) +
-	    ' radius: ' + speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
-							- ((latest_position.timestamp
-							    - early_position.timestamp)
-							   / 1000))];
+    var radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
+					       - ((latest_position.timestamp - early_position.timestamp)
+						  / 1000));
+    if (radius < 100)
+	radius = 300;
+
+    url = RPROXY_STUB + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
+//    handler = handler_task_1; //receivingNewBusStops;
+    sendGetCore(url, handler);
+
+    // return ['Origin: ' + early_position.coords.latitude + ','
+    // 	    + early_position.coords.longitude
+    // 	    + ' angle: ' + angle + ' '
+    // 	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
+    // 	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_position.timestamp - early_position.timestamp)
+    // 					 / 1000))
+    // 	    + ' speed in m/s: ' + speed_in_meters_per_second
+    // 	    + ' newPos from: ' + latest_position.coords.latitude,
+    // 	    latest_position.coords.longitude
+    // 	    + ' predicts: ' +
+    // 	    calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+    // 						   latest_position.coords.longitude,
+    // 						   angle,
+    // 						   (speed_in_meters_per_second
+    // 						    * DEFAULT_LOOKAHEAD_SECS
+    // 						   ).toString()) +
+    // 	    ' radius: ' + speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
+    // 							- ((latest_position.timestamp
+    // 							    - early_position.timestamp)
+    // 							   / 1000))];
+}
+
+function receivingNewBusStops()
+{
+
 }
 
 //
@@ -305,7 +349,7 @@ function mainLoop(position)
     prediction = positionsGetPrediction(num_positions_tracked);
 
     if (!isArrayEqual(prediction, last_prediction)) {
-	alert(prediction.toString());
 	last_prediction = prediction;
+
     }
 }
