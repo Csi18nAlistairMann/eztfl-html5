@@ -1623,3 +1623,46 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    part of the work flow I'm expecting, so we can leave it to
    one side. Good - looks like the project is persisting the
    data we want in the way we want it.
+
+2017-04-25 15:39
+Observation. A reasonable improvement would be to interrogate
+   the API for all stops within a mile or so, then scan THAT
+   for the stops within range. That gives us just the one call
+   to be made to the API until we get closer to the edge. Add
+   this to Todo
+
+Upcoming:
+   1. Next is to write code that would repeat the countdown
+   check.
+   2. Beyond that start work on UI elements
+
+Repeating the countdown check
+   This project sprouts in part because of my work on the previous
+   site at http://eztfl.pectw.net, getting countdown info out as
+   fast as poss. I want the bus countdown available in this
+   project too. These requests go to
+   "https://api.tfl.gov.uk/StopPoint/490015575X/arrivals"
+   which is slightly different for the reverse proxy: the existing
+   rule gets StopPoint?, and this one gets StopPoint/ - can the
+   two be made to marry up? Or does it need a new rule, perhaps
+   at /mirror/bar?
+   No, doesn't look like it can be a two in one. Set up its own
+   at /mirror/bar, and check it doesn't interfere with the
+   existing rule. Done! This adds to the config above:
+RewriteRule ^/mirror/bar/StopPoint/(.+)/arrivals "https://api.tfl.gov.uk/StopPoint/$1/arrivals?app_key=ABC&app_id=123" [QSA,P]
+   Reverse proxy set up.
+
+   Now we want to make use of the reverse proxy, so set up another
+   test function, similar to before: on page load send the request
+   to
+https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/490015575X/arrivals
+   Works first time. How often does that happen?
+
+
+
+
+Ideas:
+2. focus on dests at expense of other item's screen real estate
+4. <div/> position relative to user to be logarithmic
+5. a basic drop down of the info that will be shown
+6. get rid of ' vs "

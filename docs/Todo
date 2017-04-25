@@ -29,3 +29,11 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 6. Have Apache try to RewriteRule to add app_key etc, then proxy
    pass again
    Thouhghts:1530
+
+7. Call API for bus stops in local mile once, then scan that per the
+   prediction and range. Lightens load on API
+   Thoughts: 1632
+
+8. Utilise OS speed and head if avail
+
+9. expire bus stop list faster when travelling at speed

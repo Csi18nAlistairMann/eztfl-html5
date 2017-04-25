@@ -21,7 +21,9 @@ const MINIMUM_RADIUS_TO_LOOK = 200;
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
 
-const RPROXY_URL = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram";
+const RPROXY_URL_BUSSTOPS = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram";
+const RPROXY_URL_COUNTDOWN_PRE = "https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/";
+const RPROXY_URL_COUNTDOWN_POST = "/arrivals";
 
 const HTTP_200 = 200;
 //
@@ -35,8 +37,10 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
-    getLocationSetup();
-    setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    getArrivalsFromTfl('490015575X');
+
+    // getLocationSetup();
+    // setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
 function setup_tracked_positions(num_positions)
@@ -251,7 +255,7 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 
     radius = Math.round(radius);
 
-    url = RPROXY_URL + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
+    url = RPROXY_URL_BUSSTOPS + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
     handler = receiveNewBusStops;
     sendGetCore(url, handler);
 
@@ -334,6 +338,74 @@ function receiveNewBusStop(currentValue, index, array)
 
     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
 }
+
+function getArrivalsFromTfl(naptan)
+{
+    if (naptan == '')
+	return '';
+
+    var url = RPROXY_URL_COUNTDOWN_PRE + naptan + RPROXY_URL_COUNTDOWN_POST;
+    var handler = receiveNewCountdown;
+    sendGetCore(url, handler);
+
+    return url;
+}
+
+function receiveNewCountdown()
+{
+    if (this.status == HTTP_200) {
+	// this.response.stopPoints.forEach(receiveNewBusStop)
+
+	// // see if we already have this bus stop, and expire old
+	// var found = '';
+	// this.response.stopPoints.forEach(function(busStop, index, array) {
+	//     // expire when ten minutes old
+	//     found += busStop.id + ' ';
+	// });
+	alert(JSON.stringify(this.response));
+
+    } else {
+	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
+	alert($show);
+    }
+}
+
+// function receiveNewBusStop(currentValue, index, array)
+// {
+//     var timeNow = Date.now();
+//     var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
+//     var found;
+
+//     // we'll use this to expire old bus stops
+//     currentValue.timestamp = timeNow;
+
+//     // retrieve or create the storage we're after
+//     if (notedBusStops === null) {
+// 	notedBusStops = [];
+
+//     } else {
+// 	notedBusStops = JSON.parse(notedBusStops);
+//     }
+
+//     // see if we already have this bus stop, and expire old
+//     found = false;
+//     notedBusStops.forEach(function(busStop, index, array) {
+// 	// expire when ten minutes old
+// 	if (busStop.timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
+// 	    array.splice(index, 1);
+
+// 	} else {
+// 	    if (busStop.id === currentValue.id) {
+// 		found = true;
+// 	    }
+// 	}
+//     });
+//     if (found === false) {
+// 	notedBusStops.push(currentValue);
+//     }
+
+//     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
+// }
 
 //
 // array comparison
