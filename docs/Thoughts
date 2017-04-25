@@ -1595,3 +1595,31 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    stoppoints.
 
 2017-04-25 14:30
+   Gone for walking while seeing what's going on. Possibly 1/3rd
+   the requests came back 400-Bad Request. I haven't put in the
+   code to details what caused that, but as 2/3rds came back
+   fine, and over time those entries changed, I feel comfortable
+   leaving the 400-Bad Requests to one side.
+
+   Looking at the Apache log it's clear the radius has worked
+   well - it spends a lot of time at 200m (code forces 200m as
+   the minumum.) Likewise the lat/lon seems to move about as
+   one might expect - I'll take a random three and see if they
+   match my route. Yup! All good. I notice that the radiuses
+   often have decimals. Maybe that was the 404-BR problem? Try
+   it out at the TFL site. Sure enough, repeating the same
+   request with and without radius decimals causes a 400-BR and
+   a 200-OK, so correct to remove decimals. Now let's look at
+   the screen caps as the bus stops were changed. Yep, they do
+   look like the stops I'd expect.
+   A curiosity: doing a search on the id used brings back
+   multiple matches. Is the id not the naptan? Is the naptan
+   not unique? Am I searching with the wrong call? I would
+   expect a search on one naptan to return one result. Could it
+   be a convenience that local stops are also shown? Searching
+   on stationNaptan has the same effect as searching id or
+   naptanId. I can only imagine it's an error at there end, or
+   a convenience. However, searching on the naptan code is not
+   part of the work flow I'm expecting, so we can leave it to
+   one side. Good - looks like the project is persisting the
+   data we want in the way we want it.

@@ -249,6 +249,8 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     if (radius < MINIMUM_RADIUS_TO_LOOK)
 	radius = MINIMUM_RADIUS_TO_LOOK;
 
+    radius = Math.round(radius);
+
     url = RPROXY_URL + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
     handler = receiveNewBusStops;
     sendGetCore(url, handler);
