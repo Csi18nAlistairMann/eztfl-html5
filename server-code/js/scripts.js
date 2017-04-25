@@ -37,10 +37,8 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
-    getArrivalsFromTfl('490015575X');
-
-    // getLocationSetup();
-    // setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    getLocationSetup();
+    setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
 function setup_tracked_positions(num_positions)
@@ -339,6 +337,8 @@ function receiveNewBusStop(currentValue, index, array)
     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
 }
 
+//
+// getArrivalsFromTfl('490015575X');
 function getArrivalsFromTfl(naptan)
 {
     if (naptan == '')
