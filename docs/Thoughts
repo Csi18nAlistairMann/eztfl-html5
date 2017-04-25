@@ -1589,3 +1589,9 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    (KCLErrorDomain error 0)". Similar problems with Android.
    Geolocation seems to be bad, even to a machine I remoted
    into.
+
+   By midday it was back to normal. Complete and walk about to
+   see what happens: I expect it to show me a changing list of
+   stoppoints.
+
+2017-04-25 14:30

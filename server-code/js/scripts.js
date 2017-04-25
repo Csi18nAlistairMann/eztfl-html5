@@ -14,12 +14,16 @@ const LOWEST_LATITUDE = -90.0;
 const HIGHEST_LATITUDE = 90.0;
 const LOWEST_LONGITUDE = -180.0;
 const HIGHEST_LONGITUDE = 180.0;
+const BUS_STOP_EXPIRES_IN_SECS = 10 * 60 * 60;
+const NOTED_BUSSTOPS_NAME = 'notedBusStops';
+const MINIMUM_RADIUS_TO_LOOK = 200;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
 
 const RPROXY_URL = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram";
 
+const HTTP_200 = 200;
 //
 // Globals
 //
@@ -219,6 +223,8 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     var speed_in_meters_per_second;
     var url;
     var handler;
+    var pair;
+    var radius;
 
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
@@ -232,20 +238,22 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
-    var pair = calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
-						      latest_position.coords.longitude,
-						      angle,
-						      speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
+    pair = calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+						  latest_position.coords.longitude,
+						  angle,
+						  speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
-    var radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
-					       - ((latest_position.timestamp - early_position.timestamp)
-						  / 1000));
-    if (radius < 100)
-	radius = 300;
+    radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
+					   - ((latest_position.timestamp - early_position.timestamp)
+					      / 1000));
+    if (radius < MINIMUM_RADIUS_TO_LOOK)
+	radius = MINIMUM_RADIUS_TO_LOOK;
 
-    url = RPROXY_STUB + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
-//    handler = handler_task_1; //receivingNewBusStops;
+    url = RPROXY_URL + "&radius=" + radius + "&lat=" + pair[0] + "&lon=" + pair[1];
+    handler = receiveNewBusStops;
     sendGetCore(url, handler);
+
+    return url;
 
     // return ['Origin: ' + early_position.coords.latitude + ','
     // 	    + early_position.coords.longitude
@@ -269,9 +277,60 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     // 							   / 1000))];
 }
 
-function receivingNewBusStops()
+function receiveNewBusStops()
 {
+    if (this.status == HTTP_200) {
+	this.response.stopPoints.forEach(receiveNewBusStop)
 
+	// see if we already have this bus stop, and expire old
+	var found = '';
+	this.response.stopPoints.forEach(function(busStop, index, array) {
+	    // expire when ten minutes old
+	    found += busStop.id + ' ';
+	});
+	alert(found);
+
+    } else {
+	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
+	alert($show);
+    }
+}
+
+function receiveNewBusStop(currentValue, index, array)
+{
+    var timeNow = Date.now();
+    var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
+    var found;
+
+    // we'll use this to expire old bus stops
+    currentValue.timestamp = timeNow;
+
+    // retrieve or create the storage we're after
+    if (notedBusStops === null) {
+	notedBusStops = [];
+
+    } else {
+	notedBusStops = JSON.parse(notedBusStops);
+    }
+
+    // see if we already have this bus stop, and expire old
+    found = false;
+    notedBusStops.forEach(function(busStop, index, array) {
+	// expire when ten minutes old
+	if (busStop.timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
+	    array.splice(index, 1);
+
+	} else {
+	    if (busStop.id === currentValue.id) {
+		found = true;
+	    }
+	}
+    });
+    if (found === false) {
+	notedBusStops.push(currentValue);
+    }
+
+    localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
 }
 
 //
@@ -341,15 +400,17 @@ function checkPositionValues(position)
 function mainLoop(position)
 {
     var num_positions_tracked = 0;
-    var prediction = []
+    var prediction = null;
 
     position = checkPositionValues(position);
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
 
     prediction = positionsGetPrediction(num_positions_tracked);
 
-    if (!isArrayEqual(prediction, last_prediction)) {
-	last_prediction = prediction;
-
-    }
+    // if (prediction === last_prediction) {
+    // 	last_prediction = prediction;
+    // }
+    // if (!isArrayEqual(prediction, last_prediction)) {
+    // 	last_prediction = prediction;
+    // }
 }
