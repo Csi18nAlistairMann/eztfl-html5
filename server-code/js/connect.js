@@ -1,29 +1,33 @@
-///////////////////////////////////////////////////////////////////
+/*
+  eztfl-html5  Alistair Mann
 
-// Note that these all make CORS requests in the background first, as the
-// call are all Cross Origin in nature.
-//
+  Note that these all make CORS requests in the background first, as the
+  call are all Cross Origin in nature.
+*/
 
 function sendGetToTfl()
 {
     var url = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
+    var handler = handler_task_1
+
+    sendGetCore(url, handler);
+}
+
+function sendGetCore(url, handler)
+{
     if (XMLHttpRequest) {
 	var request = new XMLHttpRequest();
 	if("withCredentials" in request) {
-	    // Firefox 3.5 and Safari 4
 	    request.open('GET', url, true);
 	    request.setRequestHeader("Accept", "application/json");
 	    request.responseType = "json";
-	    request.setRequestHeader("If-Modified-Since", "Tue,  1 Jan 1980 19:12:53 BST");
-	    request.setRequestHeader("If-None-Match", "Wibble");
-	    request.onload = handler_otoos_content_14_h;
+	    request.onload = handler;
 	    request.send();
 	}
     }
-
 }
 
-function handler_otoos_content_14_h()
+function handler_task_1()
 {
     handler_uber(this, arguments.callee.toString());
 }

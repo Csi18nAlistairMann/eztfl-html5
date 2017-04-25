@@ -1545,4 +1545,22 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    Next issue up: while we ask for json, and we get json back,
    the javascript chokes on printing out for us because it's
    converted internally to an Object. Nothing wrong with that,
-   as long as we know. Fixed
+   as long as we know. Fixed.
+
+   We can be comfortable now that our project, however poorly,
+   can interact with the tfl API. We can use this opportunity
+   to tidy up the new code.
+
+   What I've done is remove the variable from the routine that
+   actually makes the call, because I know we'll need to make
+   different calls on the API and I'd like to reuse code as
+   far as possible.
+   "handler_uber" and "handler_task_1" are called on when the
+   server has responded. This unusual splitting them off is
+   a hold-over from the previous project where the one
+   handler is needed to respond to lots of different tasks
+   with no easy way to say which is which. By splitting the
+   callback function from the function that does the work,
+   the latter can look at the name of handler_task_1 and so
+   do work according to that. Versus seeing handler_task_2
+   and doing something else.
