@@ -1410,3 +1410,133 @@ Option 2: per bus route info
    data, so I'm going to copy it off an old project. And we'll
    set it up to test that it actually works before we start
    plumbing it in.
+
+   .. And of course it doesn't work as the CORS preflight
+   failed. The CORS preflight check is different because the
+   browser uses the HTTP OPTIONS to ask of the API "what may
+   I know about this link coming ...?" to which it gets a
+   405 response - Method not allowed. If OPTIONS is not
+   allowed, then the whole connection must fail as a security
+   measure.
+
+CORS - cross-origin resource sharing
+   CORS is a security technology designed to handle website A
+   causing actions on website B via the client C. Here, the
+   https://eztfl-html5.mpsvr.com site is website A, and the
+   https://api.tfl.co.uk site is website B. The javascript in
+   the browser is client C.
+   It would be entirely wrong for any website A to use client
+   C to make an amazon purchase, for instance. CORS is used
+   to ask nicely "may website A to action D?" With TFL
+   returning 405 to an OPTIONS request, the browser assumes
+   the answer is no and aborts the connection.
+
+   There could be two answers to this. Either:
+   1. TFL does offer CORS access and I don't know
+   2. I could make the CORS request back to my own server
+      which approves and passes through the request in a
+      proper way.
+
+   I can't see anything online to suggest they're allowing it
+   but I do see
+   https://www.robinosborne.co.uk/2017/01/09/london-buses-use-tls1-2/
+   where Robin specifically mentions the cross origin as
+   being an issue.
+   I do see a reference to a cross-origin prob being fixed at
+   https://blog.tfl.gov.uk/2015/12/07/unified-api-part-5-aot-arrivals-of-things/
+   but it cames from a 504-Gateway Timeout issue, suggesting
+   this is a problem with the No. 2 solution. It doesn't
+   seem likely that TFL would allow CORS to work. While
+   there doesn't seem any risk that HTTP writes could cause
+   a problem, there's also the benefit from more effectively
+   managing bandwidth.
+
+   The No.2 solution is to send the request back to my server
+   and have that forward the request on to TFL. As the JS has
+   come from the same server being interogated, CORS should
+   not enter into it. This will slow traffic down: (because
+   instead of C --> B --> C, we'll need
+   C --> B --> A --> B --> C) and also a BIG security concern.
+
+   To start with, if I simply forward traffic, then all that
+   traffic looks to TFL as if it comes from one place and
+   would be shaped very hard, very quickly. In contrast, if
+   I add my own API key etc to the rewrite, anybody using
+   that facility could do anything using my credentials. The
+   pragmatic solution would seem to be to confine what can be
+   done through the facility to what I need to provide for
+   that app (which is the bus stop lookup, then the countdown
+   lookup) denying all others, and to append to both whatever
+   my credentials are.
+
+   Robin's choice above was to code some sort of simple reverse
+   proxy. He seems to be using a Windows machine which I do not
+   so I'll skip writing PHP as a direct equivalent and instead
+   set up Apache to reverse proxy for me.
+
+   First up, Apache could reverse proxy with a simple
+   RewriteRule. The documentation says that's poor for performance
+   as it looks like it creates a one-off instance that serves
+   and ends. https://httpd.apache.org/docs/2.4/rewrite/flags.html#flag_p
+   "Avoid using this flag and prefer those directives" it says
+   referring to ProxyPass. I don't see anything in ProxyPass to
+   suggest I could later add in the API credentials. Nor in
+   ProxyPassMatch. It does look like any query string is ignored
+   for the purpose of the rewrite, however. Perhaps that query
+   string can be adjusted beforehand, and is then passed though
+   after the domain rewrite.
+
+Uknown unknown #14: can apache do the reverse proxying needed?
+   1. Show that Apache can reverse proxy https
+   2. Show that the proxied URL can be modified
+
+   1. Show that Apache can reverse proxy https
+   Reverse proxying can be done by configuring Apache with
+
+LoadModule proxy_module /usr/local/apache2/modules/mod_proxy.so
+LoadModule proxy_http_module /usr/local/apache2/modules/mod_proxy_http.so
+
+   and in the virtualhost with
+
+SSLProxyEngine on
+<Location "/mirror/foo/">
+	  # StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628
+	  ProxyPass "https://api.tfl.gov.uk/"
+</Location>
+
+   Notice that "/mirror/foo/" doesn't need to actually exist in
+   the filesystem.
+
+   2. Show that the proxied URL can be modified
+   I want to closely confine the URL passed through to an
+   acceptable range (acceptable to me.) I can confine to
+   StopPoint using the Location "/mirror/foo/StopPoint" and
+   adding that to ProxyPass: "...gov.uk/StopPoint". Can I do
+   the rest using ProxyPassMatch?
+
+   That was a several hours ago. Try as I might, I can't see
+   to get Apache to honour RewriteRule AND ProxyPassMatch.
+   Reluctantly then, I fall back to the original poor
+   performance RewriteRule. Instead of the entries above, I
+   turn them off and use:
+
+LoadModule proxy_module /usr/local/apache2/modules/mod_proxy.so
+LoadModule proxy_http_module /usr/local/apache2/modules/mod_proxy_http.so
+...
+ And in the virtualhost:
+SSLProxyEngine on
+RewriteEngine ON
+RewriteRule ^/mirror/foo/StopPoint "https://api.tfl.gov.uk/StopPoint?app_key=ABC&app_id=123" [QSA,P]
+ProxyPassReverse "/" "https://eztfl-html5.mpsvr.com/"   RewriteEngine ON
+
+   It doesn't help that I had a bunch of alchohol tonight I
+   should think. I could ask online, I suppose. Or I could
+   do what I am and saying You Know What? Using ProxyPass
+   was a performance improvement, and thus is something that
+   can go on the Todo list - it isn't mission critical.
+
+   With our own server proxying back properly (as requested
+   by:
+wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
+   We can (after changing the credents in the config) get
+   the JS using it.

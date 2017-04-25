@@ -25,3 +25,7 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 
 5. Have local stops link to each other
    Thoughts: 1388
+
+6. Have Apache try to RewriteRule to add app_key etc, then proxy
+   pass again
+   Thouhghts:1530

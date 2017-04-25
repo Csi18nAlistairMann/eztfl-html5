@@ -59,3 +59,6 @@ could cause potential workload in later improving the project.
 13. Should we handle sanity failures differently? End the entire
     program? Skip just that position?
     [ ]
+
+14: Can apache do the reverse proxying needed?
+    [x] yes

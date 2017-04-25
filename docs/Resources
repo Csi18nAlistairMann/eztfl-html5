@@ -24,7 +24,7 @@ git
 ssh
 gimp (The ASCII circles in docs/Thoughts)
 bind
-Apache
+Apache (Normal domains, also reverse proxying)
 
 Software technologies:
 CSS
@@ -32,6 +32,7 @@ HTML/HTML5
 JavaScript
 PHP
 JSON
+CORS
 
 Others:
 SSL certificate

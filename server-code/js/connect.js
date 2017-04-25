@@ -6,7 +6,7 @@
 
 function sendGetToTfl()
 {
-    var url = "https://api.tfl.gov.uk/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
+    var url = "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram&radius=322&lat=51.473840&lon=-0.200628"
     if (XMLHttpRequest) {
 	var request = new XMLHttpRequest();
 	if("withCredentials" in request) {
