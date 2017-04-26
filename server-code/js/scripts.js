@@ -192,7 +192,7 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderAddDivWithText(parent, name, text)
+function renderAddDivWithText(parent, name, text, onclick_handler)
 {
     var paragraph;
     var node;
@@ -203,6 +203,9 @@ function renderAddDivWithText(parent, name, text)
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
+	if (onclick_handler !== null) {
+	    paragraph.setAttribute('onclick', onclick_handler);
+	}
 	node = document.createTextNode(text);
 	paragraph.appendChild(node);
 
@@ -257,7 +260,7 @@ function renderBusStops()
 	if (text !== '') {
 	    text = 'Bus stop: ' + busstop.stopLetter + ' routes: ' + text;
 	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstop.naptanId + '")');
 	}
 
 	count++;
@@ -266,9 +269,9 @@ function renderBusStops()
 
 function renderScreen(divArray)
 {
-    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.');
+    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.', null);
 
-    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.');
+    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.', null);
 
     renderRemoveDiv('da_1');
 
@@ -427,6 +430,11 @@ function receiveNewBusStop(currentValue, index, array)
     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
 }
 
+function loadCountdown(naptan)
+{
+    getArrivalsFromTfl(naptan);
+}
+
 //
 // getArrivalsFromTfl('490015575X');
 function getArrivalsFromTfl(naptan)
@@ -445,6 +453,7 @@ function receiveNewCountdown()
 {
     if (this.status == HTTP_200) {
 	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, JSON.stringify(this.response));
+	alert(JSON.stringify(this.response));
 
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;

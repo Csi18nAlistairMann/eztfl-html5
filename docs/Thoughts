@@ -1770,6 +1770,12 @@ Working on the UI elements
    project goals. At the same time I'll get rid of the
    favicon lookup.
 
+   The intention has been that clicking on the bus stop will
+   cause the countdown for that bus stop to be displayed. This
+   would be done through JavaScript too, so add in something
+   to prove it can be done. This happens with the html element
+   getting onClick(), I think. Done!
+
 
 Ideas:
 2. focus on dests at expense of other item's screen real estate
