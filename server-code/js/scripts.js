@@ -37,8 +37,10 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
-    getLocationSetup();
-    setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    renderScreen('');
+
+    // getLocationSetup();
+    // setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
 function setup_tracked_positions(num_positions)
@@ -66,16 +68,16 @@ function cannotWatchPosition(positionError)
     var msg;
 
     switch(positionError.code) {
-    case error.PERMISSION_DENIED:
+    case positionError.PERMISSION_DENIED:
 	    msg = 'User denied the request for Geolocation.'
 	break;
-    case error.POSITION_UNAVAILABLE:
+    case positionError.POSITION_UNAVAILABLE:
 	    msg = 'Location information is unavailable.'
 	break;
-    case error.TIMEOUT:
+    case positionError.TIMEOUT:
 	    msg = 'The request to get user location timed out.'
 	break;
-    case error.UNKNOWN_ERROR:
+    case positionError.UNKNOWN_ERROR:
 	    msg = 'An unknown error occurred.'
 	break;
     }
@@ -184,6 +186,23 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 						- Math.sin(Math.PI / 180 * lat)
 						* Math.sin(lat2));
     return [180 / Math.PI * lat2, 180 / Math.PI * lon2];
+}
+
+//-------------------------------------------------------------
+//
+// rendering
+//
+function renderScreen(divArray)
+{
+    // first time around there are no divs to look at so create them.
+
+    var para = document.createElement("p");
+    var node = document.createTextNode("This is new.");
+    para.appendChild(node);
+
+    var element = document.getElementById("div1");
+    element.appendChild(para);
+
 }
 
 //-------------------------------------------------------------

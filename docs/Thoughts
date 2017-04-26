@@ -1658,7 +1658,86 @@ RewriteRule ^/mirror/bar/StopPoint/(.+)/arrivals "https://api.tfl.gov.uk/StopPoi
 https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/490015575X/arrivals
    Works first time. How often does that happen?
 
+   What thought needs to go into the countdown - are we going to
+   persist that too? The intention is that when the user sees a
+   stop he's interested in, he taps on it and that causes the
+   JavaScript to call for that countdown set, presumably to get
+   it echoed out. Once out there, it would seem to have no more
+   use to the project - just to the user - and would either be
+   abandoned in favour of a different countdown, or perhaps in
+   favour of an update to this, its own countdown.
+
+   There's nothing in this description that lends itself to
+   persistence in any sense. To the extent that anything does
+   persist, it will be the html elements comprising the user
+   interface; the data itself is ephemeral.
+
+   That said, we'll take and keep the data only long enough to
+   get it off for rendering.
+
 Working on the UI elements
+   There are two approaches in mind. The first I outlined above
+   when I thought of a rings approach, with bus stops in the
+   centre, buses next out, stop destinations in a ring beyond
+   that.
+
+   The second, and more obvious that somehow escaped me thinking
+   of it first, is to just whack out the data as it comes in
+   to whatever html elements are appropriate.
+
+   We should observe that there is little difference between the
+   above two approaches: they both get <divs/> on the page with
+   the second approach discarding any sense of positioning.
+
+   In which case it's a reasonable approach to a) get the <div/>s
+   out there first; then position them as best fits.
+
+   This creates a new data layer to play with. On one side we
+   have the various bits of data coming down from TFL in JSON
+   files. We then add some things: the timestamp to the bus
+   stops list is one. We'll also want to add positioning data
+   describing something about what it'll be doing, such as a
+   type: this is a bus stop. That is a near destination. The
+   other is a bus line. We will want them all to have IDs as
+   well, so updating can quickly handle old <div/>s that are
+   hanging around.
+
+   This seems to be describing an array of elements that will
+   end up being <divs/>. They have an id so we can update them
+   as time goes by; we have a timestamp so we can expire them;
+   they get an X, Y and Z that can be used to indicate where
+   they are. Could also give them speed, acceleration and so
+   forth later. In fact there's so much that could be done
+   there it'd be smarter to give them a "location" object that
+   can be extended as we go. Come to think of it, each div
+   might have children that follow in tow, for style reasons.
+   There might be other elements: for instance, and image
+   could be attached to it.
+
+   I suppose one could use the existing DOM to store some or
+   all of this stuff, but my mind is to keep it separate. If
+   nothing else it stops weird stuff happening on screen if
+   minor changes cause a very obvious rebuild of everything.
+   Using buffering of changes to screen would also allow
+   potentially interesting future options, such as moving
+   elements slowly closer to where they should be rather
+   than all at once.
+
+   Let's run it as a test. We should be able to create a
+   structure that describes the div, but which isn't the
+   div; that structure should be used to create the div when
+   the time comes; that structure can then be updated with
+   elements appearing and disappearing; and running the
+   render routine updates the browser page to reflect that
+   fact.
+
+   Would it better to create a new div that replaces the old?
+   or update the old? These questions and more shortly to be
+   answered or ignored.
+
+   And of course, geolocations is off again. Never mind, this
+   can be done without it
+
 
 
 
