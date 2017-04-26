@@ -1739,8 +1739,10 @@ Working on the UI elements
    can be done without it.
 
    Can now create, delete, update without problems. Put them
-   into their own routines
+   into their own routines. Done.
 
+   Now have good code that adds elements as it goes along;
+   can delete them, or replace them as wished.
 
 
 

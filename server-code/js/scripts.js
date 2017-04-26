@@ -26,6 +26,7 @@ const RPROXY_URL_COUNTDOWN_PRE = 'https://eztfl-html5.mpsvr.com/mirror/bar/StopP
 const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 
 const HTTP_200 = 200;
+const RENDERING_FIELD_NAME = 'renderingField';
 //
 // Globals
 //
@@ -192,51 +193,63 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderScreen(divArray)
+function renderAddDivWithText(parent, name, text)
 {
     var paragraph;
     var node;
     var div;
 
     // second time around, so test if we've already got it 1st
-    if (!document.getElementById('da_1')) {
+    if (!document.getElementById(name)) {
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', 'da_1');
-	node = document.createTextNode('This is new.');
+	paragraph.setAttribute('id', name);
+	node = document.createTextNode(text);
 	paragraph.appendChild(node);
 
-	div = document.getElementById('div1');
+	div = document.getElementById(parent);
 	div.appendChild(paragraph);
     }
+}
 
-    if (!document.getElementById('da_2')) {
-	// first time, second div to add
-	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', 'da_2');
-	node = document.createTextNode('This is also new.');
-	paragraph.appendChild(node);
-
-	div = document.getElementById('div1');
-	div.appendChild(paragraph);
-    }
+function renderRemoveDiv(name)
+{
+    var child;
 
     // now we remove the first
-    if (document.getElementById('da_1')) {
-	child = document.getElementById('da_1');
+    if (document.getElementById(name)) {
+	child = document.getElementById(name);
 	child.parentNode.removeChild(child);
     }
+}
+
+function renderReplaceDivWithText(dest, source, text)
+{
+    var paragraph;
+    var node;
+    var destChild;
 
     // now we replace the second
-    if (document.getElementById('da_3')) {
+    if (!document.getElementById(source)) {
 	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', 'da_3');
-	node = document.createTextNode('This is also new again.');
+	paragraph.setAttribute('id', source);
+	node = document.createTextNode(text);
 	paragraph.appendChild(node);
 
-	child1 = document.getElementById('da_2');
-	child1.parentNode.replaceChild(node, child1);
+	destChild = document.getElementById(dest);
+	destChild.parentNode.replaceChild(node, destChild);
     }
+}
+
+function renderScreen(divArray)
+{
+    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.');
+
+    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.');
+
+    renderRemoveDiv('da_1');
+
+    renderReplaceDivWithText('da_2', 'da_3', 'This is also new again.');
 }
 
 //-------------------------------------------------------------
