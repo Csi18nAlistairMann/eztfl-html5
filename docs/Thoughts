@@ -1744,6 +1744,27 @@ Working on the UI elements
    Now have good code that adds elements as it goes along;
    can delete them, or replace them as wished.
 
+2017-04-26 13:06
+   Next two baby steps: 1, get the incoming data into a
+   structure and pass it on. 2, traverse that structure
+   dumping to the DOM.
+   We receive new bus stop data in receiveNewBusStop() where
+   they end up in localstorage. And countdown data in
+   receiveNewCountdown(). We want to pass it elsewhere in
+   the program, just like the bus stops. We could use a
+   global to do this, but I'm going to send it to
+   sessionStorage because this allows the data to be made
+   available to future threads, whereas in a global it would
+   be lost at termination of this thread. This is less
+   efficient as we take on an overhead of dumping stuff to
+   sessionStorage, but increases out options in future.
+
+   Let's now cause the completion of the download and saving
+   to localstorage to start the bus stop rendering sequence.
+
+   Looks good. I notice occasional duplication of bus stops
+   presumably because of the naptan request seeming to bring
+   back "oh, and these local stops too..."
 
 
 

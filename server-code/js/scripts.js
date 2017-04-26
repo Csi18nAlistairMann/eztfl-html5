@@ -16,6 +16,7 @@ const LOWEST_LONGITUDE = -180.0;
 const HIGHEST_LONGITUDE = 180.0;
 const BUS_STOP_EXPIRES_IN_SECS = 10 * 60 * 60;
 const NOTED_BUSSTOPS_NAME = 'notedBusStops';
+const NOTED_COUNTDOWN_NAME = 'notedCountdown';
 const MINIMUM_RADIUS_TO_LOOK = 200;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
@@ -38,10 +39,8 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
-    renderScreen('');
-
-    // getLocationSetup();
-    // setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    getLocationSetup();
+    setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
 function setup_tracked_positions(num_positions)
@@ -241,6 +240,30 @@ function renderReplaceDivWithText(dest, source, text)
     }
 }
 
+function renderBusStops()
+{
+    var busstopData = JSON.parse(localStorage.getItem(NOTED_BUSSTOPS_NAME));
+    var text;
+    var id;
+
+    var count = 0;
+    busstopData.forEach(function(busstop, index, array) {
+	id = 'busstop_' + count;
+
+	text = '';
+	busstop.lines.forEach(function(routeno, index, array) {
+	    text += routeno.name + ' ';
+	});
+	if (text !== '') {
+	    text = 'Bus stop: ' + busstop.stopLetter + ' routes: ' + text;
+	    renderRemoveDiv(id);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text);
+	}
+
+	count++;
+    });
+}
+
 function renderScreen(divArray)
 {
     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.');
@@ -350,15 +373,16 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 function receiveNewBusStops()
 {
     if (this.status == HTTP_200) {
-	this.response.stopPoints.forEach(receiveNewBusStop)
+	this.response.stopPoints.forEach(receiveNewBusStop);
 
-	// see if we already have this bus stop, and expire old
-	var found = '';
-	this.response.stopPoints.forEach(function(busStop, index, array) {
-	    // expire when ten minutes old
-	    found += busStop.id + ' ';
-	});
-	alert(found);
+	// // see if we already have this bus stop, and expire old
+	// var found = '';
+	// this.response.stopPoints.forEach(function(busStop, index, array) {
+	//     // expire when ten minutes old
+	//     found += busStop.id + ' ';
+	// });
+
+	renderBusStops();
 
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
@@ -420,58 +444,13 @@ function getArrivalsFromTfl(naptan)
 function receiveNewCountdown()
 {
     if (this.status == HTTP_200) {
-	// this.response.stopPoints.forEach(receiveNewBusStop)
-
-	// // see if we already have this bus stop, and expire old
-	// var found = '';
-	// this.response.stopPoints.forEach(function(busStop, index, array) {
-	//     // expire when ten minutes old
-	//     found += busStop.id + ' ';
-	// });
-	alert(JSON.stringify(this.response));
+	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, JSON.stringify(this.response));
 
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
 	alert($show);
     }
 }
-
-// function receiveNewBusStop(currentValue, index, array)
-// {
-//     var timeNow = Date.now();
-//     var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
-//     var found;
-
-//     // we'll use this to expire old bus stops
-//     currentValue.timestamp = timeNow;
-
-//     // retrieve or create the storage we're after
-//     if (notedBusStops === null) {
-// 	notedBusStops = [];
-
-//     } else {
-// 	notedBusStops = JSON.parse(notedBusStops);
-//     }
-
-//     // see if we already have this bus stop, and expire old
-//     found = false;
-//     notedBusStops.forEach(function(busStop, index, array) {
-// 	// expire when ten minutes old
-// 	if (busStop.timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
-// 	    array.splice(index, 1);
-
-// 	} else {
-// 	    if (busStop.id === currentValue.id) {
-// 		found = true;
-// 	    }
-// 	}
-//     });
-//     if (found === false) {
-// 	notedBusStops.push(currentValue);
-//     }
-
-//     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
-// }
 
 //
 // array comparison
