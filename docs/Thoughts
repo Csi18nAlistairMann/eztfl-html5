@@ -1788,9 +1788,77 @@ Working on the UI elements
    so, although it was part time plus keeping the documentary
    up to date took away a bunch of that time. As of now the
    line count is:
+HTML/bash script:
+     24      48     593 a.html
+      7       8      57 index.html
+      2       6      72 sync.sh
+     49     125    1284 uu2.html
+     84     226    1977 uu7.html
+    166     413    3983 total
+166 lines
+JavaScript:
+   53   127  1226 js/connect.js
+  565  1560 14652 js/scripts.js
+  618  1687 15878 total
+618 lines
+Documentation:
+  133   847  5571 Diary
+   21   114   731 Goals
+   42    92   695 Resources
+ 1808 13073 79817 Thoughts
+   39   203  1286 Todo
+   64   308  2150 UnknownUnknowns
+ 2107 14637 90250 total
+2107 lines.
+So: 2881 lines altogether, of which 784 are lines of code.
+
+Comment on Anonymous functions
+   These seem to be very much abused. Consider the following code:
+
+busstop.lines.forEach(function(routeno, index, array) {
+  text += routeno.name + ' ';
+});
+
+   It could equally be written as:
+
+for (routeno in busstop.lines) {
+  text += busstop.lines[routeno].name + ' ';
+}
+
+   The first is an example of an anonymous function and those seem
+   to be *everywhere*. Have a look at
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach?v=control
+   Where we learn:
+
+The forEach() method executes a provided function once for each array element.
+Syntax
+arr.forEach(function callback(currentValue, index, array) {
+    //your iterator
+}[, thisArg]);
+
+   I came to learn about forEach(), yet I'm seeing the anonymous
+   function pushed in my face. The code would surely be better as:
+
+arr.forEach(<function name>) {
+    //your iterator
+}
+
+   Anonymous functions no doubt have their place in the world but
+   I can't think of anything else so heavily abused - it makes me
+   wonder if their use is more like a marker for a programmer
+   trying to obfuscate the logic and at the cost of the user who
+   has to process the function overhead each time around. So
+   refactor my code to remove the anonymous functions I've picked
+   up.
 
 
 
+
+
+
+
+
+---------------------------------------------------------------
 Ideas:
 2. focus on dests at expense of other item's screen real estate
 4. <div/> position relative to user to be logarithmic

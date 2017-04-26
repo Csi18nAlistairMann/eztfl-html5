@@ -250,21 +250,41 @@ function renderBusStops()
     var id;
 
     var count = 0;
-    busstopData.forEach(function(busstop, index, array) {
+    for (busstop in busstopData) {
 	id = 'busstop_' + count;
 
 	text = '';
-	busstop.lines.forEach(function(routeno, index, array) {
-	    text += routeno.name + ' ';
-	});
+	for (routeno in busstopData[busstop].lines) {
+	    text += busstopData[busstop].lines[routeno].name + ' ';
+	}
 	if (text !== '') {
-	    text = 'Bus stop: ' + busstop.stopLetter + ' routes: ' + text;
+	    text = 'Bus stop: ' + busstopData[busstop].stopLetter + ' routes: ' + text;
 	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstop.naptanId + '")');
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")');
 	}
 
 	count++;
-    });
+    }
+
+    // busstopData.forEach(function(busstop, index, array) {
+    // 	id = 'busstop_' + count;
+
+    // 	text = '';
+
+    // 	for (routeno in busstop.lines) {
+    // 	    text += busstop.lines[routeno].name + ' ';
+    // 	}
+    // 	// busstop.lines.forEach(function(routeno, index, array) {
+    // 	//     text += routeno.name + ' ';
+    // 	// });
+    // 	if (text !== '') {
+    // 	    text = 'Bus stop: ' + busstop.stopLetter + ' routes: ' + text;
+    // 	    renderRemoveDiv(id);
+    // 	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstop.naptanId + '")');
+    // 	}
+
+    // 	count++;
+    // });
 }
 
 function renderCountdown()
@@ -274,10 +294,10 @@ function renderCountdown()
     var id;
 
     var count = 0;
-    countdownData.forEach(function(arrival, index, array) {
+    for (arrival in countdownData) {
 	id = 'arrival_' + count;
 
-	text = arrival.lineName + ' in ' + Math.round(arrival.timeToStation / 60);
+	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
 
 	if (text !== '') {
 	    renderRemoveDiv(id);
@@ -285,7 +305,7 @@ function renderCountdown()
 	}
 
 	count++;
-    });
+    }
 }
 
 function renderScreen(divArray)
@@ -398,14 +418,6 @@ function receiveNewBusStops()
 {
     if (this.status == HTTP_200) {
 	this.response.stopPoints.forEach(receiveNewBusStop);
-
-	// // see if we already have this bus stop, and expire old
-	// var found = '';
-	// this.response.stopPoints.forEach(function(busStop, index, array) {
-	//     // expire when ten minutes old
-	//     found += busStop.id + ' ';
-	// });
-
 	renderBusStops();
 
     } else {
@@ -433,17 +445,18 @@ function receiveNewBusStop(currentValue, index, array)
 
     // see if we already have this bus stop, and expire old
     found = false;
-    notedBusStops.forEach(function(busStop, index, array) {
+
+    for (busStop in notedBusStops) {
 	// expire when ten minutes old
-	if (busStop.timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
-	    array.splice(index, 1);
+	if (notedBusStops[busStop].timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
+	    notedBusStops.splice(busStop, 1);
 
 	} else {
-	    if (busStop.id === currentValue.id) {
+	    if (notedBusStops[busStop].id === currentValue.id) {
 		found = true;
 	    }
 	}
-    });
+    }
     if (found === false) {
 	notedBusStops.push(currentValue);
     }
