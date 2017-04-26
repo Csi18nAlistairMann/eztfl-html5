@@ -1766,6 +1766,9 @@ Working on the UI elements
    presumably because of the naptan request seeming to bring
    back "oh, and these local stops too..."
 
+   Time to implement the displayport requirement per the
+   project goals. At the same time I'll get rid of the
+   favicon lookup.
 
 
 Ideas:
