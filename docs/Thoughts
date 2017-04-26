@@ -1541,7 +1541,7 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    We can (after changing the credents in the config) get
    the JS using it.
 
-2017-04-24 04:12
+2017-04-25 04:12
    Next issue up: while we ask for json, and we get json back,
    the javascript chokes on printing out for us because it's
    converted internally to an Object. Nothing wrong with that,
@@ -1565,7 +1565,7 @@ wget "https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicB
    do work according to that. Versus seeing handler_task_2
    and doing something else.
 
-2017-04-24 04:42
+2017-04-25 04:42
    Now we can have the bus stops in the predicted area, we want
    to persist them in the program. We can then return to connect
    the code that persists with the code that gets.
@@ -1675,6 +1675,7 @@ https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/490015575X/arrivals
    That said, we'll take and keep the data only long enough to
    get it off for rendering.
 
+Phase 5: drawing to the display
 Working on the UI elements
    There are two approaches in mind. The first I outlined above
    when I thought of a rings approach, with bus stops in the
@@ -1776,10 +1777,21 @@ Working on the UI elements
    to prove it can be done. This happens with the html element
    getting onClick(), I think. Done!
 
+   Now we want the countdown data to be displayed in a similar
+   manner to the bus stop data.
+
+   Excellent: we now have the bus stops listed on page, and
+   when touched, it'll bring up the countdown for it.
+
+2017-04-26 16:33
+   We now have an operational website. It's been six days or
+   so, although it was part time plus keeping the documentary
+   up to date took away a bunch of that time. As of now the
+   line count is:
+
+
 
 Ideas:
 2. focus on dests at expense of other item's screen real estate
 4. <div/> position relative to user to be logarithmic
-5. a basic drop down of the info that will be shown
-6. get rid of ' vs "
-7. comment on anonymous functions
+7. comment on anonymous functions, just in time knowledge

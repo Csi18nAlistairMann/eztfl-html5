@@ -267,6 +267,27 @@ function renderBusStops()
     });
 }
 
+function renderCountdown()
+{
+    var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
+    var text;
+    var id;
+
+    var count = 0;
+    countdownData.forEach(function(arrival, index, array) {
+	id = 'arrival_' + count;
+
+	text = arrival.lineName + ' in ' + Math.round(arrival.timeToStation / 60);
+
+	if (text !== '') {
+	    renderRemoveDiv(id);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+	}
+
+	count++;
+    });
+}
+
 function renderScreen(divArray)
 {
     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.', null);
@@ -453,7 +474,7 @@ function receiveNewCountdown()
 {
     if (this.status == HTTP_200) {
 	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, JSON.stringify(this.response));
-	alert(JSON.stringify(this.response));
+	renderCountdown();
 
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;

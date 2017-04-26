@@ -102,3 +102,33 @@ Consider how to handle drift when the user changes direction or speed
 
 24 April 2017
 Phase 4: Start considering the UI
+First description of UI: as a cool logarithmic space with rings
+      containing the layers of data; also consideration of
+      storyboard possibilities, such as what to click on to get where
+Consideration that this phase is about programming the layer behind
+	      the screen. The UI needs this, the layer behind presents
+	      it like that; phase 5 will be about the drawing
+Manually walk through the relevants API calls to make sure data
+	 actually present or calculable as needed
+So write such as to persist bus stop data because of geolocational
+   drift
+Resolve CORS problem with client directly interrogating the API by
+	setting up and using a reverse proxy
+
+25 April 2017
+Reusing XHR code from previous project
+Handling of geolocation suddenly not working
+Early test exposes problem with radius having a decimal place
+Observe could save many calls to TFL by getting a far larger circle
+	worth of bus stops and locally excluding those outside
+	predicted area
+Repeating reverse proxy work to obtain countdown data as well
+Argue against persisting countdown data
+Handling retrieving the data separately from drawing that data
+Somehow miss the first UI option - dump it all and let the user
+	sort it out
+Create drawing functions intermediating between data and display
+
+26 April 2017
+Implement basic UI for bus stops, which when touched adds the
+	  countdown
