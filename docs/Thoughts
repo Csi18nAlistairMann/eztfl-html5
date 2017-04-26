@@ -1736,7 +1736,10 @@ Working on the UI elements
    answered or ignored.
 
    And of course, geolocations is off again. Never mind, this
-   can be done without it
+   can be done without it.
+
+   Can now create, delete, update without problems. Put them
+   into their own routines
 
 
 

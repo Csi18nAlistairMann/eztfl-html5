@@ -194,15 +194,49 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 function renderScreen(divArray)
 {
-    // first time around there are no divs to look at so create them.
+    var paragraph;
+    var node;
+    var div;
 
-    var para = document.createElement("p");
-    var node = document.createTextNode("This is new.");
-    para.appendChild(node);
+    // second time around, so test if we've already got it 1st
+    if (!document.getElementById('da_1')) {
+	// first time around there are no divs to look at so create them.
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', 'da_1');
+	node = document.createTextNode('This is new.');
+	paragraph.appendChild(node);
 
-    var element = document.getElementById("div1");
-    element.appendChild(para);
+	div = document.getElementById('div1');
+	div.appendChild(paragraph);
+    }
 
+    if (!document.getElementById('da_2')) {
+	// first time, second div to add
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', 'da_2');
+	node = document.createTextNode('This is also new.');
+	paragraph.appendChild(node);
+
+	div = document.getElementById('div1');
+	div.appendChild(paragraph);
+    }
+
+    // now we remove the first
+    if (document.getElementById('da_1')) {
+	child = document.getElementById('da_1');
+	child.parentNode.removeChild(child);
+    }
+
+    // now we replace the second
+    if (document.getElementById('da_3')) {
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', 'da_3');
+	node = document.createTextNode('This is also new again.');
+	paragraph.appendChild(node);
+
+	child1 = document.getElementById('da_2');
+	child1.parentNode.replaceChild(node, child1);
+    }
 }
 
 //-------------------------------------------------------------
