@@ -1812,7 +1812,7 @@ Documentation:
 2107 lines.
 So: 2881 lines altogether, of which 784 are lines of code.
 
-Comment on Anonymous functions
+Comment on Anonymous functions:
    These seem to be very much abused. Consider the following code:
 
 busstop.lines.forEach(function(routeno, index, array) {
@@ -1851,12 +1851,56 @@ arr.forEach(<function name>) {
    refactor my code to remove the anonymous functions I've picked
    up.
 
+   Come to think of it, GOTO was more heavily abused. Now I'm wise
+   enough to know never to use it, I'm old enough to know when
+   I should use it.
 
+2017-04-26 20:26
+Comment on just-in-time knowledge:
+   This is a great term I heard on the radio earlier on. While it
+   already seems to have a meaning online it speaks to something
+   I've practiced for many years: I might not know the answer to
+   a particular question, but I know where to find the answer and,
+   more importantly, what the answer means.
 
+   Example: I've just detailed what I think about anonymous
+   functions, the removed them from the project. You might then
+   ask Why Did I Have Anonymous Functions In The Project? A
+   reasonable question. If you review the code, you'll see I had
+   objects retrieved as JSON from tfl, and then wanted to
+   iterate through them. Well, I know how to do a FOR loop, the
+   most basic loop. I also know from PHP that FOREACH loops are
+   used there to iterate over arrays and objects. When I looked
+   up the JavaScript version of it, the example gave the anonymous
+   function (see just above for the link to that.) Well, I know
+   how to work with an anonymous function, and my purpose when
+   coding is, as mentioned before, to be effective with what's in
+   front of me - not to be efficient, not to improve it, but to
+   concentrate on getting product ready.
 
+   This demonstrates the Just-in-Time Knowledge I think I use -
+   I remember the programming construct I need is the loop; I
+   recall from previous experience that there are different loops
+   for different purposes and that I'm wanting to iterate over an
+   object; I know how to use a search engine to obtain the syntax
+   for what I want; and I know how to adapt the syntax into what
+   I need to use for the purpose at hand. Thus, to me the loop is
+   in effect a black box to be plumbed in. As a black box I'm not
+   needed to be that interested in its internals: if it works,
+   then it's sufficient for now.
 
-
-
+   Of course, it may be that - as now - the result is an
+   inefficient solution such as using anonymous function as the
+   loop internal when regular code would not suffer the same
+   overhead cost. That's where more traditional knowledge and
+   experience comes in useful: knowing that the JiT solution
+   can be improved, and how, and that it can be done in a very
+   short period has its own value. A professional JavaScript
+   programmer could probably have written the same code, faster
+   and first time out. Although I'm slower if only because I
+   wrote it once then refactored without the anonymous
+   function, it does make me independent of the language I need
+   to program in.
 
 ---------------------------------------------------------------
 Ideas:
