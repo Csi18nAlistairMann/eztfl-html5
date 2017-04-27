@@ -1902,6 +1902,107 @@ Comment on just-in-time knowledge:
    function, it does make me independent of the language I need
    to program in.
 
+2017-04-26 22:09
+Phase 5 review:
+   Let's look again at what we have now that we've got a working
+   site. A review: once the data has been retrieved from tfl and
+   processed it finds itself in sessionStorage or localStorage
+   depending. There were two options for then getting that data
+   to the user. In order of complexity: 1, dump everything to
+   screen and 2, make a ring-centric, logarithmic eye-candy site.
+
+   We're into the dump everything step. As in, we dump the bus
+   stop sign and routes visiting it. At the user's request we
+   then dump the route number and minutes until it arrives for
+   as many buses as tfl report to us.
+
+   And when i say "dump", that's exactly what I mean - the data
+   is sent to the screen without checking for duplicates I'm
+   sure are happening, in whatever order they're presented to
+   us. I'm thinking certain old data stays presented (countdown
+   data not being expired when new countdown data arrives
+   maybe: if fewer new countdown entries arrive than last time,
+   the old entries beyond the number of new entries are not
+   deleted.) While I might be dumping, it's not "everything"
+   with things missing like the near destination, the bearing
+   to the bus stop and others.
+
+   The goal as originally stated was "I'm at X, Y walking in
+   direction Z. What are my bus stop options?" and it's
+   arguable that the site as it stands meets that goal: some
+   work has to be done by the user but still: I've tested that
+   I can walk down the street with the web page open, I can see
+   the bus stop sign from sme yards distance, I can open the
+   countdown for it on the browser, and I can see the entries
+   for that even before I get the bus stop.
+
+   This is an improvement for the human as he doesn't need to
+   get to the bus stop before calling for the countdown. This
+   comes at the cost of obtaining a later phone that can
+   support HTML5 than the earlier phone which needs the SMS
+   number from the stop, but uses HTML4.01 last updated in
+   2001.
+
+   However I wouldn't necessarily take the website as it stands
+   back to a client and say - here: this accomplishes your
+   goals. At the same time, if it DOES meet their goal, then
+   clearly there's more to consider than just that goal, or our
+   understanding of that goal doesn't sync.
+
+   The best way to understand how the project has
+   simultaneously met the project goals and "isn't ready" is
+   to view there as being two projects that weren't visible at
+   the beginning. We could have two Projects:
+   1: Please program a model that answers the question: "I'm at
+      X, Y walking in direction Z. What are my bus stop
+      options?"
+   2: Interacting with the model from the first project, please
+      work on its UX.
+
+   Now it's obvious that the second project has an awful line
+   with "please work on the UX" - anybody can claim almost
+   anything to establish work was done, or not done. A
+   reasonable person can look at the first project and say,
+   Yes, this answers that 'options' question. But a reasonable
+   person couldn't do the same with the second question. What
+   work? Yet as soon as that work is laid on paper, the project
+   invites trouble: what if the definition was bad? It's not in
+   the programmer's interest to see the project tank because
+   there's no room to adjust.
+
+   Rather, the approach to take is to quantify progress in
+   solid terms such as hours contributed, or money spent. This
+   should have a UX lead with the power to sign off the work
+   as being done. The second project would also have regular
+   progress meets specifically for that UX lead to raise issues
+   or change direction. If the UX is bad at the end, at that
+   lead had raised no issues, then it's likely the UX lead has
+   a bad sense of what's good. Alternatively if the UX lead had
+   been raising consistent issues about what was needed and the
+   project at the end looks bad, it's likely the programmers
+   aren't upto meeting the vision of what the UX should be.
+   If the UX vision was moon-on-a-stick territory, the
+   programmers ought to have bought that up before starting
+   work ("I want the site to work like Amazon's. Your time
+   budget is six hours, or $400 whichever comes first.") In
+   this manner, both buyer and doer share the risk inherent to
+   all projects, and both are motivated and disciplined into
+   reaching a vision that's achievable achievable, realistic
+   and time bound, even if its not simple and measurable.
+
+   In the event the UX can be done under budget and in
+   schedule, so much the better. If one or both is going to
+   go over, then that should be clear well before things go
+   south.
+
+   It's worth noting that as these are two seperate IT language
+   projects then it would have been possible to have them run
+   in parallel. To do so would require agreement on the
+   interface between the two in terms of what data in what
+   form is available in what place. With the project as it
+   stands, that would mean defining the JSON currently in
+   sessionStorage and localStorage.
+
 ---------------------------------------------------------------
 Ideas:
 2. focus on dests at expense of other item's screen real estate

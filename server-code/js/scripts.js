@@ -22,12 +22,14 @@ const MINIMUM_RADIUS_TO_LOOK = 200;
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
 
-const RPROXY_URL_BUSSTOPS = 'https://eztfl-html5.mpsvr.com/mirror/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram';
-const RPROXY_URL_COUNTDOWN_PRE = 'https://eztfl-html5.mpsvr.com/mirror/bar/StopPoint/';
+const RPROXY_URL_STUB = 'https://eztfl-html5.mpsvr.com/mirror';
+const RPROXY_URL_BUSSTOPS = RPROXY_URL_STUB + '/foo/StopPoint?stopTypes=NaptanPublicBusCoachTram';
+const RPROXY_URL_COUNTDOWN_PRE = RPROXY_URL_STUB + '/bar/StopPoint/';
 const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
+
 //
 // Globals
 //
@@ -265,26 +267,6 @@ function renderBusStops()
 
 	count++;
     }
-
-    // busstopData.forEach(function(busstop, index, array) {
-    // 	id = 'busstop_' + count;
-
-    // 	text = '';
-
-    // 	for (routeno in busstop.lines) {
-    // 	    text += busstop.lines[routeno].name + ' ';
-    // 	}
-    // 	// busstop.lines.forEach(function(routeno, index, array) {
-    // 	//     text += routeno.name + ' ';
-    // 	// });
-    // 	if (text !== '') {
-    // 	    text = 'Bus stop: ' + busstop.stopLetter + ' routes: ' + text;
-    // 	    renderRemoveDiv(id);
-    // 	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstop.naptanId + '")');
-    // 	}
-
-    // 	count++;
-    // });
 }
 
 function renderCountdown()
@@ -308,16 +290,13 @@ function renderCountdown()
     }
 }
 
-function renderScreen(divArray)
-{
-    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.', null);
-
-    renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.', null);
-
-    renderRemoveDiv('da_1');
-
-    renderReplaceDivWithText('da_2', 'da_3', 'This is also new again.');
-}
+// function renderScreen(divArray)
+// {
+//     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.', null);
+//     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.', null);
+//     renderRemoveDiv('da_1');
+//     renderReplaceDivWithText('da_2', 'da_3', 'This is also new again.');
+// }
 
 //-------------------------------------------------------------
 //
