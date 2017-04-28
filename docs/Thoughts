@@ -404,7 +404,7 @@ the routine being used is likely to be effective.
 
 At first blush it looks like the code provided accepts coords in the
 double form provided. Let's run and see.
-1. Doesn't work move script to <head /> and retest
+1. Doesn't work move script to <head> and retest
 2. Doesn't work. F12 to see error in alert() use. Fix and retest
 3. Doesn't worl. F12 to see atan2 not defined. Change to Math.atan2
    and retest
@@ -1687,10 +1687,10 @@ Working on the UI elements
    to whatever html elements are appropriate.
 
    We should observe that there is little difference between the
-   above two approaches: they both get <divs/> on the page with
+   above two approaches: they both get <divs> on the page with
    the second approach discarding any sense of positioning.
 
-   In which case it's a reasonable approach to a) get the <div/>s
+   In which case it's a reasonable approach to a) get the <div>s
    out there first; then position them as best fits.
 
    This creates a new data layer to play with. On one side we
@@ -1700,11 +1700,11 @@ Working on the UI elements
    describing something about what it'll be doing, such as a
    type: this is a bus stop. That is a near destination. The
    other is a bus line. We will want them all to have IDs as
-   well, so updating can quickly handle old <div/>s that are
+   well, so updating can quickly handle old <div>s that are
    hanging around.
 
    This seems to be describing an array of elements that will
-   end up being <divs/>. They have an id so we can update them
+   end up being <divs>. They have an id so we can update them
    as time goes by; we have a timestamp so we can expire them;
    they get an X, Y and Z that can be used to indicate where
    they are. Could also give them speed, acceleration and so
@@ -2003,8 +2003,200 @@ Phase 5 review:
    stands, that would mean defining the JSON currently in
    sessionStorage and localStorage.
 
+2017-04-27 09:52
+How many resources to put into second project?
+What method should use for doing this myself?
+
+2017-04-28 07:38
+Having spent some considerable time using the project around
+northern London today...
+
+Observations:
+ I /really/ liked that I could be a good 100ft away from the
+bus stop and see the white letter/red disc combo on top of
+the stop pole, then pull up the same on the browser. I'm very
+much looking forward to being even further away and seeing on
+screen the most likely candidate for that bus stop.
+
+Suggestions:
+  These can /only/ be suggestions because they did not form
+part of the original project goal. As a suggestion they go into
+the feature set that'll be added given the resources/budget but
+if missing, none should be considered a show stopper. If one
+actually is a show stopper, something's wrong!
+1. UX - indicator of travel direction for bus stop?
+2. UX, Middle, Backend - show tubes nearby
+3. Doc - That this a read-only project
+4. UX - connect with old site at eztfl.pectw.net
+5. UX - use 𝈚  from http://shapecatcher.com/unicode/info/119322
+6. UX - Use css to make larger, smaller (not zoom!)
+7. UX - use css and/or inline data to form images
+8. UX, middle - to stop or slow refresh lookups
+Note the above, if mandated counts as Feature Creep which is to
+be avoided. I thought of the above list while wandering around. If
+I got back to the office and demanded they be accomodated then
+1. I've distracted the programmer(s) who have not yet completed the
+phase 5 project
+2. I've diluted concentration on the second project to implement or
+think about non-core functionality
+3. I've thus managed to bloat the project, the budget, the hours
+required to complete the minimally pretty side of things and very
+particularly throw far off int the future that far off  day when
+the project can finally be signed off.
+So - suggestions are good, but they need a very, very short leash.
+
+How many resources to put into the UX project?
+  We obviously can't answer "how long would the second project
+take?" as the question is analagous to "how long is a piece of
+string?" - it could be as long or as short as desired. Our project
+could be more or less featureful as resources put in permit.
+
+That said, we shouldn't leave it open-ended either in hours or
+money even with the regular reviews. But neither should we
+fetishise finishing exactly as scheduled or budgeted. Instead,
+let's define a series of functionality milestones to be hit in a
+specified order towards which budget and hours can be assigned.
+We already start from the position where the project is in some
+sense acceptable, as we've met the original goal. What's left
+are incremental improvements.
+
+At some point, some nominated person is going to balance the
+completed features, the budget and the timing and say "Yes,
+that's enough". Until then, the UX project spends budget and
+assigns hours completing milestones. In the best of all worlds,
+that will leave the project, at each milestone, in increasingly
+acceptable states. It's then for others to decide to go early,
+or add resources after running out.
+
+So to answer "how long would the second project take?", the
+answer is "The project meets technical goals right now. It will
+get prettier according to this functionality path and will
+always be ready to go public at it's previously hit milestone.
+You decide how long it takes."
+
+By implication, remaining features would then be deferred until
+later.
+
+What method should use for doing this myself for this project?
+  To start with I recognise that the first part of the project
+is not yet finished - for instance near destinations don't
+show up in a <p> or <div>. Enumerating and implementing these
+should be trivial given knowledge of the work done. In a
+bigger project, the UX lead would already have made this list
+and the programmer would now be ticking off that they're in
+the DOM.
+
+First Project:
+[ ] Establish list of additional elements to be made available
+ - near destination (visual)
+ - distance (property)
+ - bearing (property)
+[ ] Arrange the data is cleaned of duplicates before use
+[ ] Arrange the countdown data is ordered before use
+ - first ordered by minutes to arrival
+ - second ordered by bus route's first arrival
+
+  Again, in a bigger project the UX lead would need to
+establish what data should be available with degrees of Nice-
+To-Have (n2h). The busstop data as a group might be a level 1
+n2h because without it the project makes no sense. The final
+destination of the bus might be a level 3 n2h. Having nearby
+tube countdown data might be a level 5. The UX lead might
+additionally underline all level 2 and 1 items as mandatory
+such that not having them would see the project pulled.
+
+Second project:
+  For the eztfl-html5 project, and with me as the UX lead, I
+can write up the n2h list like this:
+Level 1:
+[ ] "you are here" in the pink ball position
+[ ] Ring system:
+  [ ] Positioning system based on three rings in the centre,
+    middle and edge of the screen such that data can be
+    located on each ring if given either a bearing, or if
+    located on the middle ring and given an inner and outer
+    ring pair it should connect
+  [ ] also that given a distance, can arrange for distance from
+   the centre of the screen to be logarithmic so to fit more
+   data on screen
+  [ ] Also that the rings may be of arbitrary size, such that
+    one can be given more screen real estate at the expense
+    of the others
+  [ ] also that elements occupying the same ring should not
+    overlap but expand around the ring. Two or more elements
+    occupying the same position on the ring should centre
+    around that position on the ring;
+  [ ] that the rings be associated with the user's heading such
+    that when the user changes heading, the elements on the
+    rings shift around to match
+  [ ] That elements on the centre ring have lines connecting them
+    from their inner to outer ring
+[ ] that bearing and distance be used to associate bus stops with
+  positions on the inner ring
+[ ] that those bus stops reflect the red/white code seen on top
+  of bus stops
+[ ] that the near destination for each bus stop code occupy the
+  outer ring, initially following the bearing of it's bus stop
+  partner in the inner ring
+[ ] That touching a bus stop code in the inner ring will bring
+  up/replace an ordered countdown below the pink ball spot
+Level 3:
+1. UX - indicator of travel direction for bus stop?
+2. UX, Middle, Backend - show tubes nearby
+4. UX - connect with old site at eztfl.pectw.net
+5. UX - use 𝈚  from http://shapecatcher.com/unicode/info/119322
+6. UX - Use css to make larger, smaller (not zoom!)
+7. UX - use css and/or inline data to form images
+8. UX, middle - to stop or slow refresh lookups
+
+Notes:
+1. I have an expectation that HTML/CSS is used as far as possible
+   to effect both content and positioning so as to minimise
+   bandwidth demands either in number of download size.
+2. I have an expectation that JavaScript on the device is used to
+   accomplish processing, that is, no extra demands on the
+   server.
+
+-------------------------------------------------
+|		barnet			enfield	|
+|		    \			lock	|
+|		     \		       /	|
+|		      43    ---121----/		|
+|		       \   /			|
+|			\ /			|
+|			AB			|
+|wood						|
+|green\						|
+|      \			Z--123		|
+|	141			      \		|
+|	   \----T		       tottenham|
+|				       hale	|
+|					/	|
+|				       /	|
+|				CD--N73		|
+|				  \		|
+|finsbury			   30		|
+|pk   \--236---CM		     \---dalston|
+|						|
+|						|
+|						|
+|						|
+|						|
+|                  you are here			|
+|						|
+|						|
+|countdown  countdown  countdown  countdown     |
+|     countdown  countdown  countdown  countdown|
+|  countdown  countdown  countdown  countdown	|
+|						|
+-------------------------------------------------
+
+
+
+
+
+
+
+
 ---------------------------------------------------------------
-Ideas:
-2. focus on dests at expense of other item's screen real estate
-4. <div/> position relative to user to be logarithmic
-7. comment on anonymous functions, just in time knowledge
+3. Doc - That this a read-only project

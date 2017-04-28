@@ -136,4 +136,11 @@ Review: 784 loc, 2881 if including documentation
 Observations on anonymous functions
 Observations on just-in-time knowledge
 Review time - as the project has met the project goal. But hasn't.
-UX as a seperate project
+UX as a separate project
+
+28 April 2017
+How usage leads to feature creep, and using suggestions to handle this
+Observations on starting with a minimal acceptable project and adding
+  single pretty things to the UX such that project could be signed off
+  in a hurry. Thus time = the number of features allowed by time & budget
+Outline of UX requirements and suggestions
