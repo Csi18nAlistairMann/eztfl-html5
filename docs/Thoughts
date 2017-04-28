@@ -2277,5 +2277,108 @@ ideal, then use trigonometry to convert from that ideal into
 whatever 2D space the user has given us - so accounting for
 different screens and dimensions.
 
+"Don't overlap" technology
+  The desire is that multiple elements competing for the same real
+estate on screen do not overlap as to do so makes it tricky for the
+user to interact with them. How can this be implemented?
+
+It can't easily be done (say with an OS call) as we won't know the
+size of html elements on the ring the first time around. We will
+know after rendering as JavaScript can run collison boxes against
+the divs themselves.
+Options:
+1. If a collison is detected, restart all processing against smaller
+icon sizes
+2. "Bump" boxes affected by a collison by noting a
+clockwise/anti-clockwise bump factor, then rerun positioning again.
+
+    This gives a broad outline for processing:
+1. Establish positions on the ideal ring, with 0 bumps
+2. Collision detect, bump, and rerun.
+
+  In the collison phase, a collison happens in a direction. When
+reprocessed that direction is accounted for by having the object
+concerned move away, either by shifting along the ring, or
+clusering around that point on the ring. This repeats until no more
+collisions or some other factor (max rereuns, for example.)
+
+Could some other trigonometry shortcut things? If I know the width
+of a the ring at that point & I know the width of the div, can I
+calculate a new pos from it?
+
+  Or instead, knowing that there's a bump there, change the
+position 0.5x. If two bumps, change by 1x etc. Thi approach is
+easier!
+
+As it stands bumping to a side would leave a horizontal line across
+the screen like "A", when we might prefer a cluster like "B":
+
+		  __aasa>,.
+		=wmZY|!{Smqs,
+	A: __________   -"Um . __  B:
+	  [CD,EF,GH,I]     - _[NM]
+	   ----------       [RK,LM]_
+	  .w#(               --[Q,OP]
+	  jD^                  -----
+	 <m(                    -Xo
+	:me                      )$c
+       .jZ`                       3p,
+
+This could be accomodate by randomly assigning positions nearby and
+directionally moving in the event of a collision. If no collison
+then we use the original location. Direcrtion can be discerned with
+trigonometry, as with the bearing.
+
+All of the above exploration of the problem may or may not make it
+into the final product but what it does to is reveal the nature of
+the process for solving the problem:
+
+zero everyones bumps
+everyone get assigned how bump should be addressed (move left, move
+	 away from user etc)
+do {
+   Positioning step:
+   1. All objects get a new location on their ring while acknowledging
+      bumps etc
+   Collision step:
+   3. Compare every object that might collide with every other
+   4. If they do collide, note how they collide (which side, corner,
+      which direction etc)
+} loop back to 1 if any collisions detected and other factors
+   (eg max reruns) allow
+
+In this manner, we can add a function to the positioning step that
+defines how a bump affects a position. In doing so we've successfully
+abstracted out how the bump works from the rest of the code such
+that we can easily change things later.
+
+We can do the same for collision detection, adding collision based
+on boxes, circles or something else altogether.
+
+That we're doing it this way at all means we can do larger changes in
+future too, such as drawing lines from the bus stop signs to tinier
+dots that don't get bumped, for example, by adding objects, rings,
+and additional rules for positioning and collisions.
+
+Planning for future changes is good :-)
+
+2017-04-28 17:29
+Back to the first project and what's left to do.
+
+[ ] Establish list of additional elements to be made available
+ - near destination (visual)
+ x routes serving that bus stop (visual)
+ - distance (property) from predicted location
+ - bearing (property) from predicted location
+[ ] Arrange the data is cleaned of duplicates before use
+[ ] Arrange the countdown data is ordered before use
+ - first ordered by minutes to arrival
+ - second ordered by bus route's first arrival
+
+
+
+
+
+
 ---------------------------------------------------------------
 3. Doc - That this a read-only project

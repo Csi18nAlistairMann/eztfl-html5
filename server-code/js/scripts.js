@@ -250,22 +250,26 @@ function renderBusStops()
     var busstopData = JSON.parse(localStorage.getItem(NOTED_BUSSTOPS_NAME));
     var text;
     var id;
+    var line_count;
+    var stop_count;
 
-    var count = 0;
+    stop_count = 0;
     for (busstop in busstopData) {
-	id = 'busstop_' + count;
+	id = 'busstopno_' + stop_count;
+	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
+	renderRemoveDiv(id);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")');
 
-	text = '';
+	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
-	    text += busstopData[busstop].lines[routeno].name + ' ';
-	}
-	if (text !== '') {
-	    text = 'Bus stop: ' + busstopData[busstop].stopLetter + ' routes: ' + text;
+	    id = 'lineno_' + line_count;
+	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")');
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+	    line_count++;
 	}
 
-	count++;
+	stop_count++;
     }
 }
 
