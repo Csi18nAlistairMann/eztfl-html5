@@ -2191,12 +2191,91 @@ Notes:
 |						|
 -------------------------------------------------
 
+2017-04-28 13:50
+The ring system
+1. The Ring.
+    I envision the bus stops and other elements being laid out
+on three rings, each ring of which looks like this:
 
+		  __aasa>,.
+		=wmZY|!{Smqs,
+	      <w#Y~-     -"Uma.
+	     <W?~          -"$p.
+	   .vW(              +Xp,
+	  .w#(                -Vm;
+	  jD^                  -3m,
+	 <m(                    -Xo
+	:me                      )$c
+       .jZ`                       3p,
+       :#(                        -$(
+       j2                          ]k.
+      =m[                          )W(
+      )E             A              3C
+      d[                            )k.
+     .m=                            :#;
+     <#.                            .X(
+     ]2                              3L
+    .de                              ]k.
+    :mk                             .3W:
+    =We                              ]W`
+    :d(                              ]m:
+    <Wc                              ]W;
+    )mo.                            .dW;
+    =WE.                            =QD`
+    :$m;                            vWe.
+    -3Qp,                          <mWc
+     )WQo,                        <mWE`
+      )WQc.                      _mWE`
+      -3WQc.    You are here    =mWD+
+       -XWmg>.                =umQW(
+	+YWWmp>.         .. =umQWX(
+	  |3WWmwaa,.... _aaumQWE!`
+	   -+U##QQmwwwwwgQWB#8(`
+	     ---?UUUUUUUUUe~--
+		 - - - --
 
+While I've printed up somehting vaguely egg-shaped, I'd also
+envision having the option of changing the shape if required.
+"You are here" being at the pink spot sees it right at the
+bottom of the ring, as matches that one's position is at the
+edge of a predicted range from position "A", directly ahead.
+Thus, bus stops that are close appear below A, further appears
+above A. Whatever the bearing is from the user to the bus
+stop gets applied to the element denoting it. If the bus stop
+itself is at A, then that's where it's shown. However as one
+moves away from A, the position is logarithmic such that
+increasing distances make increasingly little difference to
+the position: A bus stop one radius from A is show on the ring
+itself, or just inside; A bus stop two radii away, if show,
+would appear perhaps 1/15th of a radius outside the ring. This
+would maximise close-up data at the expense of the far away:
+how far to the next bus stop is more important than how far to
+a bus stop 15 minutes distance - but the user can still
+determine the difference between one 15 mins away and another
+12 mins away.
 
+I envision three of these rings on screen at once. (Note:
+they're not necessarily or actually represented on screen but
+appear present from the <div>s floating along them.) Each
+element that gets on screen will have a type (bus stop, bus
+route, near destination), a position X,Y and a distance.
 
+Which type the <div> has defines which ring it's on: the bus
+stops will be on or within the central ring, bus routes on the
+middle ring, and near destinations on the outer ring. Although
+note: I also envision near destinations hugging the outer edge
+of the screen.
 
+If two elements want to occupy the same point on a ring, then
+they should occupy such a point adjacent to each other as to
+have that point on a ring between them. Same with three elements
+etc: one occupies the point, the other two are immediately
+adjacent.
 
+I have in mind that we model the ring into a behind the scenes
+ideal, then use trigonometry to convert from that ideal into
+whatever 2D space the user has given us - so accounting for
+different screens and dimensions.
 
 ---------------------------------------------------------------
 3. Doc - That this a read-only project
