@@ -2375,6 +2375,14 @@ Back to the first project and what's left to do.
  - first ordered by minutes to arrival
  - second ordered by bus route's first arrival
 
+With geolocation down again, rewrite the call again to use fake
+positioning data. Notice and fix errors!
+
+
+
+
+
+
 
 
 

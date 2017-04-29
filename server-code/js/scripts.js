@@ -8,7 +8,7 @@
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
 const EARTH_RADIUS_IN_KM = 6371;
-const EARLIEST_TIMESTAMP_EVAH = 1; // 1970-01-01T00:00:00.000Z
+const FIRST_TIMESTAMP_EVAH = 1; // 1970-01-01T00:00:00.000Z
 const LAST_TIMESTAMP_EVAH = 253402300799999; // 9999-12-31T23:59:59.999Z
 const LOWEST_LATITUDE = -90.0;
 const HIGHEST_LATITUDE = 90.0;
@@ -30,6 +30,7 @@ const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
 
+const FAKE_POSITION = true;
 //
 // Globals
 //
@@ -57,7 +58,21 @@ function setup_tracked_positions(num_positions)
 //
 function getLocationSetup()
 {
-    if (navigator.geolocation) {
+    if (FAKE_POSITION === true) {
+	position = new Object();
+	position.coords = new Object();
+	position.coords.latitude = 51.529206;;
+	position.coords.longitude = -0.11032051;
+	position.timestamp = 1193421444000;
+	positionPush(NUM_TRACKED_POSITIONS, position);
+	position = new Object();
+	position.coords = new Object();
+	position.coords.latitude = 51.529392
+	position.coords.longitude = -0.1103775;
+	position.timestamp = 1193421460000;
+	mainLoop(position);
+
+    } else if (navigator.geolocation) {
 	navigator.geolocation.watchPosition(mainLoop, cannotWatchPosition);
 
     } else {
@@ -414,6 +429,7 @@ function receiveNewBusStop(currentValue, index, array)
     var timeNow = Date.now();
     var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
     var found;
+    var towards;
 
     // we'll use this to expire old bus stops
     currentValue.timestamp = timeNow;
@@ -426,9 +442,15 @@ function receiveNewBusStop(currentValue, index, array)
 	notedBusStops = JSON.parse(notedBusStops);
     }
 
+    towards = '';
+    for(additionalPropertyIdx in currentValue.additionalProperties) {
+	if (currentValue.additionalProperties[additionalPropertyIdx].key === 'Towards') {
+	    towards = currentValue.additionalProperties[additionalPropertyIdx].value;
+	}
+    }
+
     // see if we already have this bus stop, and expire old
     found = false;
-
     for (busStop in notedBusStops) {
 	// expire when ten minutes old
 	if (notedBusStops[busStop].timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
@@ -501,15 +523,15 @@ function checkPositionValues(position)
     var new_ts = Date.now();
 
     // the timestamp should reflect a date between 1970 and 9999AD
-    if (typeof(new_ts !== 'number')) {
-	new_ts = EARLIEST_TIMESTAMP_EVAH;
+    if (typeof(new_ts) !== 'number') {
+	new_ts = FIRST_TIMESTAMP_EVAH;
 
     } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
 		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
-	new_ts = EARLIEST_TIMESTAMP_EVAH;
+	new_ts = FIRST_TIMESTAMP_EVAH;
     }
 
-    if (typeof(old_ts !== 'number')) {
+    if (typeof(old_ts) !== 'number') {
 	position.timestamp = new_ts;
 
     } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
@@ -519,20 +541,20 @@ function checkPositionValues(position)
 
     // the latitude and longitude should be values between
     // -90 & +90, -180 & +180 respectively
-    if (typeof(position.latitude !== 'number')) {
-	position.latitude = 0;
+    if (typeof(position.coords.latitude) !== 'number') {
+	position.coords.latitude = 0;
 
-    } else if (!(position.latitude >= LOWEST_LATITUDE
-		 && position.latitude <= HIGHEST_LATITUDE)) {
-	position.latitude = 0;
+    } else if (!(position.coords.latitude >= LOWEST_LATITUDE
+		 && position.coords.latitude <= HIGHEST_LATITUDE)) {
+	position.coords.latitude = 0;
     }
 
-    if (typeof(position.longitude !== 'number')) {
-	position.longitude = 0;
+    if (typeof(position.coords.longitude) !== 'number') {
+	position.coords.longitude = 0;
 
-    } else if (!(position.longitude >= LOWEST_LONGITUDE
-		 && position.longitude <= HIGHEST_LONGITUDE)) {
-	position.longitude = 0;
+    } else if (!(position.coords.longitude >= LOWEST_LONGITUDE
+		 && position.coords.longitude <= HIGHEST_LONGITUDE)) {
+	position.coords.longitude = 0;
     }
 
     return position;
