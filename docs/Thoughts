@@ -2366,7 +2366,7 @@ Planning for future changes is good :-)
 Back to the first project and what's left to do.
 
 [ ] Establish list of additional elements to be made available
- - near destination (visual)
+ x near destination (visual)
  x routes serving that bus stop (visual)
  - distance (property) from predicted location
  - bearing (property) from predicted location

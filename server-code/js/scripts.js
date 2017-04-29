@@ -281,6 +281,11 @@ function renderBusStops()
 	renderRemoveDiv(id);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")');
 
+	id = 'neardestno_' + stop_count;
+	text = busstopData[busstop].towards;
+	renderRemoveDiv(id);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
 	    id = 'lineno_' + line_count;
@@ -468,6 +473,7 @@ function receiveNewBusStop(currentValue, index, array)
 	    towards = currentValue.additionalProperties[additionalPropertyIdx].value;
 	}
     }
+    currentValue.towards = towards;
 
     // see if we already have this bus stop, and expire old
     include_this = true;
