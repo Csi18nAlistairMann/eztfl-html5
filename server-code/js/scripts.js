@@ -1,7 +1,7 @@
 /*
   eztfl-html5  Alistair Mann
 */
-
+"use strict";
 //
 // Constants
 //
@@ -48,7 +48,9 @@ function eztflHtml5_setup()
 
 function setup_tracked_positions(num_positions)
 {
-    for(var a = 0; a < num_positions; a++) {
+    var a;
+
+    for (a = 0; a < num_positions; a++) {
 	tracked_positions[a] = null;
     }
 }
@@ -58,6 +60,8 @@ function setup_tracked_positions(num_positions)
 //
 function getLocationSetup()
 {
+    var position = {};
+
     if (FAKE_POSITION === true) {
 	position = new Object();
 	position.coords = new Object();
@@ -267,6 +271,8 @@ function renderBusStops()
     var id;
     var line_count;
     var stop_count;
+    var busstop;
+    var routeno;
 
     stop_count = 0;
     for (busstop in busstopData) {
@@ -293,8 +299,10 @@ function renderCountdown()
     var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
     var text;
     var id;
+    var arrival;
+    var count;
 
-    var count = 0;
+    count = 0;
     for (arrival in countdownData) {
 	id = 'arrival_' + count;
 
@@ -328,7 +336,9 @@ function renderCountdown()
 function positionPush(num_positions, position)
 {
     var count = 0;
-    for (var a = 0; a < num_positions - 1; a++) {
+    var a;
+
+    for (a = 0; a < num_positions - 1; a++) {
 	tracked_positions[a] = tracked_positions[a + 1];
 	if (tracked_positions[a] != null)
 	    count++
@@ -430,6 +440,8 @@ function receiveNewBusStop(currentValue, index, array)
     var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
     var found;
     var towards;
+    var additionalPropertyIdx;
+    var busStop;
 
     // we'll use this to expire old bus stops
     currentValue.timestamp = timeNow;
@@ -443,7 +455,7 @@ function receiveNewBusStop(currentValue, index, array)
     }
 
     towards = '';
-    for(additionalPropertyIdx in currentValue.additionalProperties) {
+    for (additionalPropertyIdx in currentValue.additionalProperties) {
 	if (currentValue.additionalProperties[additionalPropertyIdx].key === 'Towards') {
 	    towards = currentValue.additionalProperties[additionalPropertyIdx].value;
 	}
@@ -505,9 +517,11 @@ function receiveNewCountdown()
 //
 function isArrayEqual(arr1, arr2)
 {
+    var a;
+
     if (arr1.length != arr2.length)
 	return false;
-    for(var a = 0; a < arr1.length; a++) {
+    for (a = 0; a < arr1.length; a++) {
 	if (arr1[a] !== arr2[a])
 	    return false;
     }
