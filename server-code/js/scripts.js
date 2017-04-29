@@ -18,6 +18,7 @@ const BUS_STOP_EXPIRES_IN_SECS = 10 * 60 * 60;
 const NOTED_BUSSTOPS_NAME = 'notedBusStops';
 const NOTED_COUNTDOWN_NAME = 'notedCountdown';
 const MINIMUM_RADIUS_TO_LOOK = 200;
+const CLASS_COUNTDOWN_NAME = 'countdown';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -213,7 +214,7 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderAddDivWithText(parent, name, text, onclick_handler)
+function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
 {
     var paragraph;
     var node;
@@ -224,6 +225,7 @@ function renderAddDivWithText(parent, name, text, onclick_handler)
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
+	paragraph.setAttribute('class', eztflClass);
 	if (onclick_handler !== null) {
 	    paragraph.setAttribute('onclick', onclick_handler);
 	}
@@ -279,19 +281,19 @@ function renderBusStops()
 	id = 'busstopno_' + stop_count;
 	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
 	renderRemoveDiv(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")');
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")', null);
 
 	id = 'neardestno_' + stop_count;
 	text = busstopData[busstop].towards;
 	renderRemoveDiv(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, null);
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
 	    id = 'lineno_' + line_count;
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, null);
 	    line_count++;
 	}
 
@@ -306,7 +308,16 @@ function renderCountdown()
     var id;
     var arrival;
     var count;
+    var extants;
+    var idx;
 
+    // remove all existing countdown data
+    extants = document.getElementsByClassName(CLASS_COUNTDOWN_NAME);
+    for (idx = 0; idx < extants.length; idx++) {
+	extants[idx].parentNode.removeChild(extants[idx]);
+    }
+
+    // display all the new countdown data
     count = 0;
     for (arrival in countdownData) {
 	id = 'arrival_' + count;
@@ -315,20 +326,12 @@ function renderCountdown()
 
 	if (text !== '') {
 	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME);
 	}
 
 	count++;
     }
 }
-
-// function renderScreen(divArray)
-// {
-//     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_1', 'This is new.', null);
-//     renderAddDivWithText(RENDERING_FIELD_NAME, 'da_2', 'This is also new.', null);
-//     renderRemoveDiv('da_1');
-//     renderReplaceDivWithText('da_2', 'da_3', 'This is also new again.');
-// }
 
 //-------------------------------------------------------------
 //
