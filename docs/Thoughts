@@ -2368,8 +2368,8 @@ Back to the first project and what's left to do.
 [ ] Establish list of additional elements to be made available
  x near destination (visual)
  x routes serving that bus stop (visual)
- - distance (property) from predicted location
- - bearing (property) from predicted location
+ x distance (property) from predicted location (already there)
+ x bearing (property) from predicted location
 [ ] Arrange the data is cleaned of duplicates before use
 [ ] Arrange the countdown data is ordered before use
  - first ordered by minutes to arrival

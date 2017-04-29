@@ -19,6 +19,9 @@ const NOTED_BUSSTOPS_NAME = 'notedBusStops';
 const NOTED_COUNTDOWN_NAME = 'notedCountdown';
 const MINIMUM_RADIUS_TO_LOOK = 200;
 const CLASS_COUNTDOWN_NAME = 'countdown';
+const RADIUS_NAME = 'radius';
+const LATITUDE_NAME = 'latitude';
+const LONGITUDE_NAME = 'longitude';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -225,7 +228,9 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
-	paragraph.setAttribute('class', eztflClass);
+	if (eztflClass !== null) {
+	    paragraph.setAttribute('class', eztflClass);
+	}
 	if (onclick_handler !== null) {
 	    paragraph.setAttribute('onclick', onclick_handler);
 	}
@@ -376,6 +381,8 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     var handler;
     var pair;
     var radius;
+    var lat;
+    var lon;
 
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
@@ -402,7 +409,12 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 
     radius = Math.round(radius);
 
-    url = RPROXY_URL_BUSSTOPS + '&radius=' + radius + '&lat=' + pair[0] + '&lon=' + pair[1];
+    lat = pair[0];
+    lon = pair[1];
+    url = RPROXY_URL_BUSSTOPS + '&radius=' + radius + '&lat=' + lat + '&lon=' + lon;
+    sessionStorage.setItem(RADIUS_NAME, JSON.stringify(radius));
+    sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
+    sessionStorage.setItem(LONGITUDE_NAME, JSON.stringify(lon));
     handler = receiveNewBusStops;
     sendGetCore(url, handler);
 
@@ -458,6 +470,9 @@ function receiveNewBusStop(currentValue, index, array)
 
     timeNow = Date.now();
     notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
+
+    currentValue.originLatitude = sessionStorage.getItem(LATITUDE_NAME);
+    currentValue.originLongitude = sessionStorage.getItem(LONGITUDE_NAME);
 
     // we'll use this to expire old bus stops
     currentValue.timestamp = timeNow;
