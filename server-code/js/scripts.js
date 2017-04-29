@@ -1,7 +1,7 @@
 /*
   eztfl-html5  Alistair Mann
 */
-"use strict";
+'use strict';
 //
 // Constants
 //
@@ -290,7 +290,7 @@ function renderBusStops()
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
-	    id = 'lineno_' + line_count;
+	    id = 'lineno_' + busstop + ' ' + line_count;
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDiv(id);
 	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, null);
