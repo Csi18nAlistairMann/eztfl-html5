@@ -436,12 +436,20 @@ function receiveNewBusStops()
 
 function receiveNewBusStop(currentValue, index, array)
 {
-    var timeNow = Date.now();
-    var notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
-    var found;
+    var timeNow;
+    var notedBusStops;
+    var include_this;
     var towards;
     var additionalPropertyIdx;
     var busStop;
+
+    if (currentValue.lines.length === 0) {
+	// bus stop has no routes serving it
+	return;
+    }
+
+    timeNow = Date.now();
+    notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
 
     // we'll use this to expire old bus stops
     currentValue.timestamp = timeNow;
@@ -462,19 +470,19 @@ function receiveNewBusStop(currentValue, index, array)
     }
 
     // see if we already have this bus stop, and expire old
-    found = false;
+    include_this = true;
     for (busStop in notedBusStops) {
-	// expire when ten minutes old
 	if (notedBusStops[busStop].timestamp < timeNow - BUS_STOP_EXPIRES_IN_SECS) {
+	    // expire when ten minutes old
 	    notedBusStops.splice(busStop, 1);
+	    include_this = false;
 
-	} else {
-	    if (notedBusStops[busStop].id === currentValue.id) {
-		found = true;
-	    }
+	} else if (notedBusStops[busStop].id === currentValue.id) {
+	    // we're already watching this one
+	    include_this = false;
 	}
     }
-    if (found === false) {
+    if (include_this === true) {
 	notedBusStops.push(currentValue);
     }
 
