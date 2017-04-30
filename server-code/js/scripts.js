@@ -5,6 +5,8 @@
 //
 // Constants
 //
+const FAKE_POSITION = false;
+
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
 const EARTH_RADIUS_IN_KM = 6371;
@@ -19,9 +21,15 @@ const NOTED_BUSSTOPS_NAME = 'notedBusStops';
 const NOTED_COUNTDOWN_NAME = 'notedCountdown';
 const MINIMUM_RADIUS_TO_LOOK = 200;
 const CLASS_COUNTDOWN_NAME = 'countdown';
+const CLASS_BUSSTOP_NAME = 'busstop';
+const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
+const ID_BUSSTOP_NAME = 'busstopno_';
+const ID_NEARDEST_NAME = 'neardestno_';
+const ID_ROUTE_NAME = 'lineno_';
 const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
+const NAPTAN_NAME = 'naptan';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -34,7 +42,6 @@ const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
 
-const FAKE_POSITION = true;
 //
 // Globals
 //
@@ -242,14 +249,26 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
     }
 }
 
-function renderRemoveDiv(name)
+function renderRemoveDivById(id)
 {
     var child;
 
     // now we remove the first
-    if (document.getElementById(name)) {
-	child = document.getElementById(name);
+    if (document.getElementById(id)) {
+	child = document.getElementById(id);
 	child.parentNode.removeChild(child);
+    }
+}
+
+function renderRemoveDivByClass(className)
+{
+    var child;
+    var list;
+
+    // now we remove the first
+    list = document.getElementsByClassName(className);
+    while(list.length) {
+	list[0].parentNode.removeChild(list[0]);
     }
 }
 
@@ -280,33 +299,68 @@ function renderBusStops()
     var stop_count;
     var busstop;
     var routeno;
+    var busstop_naptan_class;
+    var extants;
+    var deletable;
+    var elementmatch;
+    var classname;
+    var key;
 
+    // html that could be deleted when a busstop goes out of range
+    // is distinguished by having class busstop_<naptan>. Get an
+    // array of all such currently present in the DOM - we'll delete
+    // any that don't get updated
+    deletable = [];
+    extants = document.getElementsByClassName(CLASS_BUSSTOP_NAME);
+    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
+	for (classname = 0; classname < extants[elementmatch].classList.length; classname++) {
+	    if (extants[elementmatch].classList[classname].substring(0, 8) === CLASS_BUSSTOP_NAPTAN_NAME) {
+		deletable[extants[elementmatch].classList[classname]] = true;
+	    }
+	}
+    }
+
+    // Render new bus stop info
     stop_count = 0;
     for (busstop in busstopData) {
-	id = 'busstopno_' + stop_count;
-	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
-	renderRemoveDiv(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, 'loadCountdown("' + busstopData[busstop].naptanId + '")', null);
+	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
 
-	id = 'neardestno_' + stop_count;
+	id = ID_BUSSTOP_NAME + stop_count;
+	deletable[busstop_naptan_class] = false;
+	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
+	renderRemoveDivById(id);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
+			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
+			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class);
+
+	id = ID_NEARDEST_NAME + stop_count;
 	text = busstopData[busstop].towards;
-	renderRemoveDiv(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, null);
+	renderRemoveDivById(id);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
-	    id = 'lineno_' + busstop + ' ' + line_count;
+	    id = ID_ROUTE_NAME + busstop + ' ' + line_count;
 	    text = busstopData[busstop].lines[routeno].name;
-	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, null);
+	    renderRemoveDivById(id);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);
 	    line_count++;
 	}
 
 	stop_count++;
     }
+
+    // and delete any old items that didn't get updated
+    for (key in deletable) {
+	if (deletable.hasOwnProperty(key)) {
+	    if (deletable[key] === true) {
+		renderRemoveDivByClass(key);
+	    }
+	}
+    }
 }
 
-function renderCountdown()
+function renderCountdown(naptan)
 {
     var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
     var text;
@@ -330,8 +384,8 @@ function renderCountdown()
 	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
 
 	if (text !== '') {
-	    renderRemoveDiv(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME);
+	    renderRemoveDivById(id);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan);
 	}
 
 	count++;
@@ -419,38 +473,19 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     sendGetCore(url, handler);
 
     return url;
-
-    // return ['Origin: ' + early_position.coords.latitude + ','
-    // 	    + early_position.coords.longitude
-    // 	    + ' angle: ' + angle + ' '
-    // 	    + DEFAULT_LOOKAHEAD_SECS + ' distance: ' + speed_in_meters_per_second
-    // 	    * (DEFAULT_LOOKAHEAD_SECS - ((latest_position.timestamp - early_position.timestamp)
-    // 					 / 1000))
-    // 	    + ' speed in m/s: ' + speed_in_meters_per_second
-    // 	    + ' newPos from: ' + latest_position.coords.latitude,
-    // 	    latest_position.coords.longitude
-    // 	    + ' predicts: ' +
-    // 	    calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
-    // 						   latest_position.coords.longitude,
-    // 						   angle,
-    // 						   (speed_in_meters_per_second
-    // 						    * DEFAULT_LOOKAHEAD_SECS
-    // 						   ).toString()) +
-    // 	    ' radius: ' + speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
-    // 							- ((latest_position.timestamp
-    // 							    - early_position.timestamp)
-    // 							   / 1000))];
 }
 
 function receiveNewBusStops()
 {
+    var show;
+
     if (this.status == HTTP_200) {
 	this.response.stopPoints.forEach(receiveNewBusStop);
 	renderBusStops();
 
     } else {
-	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
-	alert($show);
+	show = 'Request failed: (' + this.status.toString() + ') ' + name;
+	alert(show);
     }
 }
 
@@ -522,21 +557,25 @@ function loadCountdown(naptan)
 // getArrivalsFromTfl('490015575X');
 function getArrivalsFromTfl(naptan)
 {
+    var url;
+    var handler;
+
     if (naptan == '')
 	return '';
 
-    var url = RPROXY_URL_COUNTDOWN_PRE + naptan + RPROXY_URL_COUNTDOWN_POST;
-    var handler = receiveNewCountdown;
+    url = RPROXY_URL_COUNTDOWN_PRE + naptan + RPROXY_URL_COUNTDOWN_POST;
+    sessionStorage.setItem(NAPTAN_NAME, naptan);
+    handler = receiveNewCountdown;
     sendGetCore(url, handler);
 
     return url;
 }
 
-function receiveNewCountdown()
+function receiveNewCountdown(naptan)
 {
     if (this.status == HTTP_200) {
 	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, JSON.stringify(this.response));
-	renderCountdown();
+	renderCountdown(sessionStorage.getItem(NAPTAN_NAME));
 
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
@@ -563,10 +602,17 @@ function isArrayEqual(arr1, arr2)
 //
 // sanity checks for the position, also replace bad/missing vals
 //
-function checkPositionValues(position)
+function checkPositionValues(original_position)
 {
-    var old_ts = position.timestamp;
+    var old_ts = original_position.timestamp;
     var new_ts = Date.now();
+    var position;
+
+    position = Object.assign({}, original_position);
+    position.coords = Object.assign({}, original_position.coords);
+    position.coords.latitude = original_position.coords.latitude;
+    position.coords.longitude = original_position.coords.longitude;
+    position.timestamp = original_position.timestamp;
 
     // the timestamp should reflect a date between 1970 and 9999AD
     if (typeof(new_ts) !== 'number') {

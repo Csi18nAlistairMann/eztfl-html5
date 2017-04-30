@@ -144,3 +144,14 @@ Observations on starting with a minimal acceptable project and adding
   single pretty things to the UX such that project could be signed off
   in a hurry. Thus time = the number of features allowed by time & budget
 Outline of UX requirements and suggestions
+Describe Ring system
+Describe how handling overlapping icons
+Complete getting all data into their own html elements
+Strict mode utilised and problems dealth with
+Exclude 'bus stops' with no routes serving them
+Handle duplicates caused by not removing old entries
+Add fake positioning because geolocation regulalrly failing on desktop
+
+29 April 2017
+30 April 2017
+Remove data associated with a bus stop if that bus stop disappears

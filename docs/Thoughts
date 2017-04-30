@@ -2365,21 +2365,71 @@ Planning for future changes is good :-)
 2017-04-28 17:29
 Back to the first project and what's left to do.
 
-[ ] Establish list of additional elements to be made available
+[x] Establish list of additional elements to be made available
  x near destination (visual)
  x routes serving that bus stop (visual)
  x distance (property) from predicted location (already there)
  x bearing (property) from predicted location
-[ ] Arrange the data is cleaned of duplicates before use
+[x] Arrange the data is cleaned of duplicates before use
+ (look into whether still happening today on road)
 [ ] Arrange the countdown data is ordered before use
  - first ordered by minutes to arrival
  - second ordered by bus route's first arrival
+ (move these to the UX)
 
 With geolocation down again, rewrite the call again to use fake
 positioning data. Notice and fix errors!
 
+2017-04-29 09:25
+I remember 'use strict' from php, and sure enough JavaScript has
+the same feature. Turn it on and all I'm noted as problems are
+a few undeclared variables. That could be because that's all it
+strict mode looks for. But I like to think it's because my code
+was great to start with.
 
+Much of the duplication was because data was being sent to the
+screen without the previous data being removed, particularly
+where the countdown entries are concerned. Adding clean up code
+and the problem seems to go away. I don't at this time, however,
+go looking for where else it might be happening. Too early, too
+little coffee. Also I plan to road test the project - duplicates
+were such a problem before that if they're elsewhere that should
+reveal if they're still there.
 
+It's clear from the day that when a bus stop is removed, the
+routes through that stop are not also removed. We should remove
+unused entries in renderBusStops(). As a quick and dirty, we
+could just remove all previous elements, totally rebuilding
+each time. I'd rather not do that: it's inelegant for a start,
+and there's almost certainly advantage in not rebuilding
+perfectly fine data.
+To delete just the expired ones ... we would get a note of all
+the bus stops on screen; we'd then cross them off as we update
+each; any left uncrossed off were not updated and should be
+removed. This means a class. Any element associated with bus
+stop K (that is, bus stop, countdown, near dest, route nos)
+gets the same class. Two classes.
+class="busstop, busstop_<naptan>".
+1. Retrieve all elements with class busstop.
+2. retrieve class name 'busstop_<naptan>' to an array as the
+   index array['busstop_<naptan>' = 1]
+3. If the new update matches an entry in the array, it is
+   removed from the array
+4. Iterate over whatevers left in the array, removing them
+   from DOM.
+So:
+[1]. Always add class "busstop" to just the busstop itself. We
+will only need one place to associate the busstop and naptan
+[2]. Always add class "busstop_<naptan>" to the busstop itself,
+to routes, to near destinations.
+3. On render, retrieve all elements with "busstop" (relatively
+few elements)
+4. Populate an array with the classname matching "busstop_"
+which has the naptan following
+5. if the rendered bus stop matches an item in the array,
+remove it from the array
+6. loop over the array removing any bus stop, route
+countdown or near destination matching each element.
 
 
 
