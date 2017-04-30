@@ -325,7 +325,7 @@ function renderBusStops()
     for (busstop in busstopData) {
 	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
 
-	id = ID_BUSSTOP_NAME + stop_count;
+	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
 	deletable[busstop_naptan_class] = false;
 	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
 	renderRemoveDivById(id);
@@ -333,14 +333,14 @@ function renderBusStops()
 			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
 			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class);
 
-	id = ID_NEARDEST_NAME + stop_count;
+	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	text = busstopData[busstop].towards;
 	renderRemoveDivById(id);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
-	    id = ID_ROUTE_NAME + busstop + ' ' + line_count;
+	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
 	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);

@@ -2431,10 +2431,41 @@ remove it from the array
 6. loop over the array removing any bus stop, route
 countdown or near destination matching each element.
 
-
-
-
-
+30 April 2017
+Completed the above. A quick walk about to make sure it's dealt
+with the problem. Then we start looking at the second project.
+On return it looks like it was still happening even with a
+browser reset. Which bus stop do they apply to? Show the
+naptan alongside. Test again - might just be elements are right
+but not in order - took pix to check. Inconclusive! Add naptan
+to bus stop too. Yes: confirmed its just they're out of order
+at least for the example I'm seeing. Seperately, I do see a
+duplicate of the bus stops being added. That looks like its
+because the count of the stop is included in the id: if the
+stop comes in earlier or later, the count changes and the
+id doesn't match. Walkytest: Seems like the same "+ count"
+thing happening to the other elements. Silliness! STILL wrong
+as now only showing one route pet stop.
+Would really be good to set up a capture of positions as we go
+along and a method by which they can be replayed elsewhere.
+Fix again. Now much better.
+    So what went wrong there? It took an inordinate number of
+iterations to correct what was an apparently simple problem.
+To wit: I was uniquely identifying each html element being
+used to hold bus stop, near destination, route no or arrival.
+The arrivals didn't have a problem as they're being renewed
+in whole each time. As that was a focus, that might have
+fooled me into disbelieving unique identifiers was a problem.
+However the ids used for the other three were including
+an identifier /outside/ the purview of uniqueness: they were
+using the count of objects having been added before this one.
+This certainly uniquely identifies each element on a page for
+sure, but it does not allow elements to be uniquely identified
+as being the same element from the last time the page was
+generated should the order that data arrives change.
+    Next time I look at the same technique of uniquely
+identifying html, I should also consider it should also
+consistently identify across reloads.
 
 
 
