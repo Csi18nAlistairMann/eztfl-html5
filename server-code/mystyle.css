@@ -4,10 +4,22 @@ html, body {
     border: 0;
     outline: 0;
     vertical-align: baseline;
-    width: 30px;
-    max-width:  30px;
-    height: 109px;
+    width: 359px;
+    height: 509px;
     background-color: green;
     overflow: hidden;
     display: block;
+}
+div#renderingField {
+    height: 509px;
+    background-color: pink;
+}
+div#you_are_here {
+    display: inline-block;
+    width: 359px;
+}
+div#you_are_here_wrapper {
+    position: fixed;
+    top: 375px;
+    text-align: center;
 }
