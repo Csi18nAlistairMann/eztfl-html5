@@ -2467,6 +2467,21 @@ generated should the order that data arrives change.
 identifying html, I should also consider it should also
 consistently identify across reloads.
 
+2017-04-29 16:52
+Now to look at proper rendering: Project 2.
+
+As a reminder, the development thus far has been driven towards
+creating an abstraction of what's going to be on screen, so as
+to leave decisions about what the content looks like to UX.
+
+My intention for UX is to start from the rings idea described
+above.
+1. The viewport doesn't scroll about - there's no left, right,
+up and down
+Accomplished after I worked out scrolling was down to slight zoom.
+Project with UX started from b.html: a.html will remain project
+with no UI work.
+
 
 
 ---------------------------------------------------------------

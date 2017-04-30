@@ -155,3 +155,4 @@ Add fake positioning because geolocation regulalrly failing on desktop
 29 April 2017
 30 April 2017
 Remove data associated with a bus stop if that bus stop disappears
+Correct html id tags not consistent across reloads
