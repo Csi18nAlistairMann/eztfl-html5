@@ -33,10 +33,11 @@ const LONGITUDE_NAME = 'longitude';
 const NAPTAN_NAME = 'naptan';
 const RENDERFIELD_WIDTH = 360;
 const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
-const PREDICTION_POINT_Y = 477 / 2;
+const PREDICTION_POINT_Y = 477 / 3;
 const RENDERFIELD_HEIGHT = 509;
 const EGG_WIDTH = 1440;
 const EGG_HEIGHT = 2040;
+const DIVISOR_FOR_RING2 = 6;
 const DIVISOR_FOR_RING3 = 8;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
@@ -53,6 +54,7 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
+const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 
 //
 // Globals
@@ -87,7 +89,7 @@ function getLocationSetup()
     var position = {};
 
     if (FAKE_POSITION === true) {
-	data = fakeData(FAKE_SRC_TRAFALGAR);
+	data = fakeData(FAKE_DATA_SOURCE);
 
 	position = new Object();
 	position.coords = new Object();
@@ -285,6 +287,37 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, p
     }
 }
 
+function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
+{
+    var paragraph;
+    var node;
+    var div;
+
+    // second time around, so test if we've already got it 1st
+    if (!document.getElementById(name)) {
+	// first time around there are no divs to look at so create them.
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', name);
+	if (positionArr !== null) {
+	    paragraph.style.position = 'fixed';
+	    positionArr = adjustForRing(positionArr, 1);
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
+	}
+	if (eztflClass !== null) {
+	    paragraph.setAttribute('class', eztflClass);
+	}
+	if (onclick_handler !== null) {
+	    paragraph.setAttribute('onclick', onclick_handler);
+	}
+	node = document.createTextNode(text);
+	paragraph.appendChild(node);
+
+	div = document.getElementById(parent);
+	div.appendChild(paragraph);
+    }
+}
+
 function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     var paragraph;
@@ -327,13 +360,22 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
 
 function adjustForRing(positionArr, ringno)
 {
+    var xoff;
+    var yoff;
+
     if (ringno === 0) {
 	// centre ring for stop letters
-	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2));
-	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + (EGG_HEIGHT / (DIVISOR_FOR_RING3 * 2));
+	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
+	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
+	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + xoff;
+	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + yoff;
 
     } else if (ringno === 1) {
 	// middle ring for route numbers
+	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
+	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
+	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING2 + xoff;
+	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
 
     } else if (ringno === 2) {
 	// outer ring for near destinations
@@ -457,7 +499,8 @@ function renderBusStops()
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, null);
+	    posOnRing = translatePositionOnRing(busstopData[busstop]); // guarantees overlap for now
+	    renderBusRoute(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, posOnRing);
 	    line_count++;
 	}
 

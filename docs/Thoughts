@@ -2753,6 +2753,7 @@ placing them on screen and shuffling their position back until
 either x or y hits an edge. Incredibly inefficient! But still,
 effective.
 
+2017-05-01 20:15
 
 
 
@@ -2762,3 +2763,5 @@ effective.
 5. lots of names for the same thing (stoppoint vs bus stop vs..)q
 6. margins are a real menace
 7. 'fake' should be shunted off to their own file
+8. smelly code: are we handling positioning in two places when
+   we shouldnt?
