@@ -2709,8 +2709,56 @@ with an offset to adust for the centre of the page.
      That also looks good. Next up, we'll get the font into
 something sans-serif, and a bit smaller.
 
+2017-04-30 11:00
+   That's the ticket. Now I want the near destination to appear
+pushed up against the external edge of the screen.
+
+If we're to follow the 'ring' model as per the stop letters
+this won't be as easy as them: While we fix the position of the
+text according to the stop's bearing, we then want to adjust
+that position inwards to wherever that bearing crosses the
+rectangle of the viewport (or smaller, depending on whether we
+leave viewport room for other things, like the countdown.)
+
+      We could just cheat, and have fixed points at which they'll
+appear, with the next available fixed point in that quadrant (or
+even that octant) being used.
+
+     In fact, what little trigonometry I know might be of use:
+if we have an origin, an angle from it, and we know the length
+of a triangle's side ISTR from school we can calculate the
+missing length. A quick google and the right words kind of come
+back: I'm pretty sure that we can calculate the opposite side of
+a triangle knowing the angle and the length of the adjacent side.
+Pythagorus' theorem? A bit more googling gets me to
+https://www.mathsisfun.com/algebra/trig-finding-side-right-triangle.html
+At "Example: Find the length of the side y:" I get the formula -
+I should use tangent(angle) * 180.
+  Will have forgotten this by morning - the downside of "just in
+time knowledge".
+
+     Its clear that css can't help in all things - the near
+destinations look great along the left or along the top but go
+off the screen at bottom or on right. Alas there's no 'use some
+other point that top left for your coords' as one would get
+elsewhere. As the width of the element can be judged before
+rendering, that seems to leave me requiring a JavaScript
+solution to getting content back on screen. The problem can be
+frame thus: does coordinate + width/height take the content
+off screen? make the coordinate the maximum, then substract the
+width/height to compensate.
+
+   In the end, implemented this without tangents at all, rather
+placing them on screen and shuffling their position back until
+either x or y hits an edge. Incredibly inefficient! But still,
+effective.
+
+
 
 
 ---------------------------------------------------------------
 3. Doc - That this a read-only project
 4.      renderAddDivWithText() is getting /really/ overloaded
+5. lots of names for the same thing (stoppoint vs bus stop vs..)q
+6. margins are a real menace
+7. 'fake' should be shunted off to their own file

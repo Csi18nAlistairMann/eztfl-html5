@@ -31,6 +31,13 @@ const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
 const NAPTAN_NAME = 'naptan';
+const RENDERFIELD_WIDTH = 360;
+const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
+const PREDICTION_POINT_Y = 477 / 2;
+const RENDERFIELD_HEIGHT = 509;
+const EGG_WIDTH = 1440;
+const EGG_HEIGHT = 2040;
+const DIVISOR_FOR_RING3 = 8;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -42,6 +49,10 @@ const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
+
+const FAKE_SRC_PECKHAM = 'peckham';
+const FAKE_SRC_PICCADILLY = 'piccadilly';
+const FAKE_SRC_TRAFALGAR = 'trafalgar';
 
 //
 // Globals
@@ -72,19 +83,22 @@ function setup_tracked_positions(num_positions)
 //
 function getLocationSetup()
 {
+    var data;
     var position = {};
 
     if (FAKE_POSITION === true) {
+	data = fakeData(FAKE_SRC_TRAFALGAR);
+
 	position = new Object();
 	position.coords = new Object();
-	position.coords.latitude = 51.510127;
-	position.coords.longitude = -0.133837;
+	position.coords.latitude = data[0];
+	position.coords.longitude = data[1];
 	position.timestamp = 1193421444000;
 	positionPush(NUM_TRACKED_POSITIONS, position);
 	position = new Object();
 	position.coords = new Object();
-	position.coords.latitude = 51.510104
-	position.coords.longitude = -0.134385;
+	position.coords.latitude = data[2];
+	position.coords.longitude = data[3];
 	position.timestamp = 1193421460000;
 	mainLoop(position);
 
@@ -93,6 +107,21 @@ function getLocationSetup()
 
     } else {
 	alert(STR_GEOLOC_NOT_SUPPORTED);
+    }
+}
+
+function fakeData(source)
+{
+    switch (source) {
+    case (FAKE_SRC_PECKHAM):
+	// 4 local stops
+	return [51.465367, -0.079329, 51.465398, -0.078962];
+    case (FAKE_SRC_PICCADILLY):
+	// more stops that can shake a stick at
+	return [51.510172, -0.133610, 51.510149, -0.133997];
+    case (FAKE_SRC_TRAFALGAR):
+	// stop central
+	return [51.505971, -0.129358, 51.506227, -0.129165];
     }
 }
 
@@ -256,13 +285,74 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, p
     }
 }
 
+function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
+{
+    var paragraph;
+    var node;
+    var div;
+    var x;
+    var y;
+
+    // second time around, so test if we've already got it 1st
+    if (!document.getElementById(name)) {
+	// first time around there are no divs to look at so create them.
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', name);
+	if (positionArr !== null) {
+	    paragraph.style.position = 'fixed';
+	    x = positionArr[0];
+	    y = positionArr[1];
+	    paragraph.style.left = x + 'px';
+	    paragraph.style.top = y + 'px';
+	}
+	if (eztflClass !== null) {
+	    paragraph.setAttribute('class', eztflClass);
+	}
+	node = document.createTextNode(text);
+	paragraph.appendChild(node);
+
+	div = document.getElementById(parent);
+	div.appendChild(paragraph);
+
+	if (paragraph.offsetLeft + paragraph.clientWidth > RENDERFIELD_WIDTH) {
+	    paragraph.style.left = RENDERFIELD_WIDTH - paragraph.clientWidth + 'px';
+	}
+	if (paragraph.offsetTop + paragraph.clientHeight > RENDERFIELD_HEIGHT) {
+	    paragraph.style.top = RENDERFIELD_HEIGHT - paragraph.clientHeight + 'px';
+	}
+	paragraph.style.marginTop = '0px';
+	paragraph.style.marginBottom = '0px';
+    }
+}
+
 function adjustForRing(positionArr, ringno)
 {
     if (ringno === 0) {
-	// centre ring
-	positionArr[0] = positionArr[0] / 8 + 90;
-	positionArr[1] = positionArr[1] / 8 + 90;
-    }
+	// centre ring for stop letters
+	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2));
+	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + (EGG_HEIGHT / (DIVISOR_FOR_RING3 * 2));
+
+    } else if (ringno === 1) {
+	// middle ring for route numbers
+
+    } else if (ringno === 2) {
+	// outer ring for near destinations
+	// REEEAAAALLLYY simple. If out of rectangle shove off
+	// to one side. No elegance at all
+	// if (positionArr[0] < (1440 / 2) - 180) {
+	//     positionArr[0] = 0;
+
+	// } else if (positionArr[0] > (1440 / 2) + 180) {
+	//     positionArr[0] = 180;
+	// }
+
+	// if (positionArr[1] < (2040 / 2) - 180) {
+	//     positionArr[1] = 0;
+
+	// } else if (positionArr[1] > (2040 / 2) + 180) {
+	//     positionArr[1] = 180;
+	// }
+    } // Should not be any other ringno
 
     return positionArr;
 }
@@ -323,6 +413,8 @@ function renderBusStops()
     var elementmatch;
     var classname;
     var key;
+    var posOnRing;
+    var nearDestPos;
 
     // html that could be deleted when a busstop goes out of range
     // is distinguished by having class busstop_<naptan>. Get an
@@ -347,15 +439,18 @@ function renderBusStops()
 	deletable[busstop_naptan_class] = false;
 	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
+	posOnRing = translatePositionOnRing(busstopData[busstop]);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
 			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
 			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
-			     translatePositionOnRing(busstopData[busstop]));
+			     posOnRing);
 
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	text = busstopData[busstop].towards;
 	renderRemoveDivById(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, null);
+
+	nearDestPos = translatePosToRing3(busstopData[busstop]);
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, nearDestPos);
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
@@ -402,6 +497,66 @@ function translatePositionOnRing(busstop)
 	idx += 3;
     }
     return [ring[idx + 1], ring[idx + 2]]
+}
+
+function translatePosToRing3(busstop)
+{
+    var bearing;
+    var idx;
+    var x;
+    var y;
+    var xoff;
+    var yoff;
+    var ratio;
+    var potential_x;
+    var potential_y;
+
+    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
+			  busstop.lat, busstop.lon);
+
+    idx = 0;
+    while (ring[idx] < bearing) {
+	idx += 3;
+    }
+
+    x = RENDERFIELD_WIDTH / EGG_WIDTH * ring[idx + 1] ;
+    y = RENDERFIELD_HEIGHT / EGG_HEIGHT * ring[idx + 2] ;
+
+    xoff = Math.abs(PREDICTION_POINT_X - x);
+    yoff = Math.abs(PREDICTION_POINT_Y - y);
+    ratio = xoff / yoff;
+
+    // this is the bit that could more usefully be done with tangents
+    if (bearing <= 90) {
+	while (x < RENDERFIELD_WIDTH && y > 0) {
+	    x += ratio;
+	    y--;
+	}
+
+    } else if (bearing <= 180) {
+	while (x < RENDERFIELD_WIDTH && y < RENDERFIELD_HEIGHT) {
+	    x += ratio;
+	    y++;
+	}
+
+    } else if (bearing <= 270) {
+	while (x > 0 && y < RENDERFIELD_HEIGHT) {
+	    x -= ratio;
+	    y++;
+	}
+
+    } else if (bearing <= 360) {
+	while (x > 0 && y > 0) {
+	    x -= ratio;
+	    y--;
+	}
+    }
+    x = (x < 0) ? 0 : x;
+    x = (x > RENDERFIELD_WIDTH) ? RENDERFIELD_WIDTH : x;
+    y = (y < 0) ? 0 : y;
+    y = (y > RENDERFIELD_HEIGHT) ? RENDERFIELD_HEIGHT : y;
+
+    return [x, y];
 }
 
 function renderCountdown(naptan)
