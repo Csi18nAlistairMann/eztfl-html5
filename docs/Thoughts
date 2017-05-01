@@ -2488,5 +2488,207 @@ to see it. Starting with "You are here" on the pink ball spot.
 At this point I want this to appear right at the back of the page
 as it's so unimportant. Done.
 
+   Now comes the trickier part: giving effect to the ring system.
+Recall the egg shape from earlier on. The project already has
+access to type, distance, and bearing of the various objects.
+This is all described as if on a circle: we want that location on
+the circle translated to the correct point on that egg. We also
+want to do this to a very fine degree such that multiple points
+in one space translate into the same place in the html. this is
+an old games writing trick: when used, it makes objects seem to
+move much more smoothly. This would appear here as the bus stops
+etc moving around the ring more smoothly, Think of it as
+anti-aliasing for phsyics.
+
+Have a look at Moire patterns, or rather just one of them patterns
+used for interefering: you'll generally have black stripes among
+clear areas. Think of the black stripes as where something could
+appear, and the transparent parts as where something will never
+appear. It will not take long for the human eye to sense that
+pattern, and it rankles. We will get a pattern of some sort -
+that's just the nature of mixing digital and angular positions.
+But if we increase the resolution of that space, then translate
+it down into a far smaller space, that goes a long way to
+hiding the problem.
+
+   The project as stands assumes a viewport of 360x510 (sub 1 pixel
+at the mo, so I can see if the border is there). The inner egg
+might be around 250x350. What we're going to do is position on the
+egg as if it had a resolution of 1440x2040. Once done, we scale
+them down to the original 360x510 before placing it on screen.
+
+     The essence of this scaling is simple enough: during all
+calculations we assume the larger space. Only immediately before
+rendering do we scale co-ordinates by 4 to the final, smaller space.
+
+   Additionally, we want to translate each point on the circle to
+an equivalent point on the egg. I should thing That egg could be
+described mathematically but my maths is not upto that.
+Further, it would actually be inefficient to run such calculations
+repeatedly.
+
+We'll use another trick from programming games: look at the
+jumping figure in a platform game like Manic Miner. Every time
+the character jumps he moves a greater distance at the start slowing
+until he reaches the middle of the jump, then accelerating as he
+approaches the ground. This movement is described by a semi-circle
+over time:
+
+
+18|Height            _aaaaaa/
+  |               ajQQP????4QQ6a
+  |             aQQ?'        )?QQa
+15|           aQQ?              ?QQa
+  |          jQ?                  ?Q6
+  |         jQ'                    )W6
+  |        jQ'                      )W6
+  |       jQ'                        )W6
+10|      ]Q'                          )Wf
+  |      Qf                            ]Q
+  |     ]Q                              Qf
+  |     Qf                              ]Q
+  |    ]Q                                Qf
+5 |    jf                                ]6
+  |    Q'                                )W
+  |   _Q                                  Q/
+  |   ]P                                  4f
+  |   ]f                                  ]f
+0 |   ]f                                  ]f
+---------------------------------------------Time
+   ^      ^      ^      ^      ^      ^      ^
+   |      |      |      |      |      |      |
+Frame 1   2      3      4      5      6      7
+
+At frame 1, the height is 0
+At frame 2, the height is 11 +11
+At frame 3, the height is 16 + 4
+At frame 4, the height is 18 + 2
+At frame 5, the height is 17 - 1
+At frame 6, the height is 12 - 5
+At frame 7, the height is 0  -12
+
+Instead of running trigonometric calculations to discover where
+on the circle we should be, and thus how high the character has
+jumped, I've recreated a table here with those values precalculated.
+I no longer need to do processor intensive maths - I can use that
+lookup table just knowing how many frames into the jump we are.
+
+       I'm going to do something similar with the egg. Whatever
+calculation would do this work would be very inefficient as it
+would repeatedly need doing so I'll create a circle-to-egg
+lookup table.
+
+       The form of such a table should be nice and easy. Given
+the angle N, what is the X, Y from the top left of a rectangle
+holding the egg? For example, at angle 0deg, the X, Y will be
+720, 0: The egg lives in a 1440x2040 box, remember. Similarly
+at 270deg X, Y will be around 200, 1020 (not 0, 1020 because
+the widest point on the egg is further down than where the it
+would be for a circle.)
+
+      First, I need a picture of the egg at 1440x2040. I've
+added one to the repo, made by taking a circle with a dot in
+the middle, then using perspective and scale on it until it
+fits. The centre, which was at 720x1020 is now at 720x477. We'll
+be measuring angles from there. The egg is also very slightly
+smaller than the 1440x2040. This shouldn't make very much
+difference to the final product but certainly if it did one
+might spend more time getting it right.
+
+      The centre, which is the exact point where the prediction
+coords say we will be, is at 720x477. The greater the distance
+from this coordinate, the further from 720x477 the element will
+be positioned.
+
+   The edge of the egg is taken to mean the radius provided by
+the prediction. The "You are here" is obviously inside the egg
+yet the maths in the code say the user is actually one radius
+away, that is, on the bottom-most edge. This is because I'm
+intending to add a second call for things immediately near to
+the user which would seem to take the user inside the ring.
+
+    Manually checking a few angles, using GIMP, from the origin
+to the inside edge of the egg we get the following:
+
+    At	 0deg, x = 720,  Y = 1
+    At  45deg. x = 1063, y = 134
+    At  90deg, x = 1313  y = 477
+    At 135deg, x = 1416, y = 1173
+    At 180deg, x = 720,  Y = 2023
+    At 270deg, X = 128,  Y = 477
+
+Notice that while I did record the result for 270deg, we only
+have to find the results for one side of the egg. As the shape
+is symmetrical we can use maths to calculate the other side.
+
+  I also note that 1deg on the top edge is 8 pixels away from
+the centre axis. On the bottom edge it gets to 26 pixels away.
+This suggests that a single pixel of movement in this large
+space egg is equivalent to 0.0384615384615deg of movement in
+the real world.
+
+   In gimp, the angle tool will detect 0.18deg of changes at
+the top.
+
+    Now we could manually check every single angle using gimp,
+filling in the look up table as we go. That would get kind of
+boring. We could instead write a program to accept the image
+and repeatedly test every 0.0384..deg angle and note the
+position where the maths hits the inside edge. For this
+project we're going to cheat again and only note the angles
+at which the x,y would change and assume that any other angle
+since the previous one would shar the same x,y or can be
+calculated through a slight adjustment.
+
+The lookup tables data will start like this:
+720,1	       90
+746,2	       86.87
+759,3	       85.30
+770,4	       83.97
+777,5	       83.11
+785,6	       82.14
+... and so forth.
+
+    Should we be required to calculate the positon of something
+at 88deg, for example, we'll do yet another cheat. We aready
+know the Y position will be 1 (as it is for all angles from
+90 through to but including 86.87). We'll guess the X by
+calculating ((90 - 86.87) / 26) = 0.120384615385. Thus,
+X = 746 - ((88 - 86.87) / 0.120384615385) = 736.61341853
+  Thus, 88deg = 736, 1
+Now, gimp says the true answer is 737, 1. Given that we're
+calculating on a map four times the size of the screen, this
+cheat is well within the margin of error.
+
+2017-04-29 21:40
+      Time to complete the lookup list.
+      Well -- that only took a few hours! Next up, the look-up
+list data needs to be massaged into place: the x and y is accurate
+but the angle in the top right quadrant needs to be started from
+zero (and so angle = 90 - value). In the bottom right quadrant it
+needs to start from 90 (and so angle = angle + 90.) We then look
+at the left hand side where the x y is identical to the right
+hand side. However the angle starts at 180 and goes up (so
+angle = 180 + 90 - angle.) And so to the top left where the
+angle goes up from 270 (so angle = 270 + angle.)
+      Our main way of interacting with the lookup table is to
+index based on the angle. The lookup table does answer the
+question - "what is the element's positon if its bearing is X?"
+There are far superior ways to store the lookup table for
+efficient access, but my purpose is to be effective, not
+efficient, so to start with we'll just loop through them all -
+there's only 700 of them.
+	Next step: massage the data into the correct angle and
+to account for the left side too. For that I'll use a spreadsheet
+The data files user are also added into the repo.
+
+
+
+
+
+
+
+
+
 ---------------------------------------------------------------
 3. Doc - That this a read-only project
