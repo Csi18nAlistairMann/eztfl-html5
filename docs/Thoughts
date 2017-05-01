@@ -2689,6 +2689,16 @@ codes.
 	To start with, we'll just dump everything at the point
 given by the ring.
 
+2017-04-30 11:00
+   Well first effort is wrong because the left hand side data
+had the right angle, but hadn't adjusted X pos to suit. After
+doing that, the result looks very good indeed.
+
+      Having converted the bus stop signs to just their letters,
+I notice that with the 'undefined' stopletters I can't just drop
+in that lovely greek 𝈚  symbol - createtextnode doesn't seem to
+allow me to pass the unicode through. Decision to use @ symbol
+instead.
 
 
 

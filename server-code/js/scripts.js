@@ -335,7 +335,7 @@ function renderBusStops()
 
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
 	deletable[busstop_naptan_class] = false;
-	text = 'Bus stop: ' + busstopData[busstop].stopLetter;
+	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
 			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
@@ -369,7 +369,18 @@ function renderBusStops()
     }
 }
 
-function translatePositionOnRing(busstop) {
+function adjustStopLetter(stopletter)
+{
+    if (stopletter === undefined) {
+	return '@';
+
+    } else {
+	return stopletter;
+    }
+}
+
+function translatePositionOnRing(busstop)
+{
     var bearing;
     var idx;
 
