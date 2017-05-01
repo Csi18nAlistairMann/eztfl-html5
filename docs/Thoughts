@@ -2682,7 +2682,12 @@ there's only 700 of them.
 to account for the left side too. For that I'll use a spreadsheet
 The data files user are also added into the repo.
 
-
+    Now that we've got the ring map file into JavaScript as a
+constant, we can now work out where to display stuff according
+to its bearing and distance. We'll start with the bus stop
+codes.
+	To start with, we'll just dump everything at the point
+given by the ring.
 
 
 

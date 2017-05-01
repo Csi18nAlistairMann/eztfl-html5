@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = false;
+const FAKE_POSITION = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -20,6 +20,7 @@ const BUS_STOP_EXPIRES_IN_SECS = 10 * 60 * 60;
 const NOTED_BUSSTOPS_NAME = 'notedBusStops';
 const NOTED_COUNTDOWN_NAME = 'notedCountdown';
 const MINIMUM_RADIUS_TO_LOOK = 200;
+const MAXIMUM_RADIUS_TO_LOOK = 500; // only used when fake_position = true
 const CLASS_COUNTDOWN_NAME = 'countdown';
 const CLASS_BUSSTOP_NAME = 'busstop';
 const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
@@ -76,14 +77,14 @@ function getLocationSetup()
     if (FAKE_POSITION === true) {
 	position = new Object();
 	position.coords = new Object();
-	position.coords.latitude = 51.529206;;
-	position.coords.longitude = -0.11032051;
+	position.coords.latitude = 51.510127;
+	position.coords.longitude = -0.133837;
 	position.timestamp = 1193421444000;
 	positionPush(NUM_TRACKED_POSITIONS, position);
 	position = new Object();
 	position.coords = new Object();
-	position.coords.latitude = 51.529392
-	position.coords.longitude = -0.1103775;
+	position.coords.latitude = 51.510104
+	position.coords.longitude = -0.134385;
 	position.timestamp = 1193421460000;
 	mainLoop(position);
 
@@ -224,7 +225,7 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
+function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     var paragraph;
     var node;
@@ -235,6 +236,11 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
+	if (positionArr !== null) {
+	    paragraph.style.position = 'fixed';
+	    paragraph.style.left = positionArr[0] / 4 + 'px';
+	    paragraph.style.top = positionArr[1] / 4 + 'px';
+	}
 	if (eztflClass !== null) {
 	    paragraph.setAttribute('class', eztflClass);
 	}
@@ -248,6 +254,8 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass)
 	div.appendChild(paragraph);
     }
 }
+
+
 
 function renderRemoveDivById(id)
 {
@@ -331,19 +339,20 @@ function renderBusStops()
 	renderRemoveDivById(id);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
 			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
-			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class);
+			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
+			     translatePositionOnRing(busstopData[busstop]));
 
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	text = busstopData[busstop].towards;
 	renderRemoveDivById(id);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);
+	renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, null);
 
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, null);
 	    line_count++;
 	}
 
@@ -358,6 +367,20 @@ function renderBusStops()
 	    }
 	}
     }
+}
+
+function translatePositionOnRing(busstop) {
+    var bearing;
+    var idx;
+
+    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
+			  busstop.lat, busstop.lon);
+
+    idx = 0;
+    while (ring[idx] < bearing) {
+	idx += 3;
+    }
+    return [ring[idx + 1], ring[idx + 2]]
 }
 
 function renderCountdown(naptan)
@@ -385,7 +408,7 @@ function renderCountdown(naptan)
 
 	if (text !== '') {
 	    renderRemoveDivById(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan);
+	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
 	}
 
 	count++;
@@ -458,9 +481,12 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
 					   - ((latest_position.timestamp - early_position.timestamp)
 					      / 1000));
-    if (radius < MINIMUM_RADIUS_TO_LOOK)
+    if (radius < MINIMUM_RADIUS_TO_LOOK) {
 	radius = MINIMUM_RADIUS_TO_LOOK;
 
+    } else if (FAKE_POSITION && radius > MAXIMUM_RADIUS_TO_LOOK) {
+	radius = MAXIMUM_RADIUS_TO_LOOK;
+    }
     radius = Math.round(radius);
 
     lat = pair[0];
