@@ -238,8 +238,9 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, p
 	paragraph.setAttribute('id', name);
 	if (positionArr !== null) {
 	    paragraph.style.position = 'fixed';
-	    paragraph.style.left = positionArr[0] / 4 + 'px';
-	    paragraph.style.top = positionArr[1] / 4 + 'px';
+	    positionArr = adjustForRing(positionArr, 0);
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
 	}
 	if (eztflClass !== null) {
 	    paragraph.setAttribute('class', eztflClass);
@@ -255,7 +256,16 @@ function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, p
     }
 }
 
+function adjustForRing(positionArr, ringno)
+{
+    if (ringno === 0) {
+	// centre ring
+	positionArr[0] = positionArr[0] / 8 + 90;
+	positionArr[1] = positionArr[1] / 8 + 90;
+    }
 
+    return positionArr;
+}
 
 function renderRemoveDivById(id)
 {

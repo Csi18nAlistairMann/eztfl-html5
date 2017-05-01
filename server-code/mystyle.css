@@ -9,6 +9,8 @@ html, body {
     background-color: green;
     overflow: hidden;
     display: block;
+    font-family: Sans-serif;
+    font-size: 12px;
 }
 div#renderingField {
     height: 509px;

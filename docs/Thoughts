@@ -2698,12 +2698,19 @@ doing that, the result looks very good indeed.
 I notice that with the 'undefined' stopletters I can't just drop
 in that lovely greek 𝈚  symbol - createtextnode doesn't seem to
 allow me to pass the unicode through. Decision to use @ symbol
-instead.
+instead - to be effective, not efficient.
 
+   Next up is to apply the "three ring" idea from earlier on
+whereby the bus stop codes would occupy what will appear to be
+a central ring of three. We'll do this by swapping the divison
+from the ring space of 1440x2040 not by 4, but by more - along
+with an offset to adust for the centre of the page.
 
-
+     That also looks good. Next up, we'll get the font into
+something sans-serif, and a bit smaller.
 
 
 
 ---------------------------------------------------------------
 3. Doc - That this a read-only project
+4.      renderAddDivWithText() is getting /really/ overloaded
