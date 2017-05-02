@@ -133,16 +133,16 @@ function cannotWatchPosition(positionError)
 
     switch(positionError.code) {
     case positionError.PERMISSION_DENIED:
-	    msg = 'User denied the request for Geolocation.'
+	msg = 'User denied the request for Geolocation.'
 	break;
     case positionError.POSITION_UNAVAILABLE:
-	    msg = 'Location information is unavailable.'
+	msg = 'Location information is unavailable.'
 	break;
     case positionError.TIMEOUT:
-	    msg = 'The request to get user location timed out.'
+	msg = 'The request to get user location timed out.'
 	break;
     case positionError.UNKNOWN_ERROR:
-	    msg = 'An unknown error occurred.'
+	msg = 'An unknown error occurred.'
 	break;
     }
     alert('Failed to start geolocation. Error:"' + msg + '"');
@@ -256,8 +256,10 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderAddDivWithText(parent, name, text, onclick_handler, eztflClass, positionArr)
+function renderGenericDiv(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    // Consider if it would be better to copy this code and shape
+    // it to handling a specific element
     var paragraph;
     var node;
     var div;
@@ -482,10 +484,10 @@ function renderBusStops()
 	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
 	posOnRing = translatePositionOnRingWithLog(busstopData[busstop]);
-	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
-			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
-			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
-			     posOnRing);
+	renderGenericDiv(RENDERING_FIELD_NAME, id, text,
+			 'loadCountdown("' + busstopData[busstop].naptanId + '")',
+			 CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
+			 posOnRing);
 
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	text = busstopData[busstop].towards;
@@ -685,7 +687,7 @@ function renderCountdown(naptan)
 
 	if (text !== '') {
 	    renderRemoveDivById(id);
-	    renderAddDivWithText(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
+	    renderGenericDiv(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
 	}
 
 	count++;
