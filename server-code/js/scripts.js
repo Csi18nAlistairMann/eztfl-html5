@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = false;
+const FAKE_POSITION = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -312,6 +312,9 @@ function renderBusStops()
     var bearing;
     var positions;
     var heading;
+    var bumpArray = [];
+
+    bumpomaticSetup(bumpArray);
 
     // html that could be deleted when a busstop goes out of range
     // is distinguished by having class busstop_<naptan>. Get an
@@ -336,6 +339,7 @@ function renderBusStops()
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
 	deletable[busstop_naptan_class] = false;
 	renderRemoveDivById(id);
+	bumpomaticDeleteById(bumpArray, id);
 
 	// get positioning info
 	bearing = se_getAngle(busstopData[busstop].originLatitude, busstopData[busstop].originLongitude,
@@ -352,6 +356,7 @@ function renderBusStops()
 		      'loadCountdown("' + busstopData[busstop].naptanId + '")',
 		      CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
 		      positionsWithLog);
+	bumpomaticAddById(bumpArray, id);
 
 	// fill in for ring 1 -- the routes serving this stop
 	line_count = 0;
@@ -359,18 +364,22 @@ function renderBusStops()
 	    // delete old stop letter if present
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
+	    bumpomaticDeleteById(bumpArray, id);
 
 	    // that we don't change positions guarantees routes overwrite each other
 	    text = busstopData[busstop].lines[routeno].name;
 	    renderBusRoute(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, positions);
+	    bumpomaticAddById(bumpArray, id);
 	    line_count++;
 	}
 
 	// fill in for ring 2 -- the near destinations
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	renderRemoveDivById(id);
+	bumpomaticDeleteById(bumpArray, id);
 	text = busstopData[busstop].towards;
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, bearing, positions);
+	bumpomaticAddById(bumpArray, id);
 
 	stop_count++;
     }
@@ -380,6 +389,8 @@ function renderBusStops()
 	if (deletable.hasOwnProperty(key)) {
 	    if (deletable[key] === true) {
 		renderRemoveDivByClass(key);
+		// not strictly needed as no rendering after this point
+		bumpomaticDeleteByClass(bumpArray, key);
 	    }
 	}
     }
@@ -947,6 +958,59 @@ function receiveNewCountdown(naptan)
     } else {
 	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
 	alert($show);
+    }
+}
+
+//-------------------------------------------------------------
+//
+// bump'o'matic
+//
+function bumpomaticSetup(bumpArray)
+{
+    var element_idx;
+
+    for (element_idx in bumpArray) {
+	bumpArray.splice(element_idx, 1);
+    }
+}
+
+function bumpomaticDeleteById(bumpArray, idName)
+{
+    var element_idx;
+
+    for (element_idx in bumpArray) {
+	if (bumpArray[element_idx].id === idName) {
+	    bumpArray.splice(element_idx, 1);
+	}
+    }
+}
+
+function bumpomaticDeleteByClass(bumpArray, className)
+{
+    var element_idx;
+
+    for (element_idx in bumpArray) {
+	if (bumpArray[element_idx].classes.indexOf(className)) {
+	    bumpArray.splice(element_idx, 1);
+	}
+    }
+}
+
+function bumpomaticAddById(bumpArray, idName)
+{
+    var html;
+    var element;
+
+    html = document.getElementById(idName);
+    if (html !== null) {
+	element = new Object();
+	element.id = idName;
+	element.classes = html.classList;
+	element.xpos = html.offsetLeft;
+	element.ypos = html.offsetTop;
+	element.width = html.clientWidth;
+	element.height = html.clientHeight;
+	bumpArray.push(element);
     }
 }
 

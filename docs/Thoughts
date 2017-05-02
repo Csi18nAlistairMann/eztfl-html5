@@ -2929,9 +2929,135 @@ Once replaced with the effect I'm after, it's also clear there is a bug
 somewhere: the left hand side seems to see bus stops in position X
 instead of origin - x. At this point, only the right hand side seems to
 position reliably. Nice fix.
+	 Not convinced by using no logarithm vs using it too. How
+interesting.
+
+2017-05-01 15:40
+Bumping along the ring
+	All the elements have a problem with overwriting: two of them
+occupying the same space will appear one on top of the other. The bus
+routes suffer this in particular.
+       It looks like the "don't overlap" facility will assume that the
+renderfield is actually another buffer for the final positions, much
+as the egg was: the positions described are further processed to reach
+the visual position.
+    This would happen with the collison boxes described a few days ago.
+Once placed into the DOM, the locations and sizes of the various
+elements can be detected with JavaScript, and actions taken to handle
+that.
+	I had originally thought that it might be easier to bump them
+into a line. That would only be if I was bumping them from behind the
+scenes - once they're on screen then any solution is as hard as any
+other.
+	The solution, using collision boxes to determine what's up,
+gets exponentially more processor intensive the more items there are
+on screen, as every additional element doubles the number of checks
+to make. This may well be too much of an issue on smaller devices. An
+alternative might be to click, hold and slide about the screen such
+that whatever gets focus gets visually larger: the user could then
+click on that larger element having made sure of what it says. While
+an alternative, it's a poor alternative to bumping, if we can.
+
+   The nature of collision boxes is a simple array of all the
+elements, and their shapes and size. We'll only use rectangles for
+this project. We then scan that array for collisions until none are
+found. If we do find a collision, we use the information available
+to shift them about, and then scan again.
+
+   Another option, which I used in a previous life getting finanicial
+charts automatically laid out, is more like a sifting tray: as the
+elements become available, they're put into the tray as close as
+possible to their home position as possible without colliding. In
+that previous cause I then had an algorithm calculate invisible bubbles
+to fill up the space, so spacing the charts out from each other nicely.
+That's not necessary here, but the idea of pre-placement is very
+attractive, as it means we only need scan the array once per element.
+
+	    A collision has occured when a pair of rectangles overlap,
+something that's trivial to implement. What to do about it is more
+challenging. And persisting that array for next time more challenging
+again.
+
+	We might want to persist the array such that if the positions
+next time are no different from this time, then we can already tell
+where the items should go. I'm not sure that's appropriate here - the
+idea is that the positions /are/ different at each moment because of
+the movement of the user through real space.
+
+    I don't think the sifting tray is appropriate here: a financial
+chart changes alot less regularly than the output from this project.
+Instead I'm going to use the array/bump method. I'm also not going
+to persist the array as I expect different positions at each moment.
+
+   The array itself could simply be the DOM, with bumping of
+elements automaticallt bumping items on screen. It could also be made
+up from the DOM, juggled, and then have bumps applied back. It's in
+the interests of performance, and the interests of future use that
+it's the latter.
+
+[ ] Step 1 - establish where the collison code is to go and get in
+  placeholder code.
+[ ] Step 2 - establish the array of elements in their existing state
+[ ] Step 3 - process for bumps, bumping where merited
+[ ] Step 4 - Apply bumps to DOM.
+
+
+[x] Step 1 - establish where the collison code is to go and get in
+  placeholder code.
+  Where this code goes depends very much on how the implementation
+occurs. On the one hand, the array filling element can happen as we
+post elements to the DOM, or we could traverse the DOM afterwards to
+establish what is where.
+	  By the same token, where the bumping happens is also
+dependant on implementation. We could take the Tetris-style approach
+of bumping each element as we post the element, or we could wait
+until after and bump them then.
+      I should also mention we could do both: drop everything in the
+array, complete with bumps, as we go; then follow up with a full
+bump of everything afterwards if required. (Although, if we require
+it, it may already be too late - we may require it because the screen
+is full and cannot be fixed with a bump.)
+   The better solution is the first: fill in as we go, Tetris-style,
+bumping as we go.
+	Another point to note: we do leave html on screen, so the
+array will need to be persisted from one frame to the next. That means
+the array itself will only get set up once: on landing. It would then
+survive in localStorage.
+	This does raise the prospect of race conditions: with the
+bump array and DOM both tracking what's on screen, the possibility
+exists that they'll diverge. To minimise this, we could instead reload
+the bump array at each new rendering from what's already on screen,
+deleting where appropriate and as we go. If the bump array and DOM
+diverge, that should leave the two out of sync for no more than one
+refresh, greatly limiting the damage.
+	 This also raises the possibility that what's already on
+screen, if it has a neighbour that's been deleted, may see odd gaps
+forming. as there's no thought here to specifically re-using that
+space. Indeed, we won't know the space can be reused until after the
+whole frame has been written. Beyond that though, random chance should
+see the empty space reused. Out other option is to force a reassessment
+of what goes where whenever an element is deleted.
+   This is a small project: we'll allow the problem of reusing deleted
+space to go unaddressed.
+
+The array should be set up before we start posting the html.
+As we post html, we should address the bumping.
+
+   Doing this we can see we'll need to store both the id and any class
+names the object has. We can already tell we'll want to store the
+x and y positions. So this gives us an outline of and individual object
+in the array.
+
+[ ] Step 2 - establish the array of elements in their existing state
+   Good! 218 objects around trafalgar square.
+
+
+
+[ ] Step 3 - process for bumps, bumping where merited
+[ ] Step 4 - Apply bumps to DOM.
+
 
 
 ---------------------------------------------------------------
 6. margins are a real menace
-9. Take users' heading into account
 10 bumping along the ring

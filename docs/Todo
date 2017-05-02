@@ -41,3 +41,6 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 10. nearer icons larger than further icons
 
 11. Clicking and holding icon makes it larger for legibility
+
+12. Rotating sees the near destinations rotate other than I expect
+    - shouldn't they hug the corner as they go around?
