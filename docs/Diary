@@ -168,3 +168,6 @@ Account for logarithmic distance too - relearn maths
 2 May 2017
 Observations that there are still attack vectors for this, a 'read-only'
 	     project.
+Deal with smelly code, including big reorganisation of the source
+Observations about the same thing having different names
+Observation that test support code is better off in the same file for now

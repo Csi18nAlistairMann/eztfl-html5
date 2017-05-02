@@ -2887,13 +2887,44 @@ Perhaps because not enough to contrast it with, perhaps because the update
 rate is too slow for nuance. It did give me the idea of clicking and
 holding making the selected item grow in size for legibility.
 
+Lots of names for the same thing:
+     It doesn't (yet) amount to a problem, but there's quite a few places
+where the same thing has different names. The number on the front of the
+bus is known as the 'line', at their main site it's known as 'bus route'
+and 'route number' and 'bus number'. Four names at least, and I haven't
+even looked at my own code where I use 'routeno', 'bus route' as well,
+line[routeno].name and .lineName - seven different names for the same
+thing. It isn't a problem at this point, but it is an indicator of code
+smell: if different names are being used, are they being used for very
+subtly different things? 'Bus number' above /could/ be read as meaning
+literally the number on the front of a bus - whatever number it may have
+- rather than the figurative route to which that bus has been assigned.
 
+"Fake" support should be in a separate file
+       In a server-side project, this kind of test support would be in a
+separate file to pull in as and when needed. This is cleaner as source,
+and a good security help (if it ain't present, it can't run.) But with
+JavaScript this approach would be against what I'm trying to achieve with
+fewer network calls helping keep the costs down and speed up. Of course,
+were the project ever to be serious, the support code could be removed in
+whole.
 
+2017-05-01 14:18
+Take the user's heading into account
+     As it stands the display will show north at the top, regardless of
+whether that's the user's heading. It would make more sense to accomodate
+that heading by rotating everything around such that the user's heading
+is at the top instead.
+   Sounds complex, but it shouldn't be: once we have the heading, it
+should be a case of adding that heading to any use of direction.
+Obtaining the heading is easy: we already know it from the prediction
+stage. We'll dump it into sessionStorage so it can persist into the
+response stage.
+	 Does it work? It certainly seems to. I've temporarily added an
+html slider to see. Looks fun!
 
 
 ---------------------------------------------------------------
-5. lots of names for the same thing (stoppoint vs bus stop vs..)q
 6. margins are a real menace
-7. 'fake' should be shunted off to their own file
 9. Take users' heading into account
 10 bumping along the ring

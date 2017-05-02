@@ -42,6 +42,7 @@ const DIVISOR_FOR_RING3 = 8;
 const RING0 = 0 // centre for bus stops
 const RING1 = 1 // middle for bus routes
 const RING2 = 2 // outside for near destinations
+const USERS_HEADING_NAME = 'usersheading';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -58,6 +59,12 @@ const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
+
+function updateHeading(value)
+{
+    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(256 / 100 * value));
+    renderBusStops();
+}
 
 //
 // Globals
@@ -310,6 +317,7 @@ function renderBusStops()
     var nearDestPos;
     var bearing;
     var positions;
+    var heading;
 
     // html that could be deleted when a busstop goes out of range
     // is distinguished by having class busstop_<naptan>. Get an
@@ -326,6 +334,7 @@ function renderBusStops()
     }
 
     // Render new bus stop info
+    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
     stop_count = 0;
     for (busstop in busstopData) {
 	// note bus stop going to be used, remove old name if present
@@ -337,6 +346,9 @@ function renderBusStops()
 	// get positioning info
 	bearing = se_getAngle(busstopData[busstop].originLatitude, busstopData[busstop].originLongitude,
 			      busstopData[busstop].lat, busstopData[busstop].lon);
+	bearing += heading;
+	bearing %= 360;
+
 	positions = getPositionOnRing(bearing);
 	positionsWithLog = scalePositionsUsingLog(bearing, positions, busstopData[busstop].distance);
 
@@ -593,9 +605,6 @@ function scaleRingToRenderfield(positionArr, ringno)
 function scalePositionsUsingLog(bearing, positions, busstopDistance)
 {
     var bearing;
-    var tempbearing;
-    var idx;
-    var distance2radius;
     var full;
     var part;
     var logMultiplier;
@@ -656,7 +665,7 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     var early_position = [];
     var latest_position = [];
     var distance_in_meters;
-    var angle;
+    var users_heading;
     var speed_in_meters_per_second;
     var url;
     var handler;
@@ -673,13 +682,16 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     latest_position = tracked_positions[NUM_TRACKED_POSITIONS - 1];
 
     distance_in_meters = getDistanceInMeters(early_position, latest_position);
-    angle = getAngle(early_position, latest_position);
+
+    users_heading = getAngle(early_position, latest_position);
+    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(users_heading));
+
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
     pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
 						     latest_position.coords.longitude,
-						     angle,
+						     users_heading,
 						     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
     radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
