@@ -15,12 +15,11 @@
   <script src="js/EggPositionAngles.js"></script>
 
 </head>
-<body onload="eztflHtml5_setup()">
+<body onload="eztflHtml5_setup()" onkeypress="capturedKeypress(event)">
 
 <div id="renderingField">
 <div id="you_are_here_wrapper">
 <div id="you_are_here">You are here</div>
-<input type="range" id="myRange" value="0" onchange="updateHeading(this.value)">
 </div> <!-- renderingField -->
 </div> <!-- you_are_here_wrapper -->
 

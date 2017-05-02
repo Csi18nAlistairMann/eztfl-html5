@@ -60,9 +60,26 @@ const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 
-function updateHeading(value)
+function capturedKeypress(evt)
 {
-    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(256 / 100 * value));
+    var key;
+    var heading;
+
+    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
+
+    var charCode = (evt.which) ? evt.which : evt.keyCode
+    if (charCode == 48) {
+	heading += 1;
+
+    } else if (charCode == 49) {
+	heading -= 1;
+
+    } else {
+	return;
+    }
+
+    heading = modulo(heading, 360);
+    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(heading));
     renderBusStops();
 }
 
@@ -347,7 +364,7 @@ function renderBusStops()
 	bearing = se_getAngle(busstopData[busstop].originLatitude, busstopData[busstop].originLongitude,
 			      busstopData[busstop].lat, busstopData[busstop].lon);
 	bearing += heading;
-	bearing %= 360;
+	bearing = modulo(bearing, 360);
 
 	positions = getPositionOnRing(bearing);
 	positionsWithLog = scalePositionsUsingLog(bearing, positions, busstopData[busstop].distance);
@@ -734,6 +751,13 @@ function loadCountdown(naptan)
 //
 // other helpers
 //
+function modulo(value, modulo)
+{
+    // required because % on test machine handles negatives
+    // in a manner other than I would wish
+    return ((value % modulo) + modulo) % modulo;
+}
+
 function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
 {
     var seconds;

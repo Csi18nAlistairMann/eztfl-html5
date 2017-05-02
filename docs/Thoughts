@@ -2922,6 +2922,13 @@ stage. We'll dump it into sessionStorage so it can persist into the
 response stage.
 	 Does it work? It certainly seems to. I've temporarily added an
 html slider to see. Looks fun!
+     Changed to use keypresses to single step around. LOL lots more fun
+and also two revealing facts: JavaScript modulo doesn't handle going
+below 0 by wrapping around but rather actually does go below actual 0.
+Once replaced with the effect I'm after, it's also clear there is a bug
+somewhere: the left hand side seems to see bus stops in position X
+instead of origin - x. At this point, only the right hand side seems to
+position reliably.
 
 
 ---------------------------------------------------------------
