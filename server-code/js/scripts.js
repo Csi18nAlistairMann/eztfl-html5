@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = true;
+const FAKE_POSITION = false;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -59,29 +59,6 @@ const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
-
-function capturedKeypress(evt)
-{
-    var key;
-    var heading;
-
-    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
-
-    var charCode = (evt.which) ? evt.which : evt.keyCode
-    if (charCode == 48) {
-	heading += 1;
-
-    } else if (charCode == 49) {
-	heading -= 1;
-
-    } else {
-	return;
-    }
-
-    heading = modulo(heading, 360);
-    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(heading));
-    renderBusStops();
-}
 
 //
 // Globals
@@ -656,11 +633,11 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 	ringy = ((ringy - originy) * logMultiplier) + originy;
 
     } else if (bearing <= 270) {
-	ringx = originx = ((originx - ringx) * logMultiplier);
+	ringx = originx - ((originx - ringx) * logMultiplier);
 	ringy = ((ringy - originy) * logMultiplier) + originy;
 
     } else if (bearing <= 360) {
-	ringx = originx = ((originx - ringx) * logMultiplier);
+	ringx = originx - ((originx - ringx) * logMultiplier);
 	ringy = originy - ((originy - ringy) * logMultiplier);
     }
 

@@ -2928,7 +2928,7 @@ below 0 by wrapping around but rather actually does go below actual 0.
 Once replaced with the effect I'm after, it's also clear there is a bug
 somewhere: the left hand side seems to see bus stops in position X
 instead of origin - x. At this point, only the right hand side seems to
-position reliably.
+position reliably. Nice fix.
 
 
 ---------------------------------------------------------------
