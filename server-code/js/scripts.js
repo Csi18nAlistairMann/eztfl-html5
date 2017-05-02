@@ -58,7 +58,7 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
-const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
+const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
 
 //
 // Globals
@@ -266,6 +266,9 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
 	}
 	node = document.createTextNode(text);
 	paragraph.appendChild(node);
+
+	paragraph.style.marginTop = '0px';
+	paragraph.style.marginBottom = '0px';
 
 	div = document.getElementById(parent);
 	div.appendChild(paragraph);
@@ -735,6 +738,39 @@ function loadCountdown(naptan)
     getArrivalsFromTfl(naptan);
 }
 
+function capturedKeypress(evt)
+{
+    var key;
+
+    var charCode = (evt.which) ? evt.which : evt.keyCode
+    if (charCode == 48) {
+	fakeHeadingRotate(1)
+
+    } else if (charCode == 49) {
+	fakeHeadingRotate(-1)
+
+    } else {
+	return;
+    }
+
+}
+
+function fakeHeadingRotate(step)
+{
+    fakeHeadingRotateCore(step)
+}
+
+function fakeHeadingRotateCore(headingOffset)
+{
+    var heading;
+
+    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
+    heading += headingOffset;
+    heading = modulo(heading, 360);
+    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(heading));
+    renderBusStops();
+}
+
 //-------------------------------------------------------------
 //
 // other helpers
@@ -1000,6 +1036,7 @@ function bumpomaticAddById(bumpArray, idName)
 {
     var html;
     var element;
+    var offset;
 
     html = document.getElementById(idName);
     if (html !== null) {
@@ -1010,7 +1047,61 @@ function bumpomaticAddById(bumpArray, idName)
 	element.ypos = html.offsetTop;
 	element.width = html.clientWidth;
 	element.height = html.clientHeight;
+
+	offset = bumpomaticCheckIfCollides(bumpArray, element);
+	if (offset !== null) {
+	    // shift html about
+	    html.style.backgroundColor = 'red';
+	    html.style.top = html.offsetTop + offset[1] + 'px';
+	    element.ypos = html.offsetTop; // note setting style.top changed this in the last line!
+	}
 	bumpArray.push(element);
+    }
+}
+
+function bumpomaticCheckIfCollides(bumpArray, element)
+{
+    var xcollides;
+    var ycollides;
+    var xoff;
+    var yoff;
+    var index;
+    var found;
+
+    xoff = 0;
+    yoff = 0;
+    do {
+	found = false;
+	for (index in bumpArray) {
+	    // simple: force element down page until it doesn't collide
+	    do {
+		xcollides = false;
+		ycollides = false;
+		if (element.xpos + xoff < bumpArray[index].xpos + bumpArray[index].width
+		    &&
+		    element.xpos + element.width + xoff > bumpArray[index].xpos) {
+		    xcollides = true;
+		    if (element.ypos + yoff < bumpArray[index].ypos + bumpArray[index].height
+			&&
+			element.ypos + element.height + yoff > bumpArray[index].ypos) {
+			ycollides = true;
+			if (element.height > 0) {
+			    yoff += element.height;
+
+			} else {
+			    yoff++;
+			}
+			found = true;
+		    }
+		}
+	    } while (xcollides === true && ycollides === true);
+	}
+    } while (found === true);
+
+    if (xoff === 0 && yoff === 0) {
+	return null;
+    } else {
+	return [xoff, yoff];
     }
 }
 

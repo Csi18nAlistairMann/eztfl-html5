@@ -3048,16 +3048,42 @@ names the object has. We can already tell we'll want to store the
 x and y positions. So this gives us an outline of and individual object
 in the array.
 
-[ ] Step 2 - establish the array of elements in their existing state
+[x] Step 2 - establish the array of elements in their existing state
    Good! 218 objects around trafalgar square.
 
+[x] Step 3 - process for bumps, bumping where merited
+  When we add something new to the bumpArray, we want to check that
+what we're adding doesn't collide with anything else. If it does, we
+want to see a call to placeholder code. As we might want to run
+a bump check at some point /other/ than when we're posting a new html
+element, we want to do this in another function.
+	 Done. Looks good rotating manually around Peckham fake data
+too. Also rotates around Trafalgar too, but there's so much bumping
+going on that near destinations and route numbers vanish off the
+bottom of the display. Worse, bus stops are forced off the bottom too
+although this could be handled by prioritising bus stops. The response
+is much better for Peckham. However a decision about what to do is for
+the next review, not for now.
 
+[x] Step 4 - Apply bumps to DOM.
+    Done at same time as step 3.
 
-[ ] Step 3 - process for bumps, bumping where merited
-[ ] Step 4 - Apply bumps to DOM.
+    It's clear from the trafalgar experiment that there can be so
+many bus routes that it's clearly impossible to fit them all 'along the
+ring' as planned. Where they are few in number - as with the Peckham
+test - there is no need to shift them along for much if not completely
+all of the bearings available. It even looks like some cheating could
+make things easier: depending on which octant the element starts in,
+shift things up/ down/ left or right. IE, 0-45deg, shift right;
+45-135deg shift down etc. There's enough room in the
+bumpomaticCheckIfCollides() to form new ways of bumping.
 
+	  The manual rotate is so fun, I'm going to leave it now
+instead of off in that test file. For the mo I'll leave the keypress
+code live, as well as a touchtable table cells for direction to
+rotate. Aqua and Chocolate for their first letters - Anticlockwise
+and Clockwise.
 
 
 ---------------------------------------------------------------
 6. margins are a real menace
-10 bumping along the ring

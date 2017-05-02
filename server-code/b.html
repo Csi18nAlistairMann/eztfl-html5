@@ -13,17 +13,20 @@
   <script src="js/scripts.js"></script>
   <script src="js/connect.js"></script>
   <script src="js/EggPositionAngles.js"></script>
-  <!-- <script src="js/test.js"></script> -->
 
 </head>
-<!-- <body onload="eztflHtml5_setup()" onkeypress="capturedKeypress(event)"> -->
-<body onload="eztflHtml5_setup()">
+<body onload="eztflHtml5_setup()" onkeypress="capturedKeypress(event)">
 
 <div id="renderingField">
 <div id="you_are_here_wrapper">
 <div id="you_are_here">You are here</div>
+<table border=1 width=100%><tr>
+<td onclick="fakeHeadingRotate(-10)" width=50% height=30px style="background-color: aqua"></td>
+<td onclick="fakeHeadingRotate(10)" width=50% height=30px style="background-color: chocolate"></td></table>
+</div> <!-- rotateAntiClockwise -->
 </div> <!-- renderingField -->
 </div> <!-- you_are_here_wrapper -->
+
 
 </body>
 </html>

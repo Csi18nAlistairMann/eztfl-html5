@@ -172,3 +172,5 @@ Deal with smelly code, including big reorganisation of the source
 Observations about the same thing having different names
 Observation that test support code is better off in the same file for now
 Support for using user's heading
+Support for a simple algorithm bumping divs that overlap
+Support for manual rotate of heading
