@@ -39,6 +39,9 @@ const EGG_WIDTH = 1440;
 const EGG_HEIGHT = 2040;
 const DIVISOR_FOR_RING2 = 6;
 const DIVISOR_FOR_RING3 = 8;
+const RING0 = 0 // centre for bus stops
+const RING1 = 1 // middle for bus routes
+const RING2 = 2 // outside for near destinations
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -256,7 +259,7 @@ function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_m
 //
 // rendering
 //
-function renderGenericDiv(parent, name, text, onclick_handler, eztflClass, positionArr)
+function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     // Consider if it would be better to copy this code and shape
     // it to handling a specific element
@@ -271,7 +274,6 @@ function renderGenericDiv(parent, name, text, onclick_handler, eztflClass, posit
 	paragraph.setAttribute('id', name);
 	if (positionArr !== null) {
 	    paragraph.style.position = 'fixed';
-	    positionArr = adjustForRing(positionArr, 0);
 	    paragraph.style.left = positionArr[0] + 'px';
 	    paragraph.style.top = positionArr[1] + 'px';
 	}
@@ -289,35 +291,20 @@ function renderGenericDiv(parent, name, text, onclick_handler, eztflClass, posit
     }
 }
 
+function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
+{
+    if (positionArr !== null) {
+	positionArr = adjustForRing(positionArr, 0);
+    }
+    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
+}
+
 function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
-    var paragraph;
-    var node;
-    var div;
-
-    // second time around, so test if we've already got it 1st
-    if (!document.getElementById(name)) {
-	// first time around there are no divs to look at so create them.
-	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', name);
-	if (positionArr !== null) {
-	    paragraph.style.position = 'fixed';
-	    positionArr = adjustForRing(positionArr, 1);
-	    paragraph.style.left = positionArr[0] + 'px';
-	    paragraph.style.top = positionArr[1] + 'px';
-	}
-	if (eztflClass !== null) {
-	    paragraph.setAttribute('class', eztflClass);
-	}
-	if (onclick_handler !== null) {
-	    paragraph.setAttribute('onclick', onclick_handler);
-	}
-	node = document.createTextNode(text);
-	paragraph.appendChild(node);
-
-	div = document.getElementById(parent);
-	div.appendChild(paragraph);
+    if (positionArr !== null) {
+	positionArr = adjustForRing(positionArr, 1);
     }
+    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
 }
 
 function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
@@ -325,8 +312,6 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
     var paragraph;
     var node;
     var div;
-    var x;
-    var y;
 
     // second time around, so test if we've already got it 1st
     if (!document.getElementById(name)) {
@@ -335,10 +320,8 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
 	paragraph.setAttribute('id', name);
 	if (positionArr !== null) {
 	    paragraph.style.position = 'fixed';
-	    x = positionArr[0];
-	    y = positionArr[1];
-	    paragraph.style.left = x + 'px';
-	    paragraph.style.top = y + 'px';
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
 	}
 	if (eztflClass !== null) {
 	    paragraph.setAttribute('class', eztflClass);
@@ -484,7 +467,7 @@ function renderBusStops()
 	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
 	posOnRing = translatePositionOnRingWithLog(busstopData[busstop]);
-	renderGenericDiv(RENDERING_FIELD_NAME, id, text,
+	renderBusStop(RENDERING_FIELD_NAME, id, text,
 			 'loadCountdown("' + busstopData[busstop].naptanId + '")',
 			 CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
 			 posOnRing);
@@ -687,7 +670,7 @@ function renderCountdown(naptan)
 
 	if (text !== '') {
 	    renderRemoveDivById(id);
-	    renderGenericDiv(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
+	    renderGenericDivCore(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
 	}
 
 	count++;
