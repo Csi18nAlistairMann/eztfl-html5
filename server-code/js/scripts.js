@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = true;
+const FAKE_POSITION = false;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -481,7 +481,7 @@ function renderBusStops()
 	deletable[busstop_naptan_class] = false;
 	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
-	posOnRing = translatePositionOnRing(busstopData[busstop]);
+	posOnRing = translatePositionOnRingWithLog(busstopData[busstop]);
 	renderAddDivWithText(RENDERING_FIELD_NAME, id, text,
 			     'loadCountdown("' + busstopData[busstop].naptanId + '")',
 			     CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
@@ -540,6 +540,64 @@ function translatePositionOnRing(busstop)
 	idx += 3;
     }
     return [ring[idx + 1], ring[idx + 2]]
+}
+
+function translatePositionOnRingWithLog(busstop)
+{
+    var bearing;
+    var tempbearing;
+    var idx;
+    var distance2radius;
+    var full;
+    var part;
+    var logMultiplier;
+    var ringx;
+    var ringy;
+    var originx;
+    var originy;
+
+    // get the real life bearing towards the bus stop
+    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
+			  busstop.lat, busstop.lon);
+
+    // convert it into the location on the egg
+    idx = 0;
+    while (ring[idx] < bearing) {
+	idx += 3;
+    }
+    ringx = ring[idx + 1];
+    ringy = ring[idx + 2];
+
+    // obtain the prediction point on the egg
+    originx = EGG_WIDTH / 2;
+    originy = PREDICTION_POINT_Y * 3;
+
+    // now get the log as if we're on the radius, and another
+    // as if we're on an internal point. That gives us a
+    // multiplier
+    full = Math.log(sessionStorage.getItem(RADIUS_NAME));
+    part = Math.log(busstop.distance);
+    logMultiplier = 1 / full * part;
+
+    // now apply that multiplier to the position we'll show
+    if (bearing <= 90) {
+	ringx = ((ringx - originx) * logMultiplier) + originx;
+	ringy = originy - ((originy - ringy) * logMultiplier);
+
+    } else if (bearing <= 180) {
+	ringx = ((ringx - originx) * logMultiplier) + originx;
+	ringy = ((ringy - originy) * logMultiplier) + originy;
+
+    } else if (bearing <= 270) {
+	ringx = originx = ((originx - ringx) * logMultiplier);
+	ringy = ((ringy - originy) * logMultiplier) + originy;
+
+    } else if (bearing <= 360) {
+	ringx = originx = ((originx - ringx) * logMultiplier);
+	ringy = originy - ((originy - ringy) * logMultiplier);
+    }
+
+    return [ringx, ringy];
 }
 
 function translatePosToRing3(busstop)

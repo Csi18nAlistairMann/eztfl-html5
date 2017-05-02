@@ -2753,7 +2753,58 @@ placing them on screen and shuffling their position back until
 either x or y hits an edge. Incredibly inefficient! But still,
 effective.
 
-2017-05-01 20:15
+2017-05-01 20:45
+   Looks good off on walkies again.
+Feature creep: wouldn't it be great if the user's own bearing
+was taken into account? I-meant-that-at-the-beginning edition.
+
+    We can now get the bus route numbers themselves into the
+middle ring:
+    Currently they are ranged down the left hand side as they
+come in. Rather, they can fit in the spaces between the stop
+letters in the central ring and the near destinations on the
+outside. I can tell they'll overwrite each other, but bumping
+is a problem for a little later.
+
+And now acknowledge distance too:
+    If the bus stop is dead on the prediction point, then we want
+it displayed on screen exactly on the prediction point. If it's
+exactly one radius away it should appear on the ring. If it's
+halfway to the radius, it should appear (something like) 2/3rds
+the way to that edge.
+
+    Actually no: we want it to be logarithmic from the user, not
+from the prediction point. Or do we?
+
+     Exactly the sort of question that comes up when programming.
+The actual answer is not that interesting, but it clearly shows
+the value of constructing the program to accomodate potential
+changes. For now we'll use logarithmic from the prediction point.
+
+  When I write 'logarithmic', what I'm wanting is that the greater
+the distance from the prediction point, the less any more distance
+would matter.
+
+100ft = 100 px
+200ft = 150 px
+300ft = 175 px
+400ft = 187.5px etc
+
+      It looks like I ask for Math.log(distance) and get back some
+number. I ask for Math.log(radius) and get some other number. I
+then use the relationship between the two to work out the distance
+I'm actually going to use. Then adapt the positions, relative to
+the origin, accordig to that relationship.
+    Done. Certainly looks different with the code on than off -
+can't actually tell if it's what I want. I could, of course, fake
+a data set that has bus stops every 20m in a grid and see what
+comes back. That would mean writing up a script that fakes lat,
+lon and distance - mandatory in a bigger project, but in this free
+one  I'll do if it looks too nuts.
+
+
+
+
 
 
 
@@ -2765,3 +2816,5 @@ effective.
 7. 'fake' should be shunted off to their own file
 8. smelly code: are we handling positioning in two places when
    we shouldnt?
+9. Take users heading into account
+10 bumping along the ring
