@@ -74,59 +74,19 @@ function eztflHtml5_setup()
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
 
-function setup_tracked_positions(num_positions)
-{
-    var a;
-
-    for (a = 0; a < num_positions; a++) {
-	tracked_positions[a] = null;
-    }
-}
-
 //
 // geolocation helpers
 //
 function getLocationSetup()
 {
-    var data;
-    var position = {};
-
     if (FAKE_POSITION === true) {
-	data = fakeData(FAKE_DATA_SOURCE);
-
-	position = new Object();
-	position.coords = new Object();
-	position.coords.latitude = data[0];
-	position.coords.longitude = data[1];
-	position.timestamp = 1193421444000;
-	positionPush(NUM_TRACKED_POSITIONS, position);
-	position = new Object();
-	position.coords = new Object();
-	position.coords.latitude = data[2];
-	position.coords.longitude = data[3];
-	position.timestamp = 1193421460000;
-	mainLoop(position);
+	runAsFake();
 
     } else if (navigator.geolocation) {
 	navigator.geolocation.watchPosition(mainLoop, cannotWatchPosition);
 
     } else {
 	alert(STR_GEOLOC_NOT_SUPPORTED);
-    }
-}
-
-function fakeData(source)
-{
-    switch (source) {
-    case (FAKE_SRC_PECKHAM):
-	// 4 local stops
-	return [51.465367, -0.079329, 51.465398, -0.078962];
-    case (FAKE_SRC_PICCADILLY):
-	// more stops that can shake a stick at
-	return [51.510172, -0.133610, 51.510149, -0.133997];
-    case (FAKE_SRC_TRAFALGAR):
-	// stop central
-	return [51.505971, -0.129358, 51.506227, -0.129165];
     }
 }
 
@@ -151,27 +111,47 @@ function cannotWatchPosition(positionError)
     alert('Failed to start geolocation. Error:"' + msg + '"');
 }
 
-function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
+//-------------------------------------------------------------
+//
+// Fake data helpers
+//
+function runAsFake()
 {
-    var seconds;
-    var mseconds;
+    var data;
+    var position = {};
 
-    if (distance_in_meters == 0)
-	return 0;
+    data = fakeData(FAKE_DATA_SOURCE);
 
-    mseconds = position2.timestamp - position1.timestamp;
-
-    if (mseconds == 0)
-	return 0;
-
-    seconds = mseconds / 1000;
-
-    if (seconds == 0)
-	return 0;
-
-    return distance_in_meters / seconds;
+    position = new Object();
+    position.coords = new Object();
+    position.coords.latitude = data[0];
+    position.coords.longitude = data[1];
+    position.timestamp = 1193421444000;
+    positionPush(NUM_TRACKED_POSITIONS, position);
+    position = new Object();
+    position.coords = new Object();
+    position.coords.latitude = data[2];
+    position.coords.longitude = data[3];
+    position.timestamp = 1193421460000;
+    mainLoop(position);
 }
 
+function fakeData(source)
+{
+    switch (source) {
+    case (FAKE_SRC_PECKHAM):
+	// 4 local stops
+	return [51.465367, -0.079329, 51.465398, -0.078962];
+    case (FAKE_SRC_PICCADILLY):
+	// more stops that can shake a stick at
+	return [51.510172, -0.133610, 51.510149, -0.133997];
+    case (FAKE_SRC_TRAFALGAR):
+	// stop central
+	return [51.505971, -0.129358, 51.506227, -0.129165];
+    }
+}
+
+//-------------------------------------------------------------
 //
 // trigonometry helpers
 //
@@ -237,7 +217,7 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
     return d;
 }
 
-function calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters)
+function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters)
 {
     var R = EARTH_RADIUS_IN_KM;
 
@@ -291,14 +271,6 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
     }
 }
 
-function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
-{
-    if (positionArr !== null) {
-	positionArr = adjustForRing(positionArr, 0);
-    }
-    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
-}
-
 function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     if (positionArr !== null) {
@@ -307,122 +279,12 @@ function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positio
     renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
 }
 
-function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
+function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
-    var paragraph;
-    var node;
-    var div;
-
-    // second time around, so test if we've already got it 1st
-    if (!document.getElementById(name)) {
-	// first time around there are no divs to look at so create them.
-	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', name);
-	if (positionArr !== null) {
-	    paragraph.style.position = 'fixed';
-	    paragraph.style.left = positionArr[0] + 'px';
-	    paragraph.style.top = positionArr[1] + 'px';
-	}
-	if (eztflClass !== null) {
-	    paragraph.setAttribute('class', eztflClass);
-	}
-	node = document.createTextNode(text);
-	paragraph.appendChild(node);
-
-	div = document.getElementById(parent);
-	div.appendChild(paragraph);
-
-	if (paragraph.offsetLeft + paragraph.clientWidth > RENDERFIELD_WIDTH) {
-	    paragraph.style.left = RENDERFIELD_WIDTH - paragraph.clientWidth + 'px';
-	}
-	if (paragraph.offsetTop + paragraph.clientHeight > RENDERFIELD_HEIGHT) {
-	    paragraph.style.top = RENDERFIELD_HEIGHT - paragraph.clientHeight + 'px';
-	}
-	paragraph.style.marginTop = '0px';
-	paragraph.style.marginBottom = '0px';
+    if (positionArr !== null) {
+	positionArr = adjustForRing(positionArr, 0);
     }
-}
-
-function adjustForRing(positionArr, ringno)
-{
-    var xoff;
-    var yoff;
-
-    if (ringno === 0) {
-	// centre ring for stop letters
-	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
-	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
-	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + xoff;
-	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + yoff;
-
-    } else if (ringno === 1) {
-	// middle ring for route numbers
-	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
-	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
-	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING2 + xoff;
-	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
-
-    } else if (ringno === 2) {
-	// outer ring for near destinations
-	// REEEAAAALLLYY simple. If out of rectangle shove off
-	// to one side. No elegance at all
-	// if (positionArr[0] < (1440 / 2) - 180) {
-	//     positionArr[0] = 0;
-
-	// } else if (positionArr[0] > (1440 / 2) + 180) {
-	//     positionArr[0] = 180;
-	// }
-
-	// if (positionArr[1] < (2040 / 2) - 180) {
-	//     positionArr[1] = 0;
-
-	// } else if (positionArr[1] > (2040 / 2) + 180) {
-	//     positionArr[1] = 180;
-	// }
-    } // Should not be any other ringno
-
-    return positionArr;
-}
-
-function renderRemoveDivById(id)
-{
-    var child;
-
-    // now we remove the first
-    if (document.getElementById(id)) {
-	child = document.getElementById(id);
-	child.parentNode.removeChild(child);
-    }
-}
-
-function renderRemoveDivByClass(className)
-{
-    var child;
-    var list;
-
-    // now we remove the first
-    list = document.getElementsByClassName(className);
-    while(list.length) {
-	list[0].parentNode.removeChild(list[0]);
-    }
-}
-
-function renderReplaceDivWithText(dest, source, text)
-{
-    var paragraph;
-    var node;
-    var destChild;
-
-    // now we replace the second
-    if (!document.getElementById(source)) {
-	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', source);
-	node = document.createTextNode(text);
-	paragraph.appendChild(node);
-
-	destChild = document.getElementById(dest);
-	destChild.parentNode.replaceChild(node, destChild);
-    }
+    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
 }
 
 function renderBusStops()
@@ -468,9 +330,9 @@ function renderBusStops()
 	renderRemoveDivById(id);
 	posOnRing = translatePositionOnRingWithLog(busstopData[busstop]);
 	renderBusStop(RENDERING_FIELD_NAME, id, text,
-			 'loadCountdown("' + busstopData[busstop].naptanId + '")',
-			 CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
-			 posOnRing);
+		      'loadCountdown("' + busstopData[busstop].naptanId + '")',
+		      CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
+		      posOnRing);
 
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
 	text = busstopData[busstop].towards;
@@ -502,14 +364,160 @@ function renderBusStops()
     }
 }
 
-function adjustStopLetter(stopletter)
+function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
-    if (stopletter === undefined) {
-	return '@';
+    var paragraph;
+    var node;
+    var div;
 
-    } else {
-	return stopletter;
+    // second time around, so test if we've already got it 1st
+    if (!document.getElementById(name)) {
+	// first time around there are no divs to look at so create them.
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', name);
+	if (positionArr !== null) {
+	    paragraph.style.position = 'fixed';
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
+	}
+	if (eztflClass !== null) {
+	    paragraph.setAttribute('class', eztflClass);
+	}
+	node = document.createTextNode(text);
+	paragraph.appendChild(node);
+
+	div = document.getElementById(parent);
+	div.appendChild(paragraph);
+
+	if (paragraph.offsetLeft + paragraph.clientWidth > RENDERFIELD_WIDTH) {
+	    paragraph.style.left = RENDERFIELD_WIDTH - paragraph.clientWidth + 'px';
+	}
+	if (paragraph.offsetTop + paragraph.clientHeight > RENDERFIELD_HEIGHT) {
+	    paragraph.style.top = RENDERFIELD_HEIGHT - paragraph.clientHeight + 'px';
+	}
+	paragraph.style.marginTop = '0px';
+	paragraph.style.marginBottom = '0px';
     }
+}
+
+function renderCountdown(naptan)
+{
+    var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
+    var text;
+    var id;
+    var arrival;
+    var count;
+    var extants;
+    var idx;
+
+    // remove all existing countdown data
+    extants = document.getElementsByClassName(CLASS_COUNTDOWN_NAME);
+    for (idx = 0; idx < extants.length; idx++) {
+	extants[idx].parentNode.removeChild(extants[idx]);
+    }
+
+    // display all the new countdown data
+    count = 0;
+    for (arrival in countdownData) {
+	id = 'arrival_' + count;
+
+	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
+
+	if (text !== '') {
+	    renderRemoveDivById(id);
+	    renderGenericDivCore(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
+	}
+
+	count++;
+    }
+}
+
+// render helpers
+
+function renderRemoveDivById(id)
+{
+    var child;
+
+    // now we remove the first
+    if (document.getElementById(id)) {
+	child = document.getElementById(id);
+	child.parentNode.removeChild(child);
+    }
+}
+
+function renderRemoveDivByClass(className)
+{
+    var child;
+    var list;
+
+    // now we remove the first
+    list = document.getElementsByClassName(className);
+    while(list.length) {
+	list[0].parentNode.removeChild(list[0]);
+    }
+}
+
+function renderReplaceDivWithText(dest, source, text)
+{
+    var paragraph;
+    var node;
+    var destChild;
+
+    // now we replace the second
+    if (!document.getElementById(source)) {
+	paragraph = document.createElement('p');
+	paragraph.setAttribute('id', source);
+	node = document.createTextNode(text);
+	paragraph.appendChild(node);
+
+	destChild = document.getElementById(dest);
+	destChild.parentNode.replaceChild(node, destChild);
+    }
+}
+
+//-------------------------------------------------------------
+//
+// Positioning
+//
+function adjustForRing(positionArr, ringno)
+{
+    var xoff;
+    var yoff;
+
+    if (ringno === 0) {
+	// centre ring for stop letters
+	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
+	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
+	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + xoff;
+	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + yoff;
+
+    } else if (ringno === 1) {
+	// middle ring for route numbers
+	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
+	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
+	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING2 + xoff;
+	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
+
+    } else if (ringno === 2) {
+	// outer ring for near destinations
+	// REEEAAAALLLYY simple. If out of rectangle shove off
+	// to one side. No elegance at all
+	// if (positionArr[0] < (1440 / 2) - 180) {
+	//     positionArr[0] = 0;
+
+	// } else if (positionArr[0] > (1440 / 2) + 180) {
+	//     positionArr[0] = 180;
+	// }
+
+	// if (positionArr[1] < (2040 / 2) - 180) {
+	//     positionArr[1] = 0;
+
+	// } else if (positionArr[1] > (2040 / 2) + 180) {
+	//     positionArr[1] = 180;
+	// }
+    } // Should not be any other ringno
+
+    return positionArr;
 }
 
 function translatePositionOnRing(busstop)
@@ -521,10 +529,10 @@ function translatePositionOnRing(busstop)
 			  busstop.lat, busstop.lon);
 
     idx = 0;
-    while (ring[idx] < bearing) {
+    while (ringMap[idx] < bearing) {
 	idx += 3;
     }
-    return [ring[idx + 1], ring[idx + 2]]
+    return [ringMap[idx + 1], ringMap[idx + 2]]
 }
 
 function translatePositionOnRingWithLog(busstop)
@@ -547,11 +555,11 @@ function translatePositionOnRingWithLog(busstop)
 
     // convert it into the location on the egg
     idx = 0;
-    while (ring[idx] < bearing) {
+    while (ringMap[idx] < bearing) {
 	idx += 3;
     }
-    ringx = ring[idx + 1];
-    ringy = ring[idx + 2];
+    ringx = ringMap[idx + 1];
+    ringy = ringMap[idx + 2];
 
     // obtain the prediction point on the egg
     originx = EGG_WIDTH / 2;
@@ -601,12 +609,12 @@ function translatePosToRing3(busstop)
 			  busstop.lat, busstop.lon);
 
     idx = 0;
-    while (ring[idx] < bearing) {
+    while (ringMap[idx] < bearing) {
 	idx += 3;
     }
 
-    x = RENDERFIELD_WIDTH / EGG_WIDTH * ring[idx + 1] ;
-    y = RENDERFIELD_HEIGHT / EGG_HEIGHT * ring[idx + 2] ;
+    x = RENDERFIELD_WIDTH / EGG_WIDTH * ringMap[idx + 1] ;
+    y = RENDERFIELD_HEIGHT / EGG_HEIGHT * ringMap[idx + 2] ;
 
     xoff = Math.abs(PREDICTION_POINT_X - x);
     yoff = Math.abs(PREDICTION_POINT_Y - y);
@@ -645,61 +653,7 @@ function translatePosToRing3(busstop)
     return [x, y];
 }
 
-function renderCountdown(naptan)
-{
-    var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
-    var text;
-    var id;
-    var arrival;
-    var count;
-    var extants;
-    var idx;
-
-    // remove all existing countdown data
-    extants = document.getElementsByClassName(CLASS_COUNTDOWN_NAME);
-    for (idx = 0; idx < extants.length; idx++) {
-	extants[idx].parentNode.removeChild(extants[idx]);
-    }
-
-    // display all the new countdown data
-    count = 0;
-    for (arrival in countdownData) {
-	id = 'arrival_' + count;
-
-	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
-
-	if (text !== '') {
-	    renderRemoveDivById(id);
-	    renderGenericDivCore(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
-	}
-
-	count++;
-    }
-}
-
 //-------------------------------------------------------------
-//
-// other helpers
-//
-
-//
-// handling the stack of tracked positions
-//
-function positionPush(num_positions, position)
-{
-    var count = 0;
-    var a;
-
-    for (a = 0; a < num_positions - 1; a++) {
-	tracked_positions[a] = tracked_positions[a + 1];
-	if (tracked_positions[a] != null)
-	    count++
-    }
-    tracked_positions[num_positions - 1] = position;
-
-    return ++count;
-}
-
 //
 // prediction helpers
 //
@@ -735,10 +689,10 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
-    pair = calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
-						  latest_position.coords.longitude,
-						  angle,
-						  speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
+    pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+						     latest_position.coords.longitude,
+						     angle,
+						     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
     radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
 					   - ((latest_position.timestamp - early_position.timestamp)
@@ -763,6 +717,135 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     return url;
 }
 
+//-------------------------------------------------------------
+//
+// User Interface helpers
+//
+
+//
+// what to do if user clicks on bus stop?
+//
+function loadCountdown(naptan)
+{
+    getArrivalsFromTfl(naptan);
+}
+
+//-------------------------------------------------------------
+//
+// other helpers
+//
+function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
+{
+    var seconds;
+    var mseconds;
+
+    if (distance_in_meters == 0)
+	return 0;
+
+    mseconds = position2.timestamp - position1.timestamp;
+
+    if (mseconds == 0)
+	return 0;
+
+    seconds = mseconds / 1000;
+
+    if (seconds == 0)
+	return 0;
+
+    return distance_in_meters / seconds;
+}
+
+//
+// Convert stop letters to something more meaningful
+//
+function adjustStopLetter(stopletter)
+{
+    if (stopletter === undefined) {
+	return '@';
+
+    } else {
+	return stopletter;
+    }
+}
+
+//
+// array comparison
+//
+function isArrayEqual(arr1, arr2)
+{
+    var a;
+
+    if (arr1.length != arr2.length)
+	return false;
+    for (a = 0; a < arr1.length; a++) {
+	if (arr1[a] !== arr2[a])
+	    return false;
+    }
+    return true;
+}
+
+//-------------------------------------------------------------
+//
+// Sanity check helpers
+//
+
+//
+// sanity checks for the position, also replace bad/missing vals
+//
+function checkPositionValues(original_position)
+{
+    var old_ts = original_position.timestamp;
+    var new_ts = Date.now();
+    var position;
+
+    position = Object.assign({}, original_position);
+    position.coords = Object.assign({}, original_position.coords);
+    position.coords.latitude = original_position.coords.latitude;
+    position.coords.longitude = original_position.coords.longitude;
+    position.timestamp = original_position.timestamp;
+
+    // the timestamp should reflect a date between 1970 and 9999AD
+    if (typeof(new_ts) !== 'number') {
+	new_ts = FIRST_TIMESTAMP_EVAH;
+
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
+		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
+	new_ts = FIRST_TIMESTAMP_EVAH;
+    }
+
+    if (typeof(old_ts) !== 'number') {
+	position.timestamp = new_ts;
+
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
+		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
+	position.timestamp = new_ts;
+    }
+
+    // the latitude and longitude should be values between
+    // -90 & +90, -180 & +180 respectively
+    if (typeof(position.coords.latitude) !== 'number') {
+	position.coords.latitude = 0;
+
+    } else if (!(position.coords.latitude >= LOWEST_LATITUDE
+		 && position.coords.latitude <= HIGHEST_LATITUDE)) {
+	position.coords.latitude = 0;
+    }
+
+    if (typeof(position.coords.longitude) !== 'number') {
+	position.coords.longitude = 0;
+
+    } else if (!(position.coords.longitude >= LOWEST_LONGITUDE
+		 && position.coords.longitude <= HIGHEST_LONGITUDE)) {
+	position.coords.longitude = 0;
+    }
+
+    return position;
+}
+
+//-------------------------------------------------------------
+//
+// Higher level handling of API
+//
 function receiveNewBusStops()
 {
     var show;
@@ -836,11 +919,6 @@ function receiveNewBusStop(currentValue, index, array)
     localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
 }
 
-function loadCountdown(naptan)
-{
-    getArrivalsFromTfl(naptan);
-}
-
 //
 // getArrivalsFromTfl('490015575X');
 function getArrivalsFromTfl(naptan)
@@ -871,73 +949,32 @@ function receiveNewCountdown(naptan)
     }
 }
 
+//-------------------------------------------------------------
 //
-// array comparison
+// handling the stack of tracked positions
 //
-function isArrayEqual(arr1, arr2)
+function setup_tracked_positions(num_positions)
 {
     var a;
 
-    if (arr1.length != arr2.length)
-	return false;
-    for (a = 0; a < arr1.length; a++) {
-	if (arr1[a] !== arr2[a])
-	    return false;
+    for (a = 0; a < num_positions; a++) {
+	tracked_positions[a] = null;
     }
-    return true;
 }
 
-//
-// sanity checks for the position, also replace bad/missing vals
-//
-function checkPositionValues(original_position)
+function positionPush(num_positions, position)
 {
-    var old_ts = original_position.timestamp;
-    var new_ts = Date.now();
-    var position;
+    var count = 0;
+    var a;
 
-    position = Object.assign({}, original_position);
-    position.coords = Object.assign({}, original_position.coords);
-    position.coords.latitude = original_position.coords.latitude;
-    position.coords.longitude = original_position.coords.longitude;
-    position.timestamp = original_position.timestamp;
-
-    // the timestamp should reflect a date between 1970 and 9999AD
-    if (typeof(new_ts) !== 'number') {
-	new_ts = FIRST_TIMESTAMP_EVAH;
-
-    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
-		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
-	new_ts = FIRST_TIMESTAMP_EVAH;
+    for (a = 0; a < num_positions - 1; a++) {
+	tracked_positions[a] = tracked_positions[a + 1];
+	if (tracked_positions[a] != null)
+	    count++
     }
+    tracked_positions[num_positions - 1] = position;
 
-    if (typeof(old_ts) !== 'number') {
-	position.timestamp = new_ts;
-
-    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
-		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
-	position.timestamp = new_ts;
-    }
-
-    // the latitude and longitude should be values between
-    // -90 & +90, -180 & +180 respectively
-    if (typeof(position.coords.latitude) !== 'number') {
-	position.coords.latitude = 0;
-
-    } else if (!(position.coords.latitude >= LOWEST_LATITUDE
-		 && position.coords.latitude <= HIGHEST_LATITUDE)) {
-	position.coords.latitude = 0;
-    }
-
-    if (typeof(position.coords.longitude) !== 'number') {
-	position.coords.longitude = 0;
-
-    } else if (!(position.coords.longitude >= LOWEST_LONGITUDE
-		 && position.coords.longitude <= HIGHEST_LONGITUDE)) {
-	position.coords.longitude = 0;
-    }
-
-    return position;
+    return ++count;
 }
 
 //-------------------------------------------------------------
