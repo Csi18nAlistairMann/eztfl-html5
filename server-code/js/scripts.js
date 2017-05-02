@@ -5,7 +5,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = false;
+const FAKE_POSITION = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -273,18 +273,22 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
 
 function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    var scaledPositions;
+
     if (positionArr !== null) {
-	positionArr = adjustForRing(positionArr, 1);
+	scaledPositions = scaleRingToRenderfield(positionArr, RING1);
     }
-    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
+    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
 }
 
 function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    var scaledPositions;
+
     if (positionArr !== null) {
-	positionArr = adjustForRing(positionArr, 0);
+	scaledPositions = scaleRingToRenderfield(positionArr, RING0);
     }
-    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr);
+    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
 }
 
 function renderBusStops()
@@ -302,8 +306,10 @@ function renderBusStops()
     var elementmatch;
     var classname;
     var key;
-    var posOnRing;
+    var positionsWithLog;
     var nearDestPos;
+    var bearing;
+    var positions;
 
     // html that could be deleted when a busstop goes out of range
     // is distinguished by having class busstop_<naptan>. Get an
@@ -322,34 +328,43 @@ function renderBusStops()
     // Render new bus stop info
     stop_count = 0;
     for (busstop in busstopData) {
+	// note bus stop going to be used, remove old name if present
 	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
-
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
 	deletable[busstop_naptan_class] = false;
-	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderRemoveDivById(id);
-	posOnRing = translatePositionOnRingWithLog(busstopData[busstop]);
+
+	// get positioning info
+	bearing = se_getAngle(busstopData[busstop].originLatitude, busstopData[busstop].originLongitude,
+			      busstopData[busstop].lat, busstopData[busstop].lon);
+	positions = getPositionOnRing(bearing);
+	positionsWithLog = scalePositionsUsingLog(bearing, positions, busstopData[busstop].distance);
+
+	// fill in for ring 0 -- the stop letter
+	text = adjustStopLetter(busstopData[busstop].stopLetter);
 	renderBusStop(RENDERING_FIELD_NAME, id, text,
 		      'loadCountdown("' + busstopData[busstop].naptanId + '")',
 		      CLASS_BUSSTOP_NAME + ' ' + busstop_naptan_class,
-		      posOnRing);
+		      positionsWithLog);
 
-	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
-	text = busstopData[busstop].towards;
-	renderRemoveDivById(id);
-
-	nearDestPos = translatePosToRing3(busstopData[busstop]);
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, nearDestPos);
-
+	// fill in for ring 1 -- the routes serving this stop
 	line_count = 0;
 	for (routeno in busstopData[busstop].lines) {
+	    // delete old stop letter if present
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
-	    text = busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
-	    posOnRing = translatePositionOnRing(busstopData[busstop]); // guarantees overlap for now
-	    renderBusRoute(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, posOnRing);
+
+	    // that we don't change positions guarantees routes overwrite each other
+	    text = busstopData[busstop].lines[routeno].name;
+	    renderBusRoute(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, positions);
 	    line_count++;
 	}
+
+	// fill in for ring 2 -- the near destinations
+	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
+	renderRemoveDivById(id);
+	text = busstopData[busstop].towards;
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, bearing, positions);
 
 	stop_count++;
     }
@@ -364,7 +379,17 @@ function renderBusStops()
     }
 }
 
-function renderNearDestination(parent, name, text, onclick_handler, eztflClass, positionArr)
+function renderNearDestination(parent, name, text, onclick_handler, eztflClass, bearing, positionArr)
+{
+    var scaledPositions;
+
+    if (positionArr !== null) {
+	scaledPositions = scaleRingToRenderfield(positionArr, RING2);
+    }
+    renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
+}
+
+function renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     var paragraph;
     var node;
@@ -479,63 +504,93 @@ function renderReplaceDivWithText(dest, source, text)
 //
 // Positioning
 //
-function adjustForRing(positionArr, ringno)
+function getPositionOnRing(bearing)
+{
+    var bearing;
+    var idx;
+
+    // convert it into the location on the egg
+    idx = 0;
+    while (RINGMAP[idx] < bearing) {
+	idx += 3;
+    }
+    return [RINGMAP[idx + 1], RINGMAP[idx + 2]]
+}
+
+function scaleRingToRenderfield(positionArr, ringno)
 {
     var xoff;
     var yoff;
+    var scaledPositionsArr = [];
 
     if (ringno === 0) {
 	// centre ring for stop letters
 	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
 	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING3 * 2)));
-	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + xoff;
-	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + yoff;
+	scaledPositionsArr[0] = positionArr[0] / DIVISOR_FOR_RING3 + xoff;
+	scaledPositionsArr[1] = positionArr[1] / DIVISOR_FOR_RING3 + yoff;
 
     } else if (ringno === 1) {
 	// middle ring for route numbers
 	xoff = (PREDICTION_POINT_X - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
 	yoff = (PREDICTION_POINT_Y - (EGG_WIDTH / (DIVISOR_FOR_RING2 * 2)));
-	positionArr[0] = positionArr[0] / DIVISOR_FOR_RING2 + xoff;
-	positionArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
+	scaledPositionsArr[0] = positionArr[0] / DIVISOR_FOR_RING2 + xoff;
+	scaledPositionsArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
 
     } else if (ringno === 2) {
-	// outer ring for near destinations
-	// REEEAAAALLLYY simple. If out of rectangle shove off
-	// to one side. No elegance at all
-	// if (positionArr[0] < (1440 / 2) - 180) {
-	//     positionArr[0] = 0;
+	var bearing;
+	var idx;
+	var x;
+	var y;
+	var xoff;
+	var yoff;
+	var ratio;
+	var potential_x;
+	var potential_y;
+	var positions;
 
-	// } else if (positionArr[0] > (1440 / 2) + 180) {
-	//     positionArr[0] = 180;
-	// }
+	scaledPositionsArr[0] = RENDERFIELD_WIDTH / EGG_WIDTH * positionArr[0];
+	scaledPositionsArr[1] = RENDERFIELD_HEIGHT / EGG_HEIGHT * positionArr[1];
 
-	// if (positionArr[1] < (2040 / 2) - 180) {
-	//     positionArr[1] = 0;
+	xoff = Math.abs(PREDICTION_POINT_X - scaledPositionsArr[0]);
+	yoff = Math.abs(PREDICTION_POINT_Y - scaledPositionsArr[1]);
+	ratio = xoff / yoff;
 
-	// } else if (positionArr[1] > (2040 / 2) + 180) {
-	//     positionArr[1] = 180;
-	// }
+	// this is the bit that could more usefullscaledPositionsArr[1]be done with tangents
+	if (bearing <= 90) {
+	    while (scaledPositionsArr[0] < RENDERFIELD_WIDTH && scaledPositionsArr[1] > 0) {
+		scaledPositionsArr[0] += ratio;
+		scaledPositionsArr[1]--;
+	    }
+
+	} else if (bearing <= 180) {
+	    while (scaledPositionsArr[0] < RENDERFIELD_WIDTH && scaledPositionsArr[1] < RENDERFIELD_HEIGHT) {
+		scaledPositionsArr[0] += ratio;
+		scaledPositionsArr[1]++;
+	    }
+
+	} else if (bearing <= 270) {
+	    while (scaledPositionsArr[0] > 0 && scaledPositionsArr[1] < RENDERFIELD_HEIGHT) {
+		scaledPositionsArr[0] -= ratio;
+		scaledPositionsArr[1]++;
+	    }
+
+	} else if (bearing <= 360) {
+	    while (scaledPositionsArr[0] > 0 && scaledPositionsArr[1] > 0) {
+		scaledPositionsArr[0] -= ratio;
+		scaledPositionsArr[1]--;
+	    }
+	}
+	scaledPositionsArr[0] = (scaledPositionsArr[0] < 0) ? 0 : scaledPositionsArr[0];
+	scaledPositionsArr[0] = (scaledPositionsArr[0] > RENDERFIELD_WIDTH) ? RENDERFIELD_WIDTH : scaledPositionsArr[0];
+	scaledPositionsArr[1] = (scaledPositionsArr[1] < 0) ? 0 : scaledPositionsArr[1];
+	scaledPositionsArr[1] = (scaledPositionsArr[1] > RENDERFIELD_HEIGHT) ? RENDERFIELD_HEIGHT : scaledPositionsArr[1];
     } // Should not be any other ringno
 
-    return positionArr;
+    return scaledPositionsArr;
 }
 
-function translatePositionOnRing(busstop)
-{
-    var bearing;
-    var idx;
-
-    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
-			  busstop.lat, busstop.lon);
-
-    idx = 0;
-    while (ringMap[idx] < bearing) {
-	idx += 3;
-    }
-    return [ringMap[idx + 1], ringMap[idx + 2]]
-}
-
-function translatePositionOnRingWithLog(busstop)
+function scalePositionsUsingLog(bearing, positions, busstopDistance)
 {
     var bearing;
     var tempbearing;
@@ -548,18 +603,11 @@ function translatePositionOnRingWithLog(busstop)
     var ringy;
     var originx;
     var originy;
+    var positions;
 
-    // get the real life bearing towards the bus stop
-    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
-			  busstop.lat, busstop.lon);
-
-    // convert it into the location on the egg
-    idx = 0;
-    while (ringMap[idx] < bearing) {
-	idx += 3;
-    }
-    ringx = ringMap[idx + 1];
-    ringy = ringMap[idx + 2];
+    // positions = getPositionOnRing(bearing, busstop);
+    ringx = positions[0];
+    ringy = positions[1];
 
     // obtain the prediction point on the egg
     originx = EGG_WIDTH / 2;
@@ -569,7 +617,7 @@ function translatePositionOnRingWithLog(busstop)
     // as if we're on an internal point. That gives us a
     // multiplier
     full = Math.log(sessionStorage.getItem(RADIUS_NAME));
-    part = Math.log(busstop.distance);
+    part = Math.log(busstopDistance);
     logMultiplier = 1 / full * part;
 
     // now apply that multiplier to the position we'll show
@@ -591,66 +639,6 @@ function translatePositionOnRingWithLog(busstop)
     }
 
     return [ringx, ringy];
-}
-
-function translatePosToRing3(busstop)
-{
-    var bearing;
-    var idx;
-    var x;
-    var y;
-    var xoff;
-    var yoff;
-    var ratio;
-    var potential_x;
-    var potential_y;
-
-    bearing = se_getAngle(busstop.originLatitude, busstop.originLongitude,
-			  busstop.lat, busstop.lon);
-
-    idx = 0;
-    while (ringMap[idx] < bearing) {
-	idx += 3;
-    }
-
-    x = RENDERFIELD_WIDTH / EGG_WIDTH * ringMap[idx + 1] ;
-    y = RENDERFIELD_HEIGHT / EGG_HEIGHT * ringMap[idx + 2] ;
-
-    xoff = Math.abs(PREDICTION_POINT_X - x);
-    yoff = Math.abs(PREDICTION_POINT_Y - y);
-    ratio = xoff / yoff;
-
-    // this is the bit that could more usefully be done with tangents
-    if (bearing <= 90) {
-	while (x < RENDERFIELD_WIDTH && y > 0) {
-	    x += ratio;
-	    y--;
-	}
-
-    } else if (bearing <= 180) {
-	while (x < RENDERFIELD_WIDTH && y < RENDERFIELD_HEIGHT) {
-	    x += ratio;
-	    y++;
-	}
-
-    } else if (bearing <= 270) {
-	while (x > 0 && y < RENDERFIELD_HEIGHT) {
-	    x -= ratio;
-	    y++;
-	}
-
-    } else if (bearing <= 360) {
-	while (x > 0 && y > 0) {
-	    x -= ratio;
-	    y--;
-	}
-    }
-    x = (x < 0) ? 0 : x;
-    x = (x > RENDERFIELD_WIDTH) ? RENDERFIELD_WIDTH : x;
-    y = (y < 0) ? 0 : y;
-    y = (y > RENDERFIELD_HEIGHT) ? RENDERFIELD_HEIGHT : y;
-
-    return [x, y];
 }
 
 //-------------------------------------------------------------

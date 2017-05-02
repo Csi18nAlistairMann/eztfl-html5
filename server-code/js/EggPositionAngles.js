@@ -9,7 +9,7 @@
 // The centre of the ring from which bearings are made is
 // at 720x477. 
 //
-const ringMap = [
+const RINGMAP = [
 0,720,1,
 3.13,746,2,
 4.7,759,3,
