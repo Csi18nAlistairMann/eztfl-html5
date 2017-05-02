@@ -2802,19 +2802,98 @@ comes back. That would mean writing up a script that fakes lat,
 lon and distance - mandatory in a bigger project, but in this free
 one  I'll do if it looks too nuts.
 
+2017-05-01 09:32
 
+This is a read-only project. Or is it?
+     This is about security. A big part is managing user input: if the
+user is allowed to get data into the device, there's the possibility
+of the device being cajoled into unexpected behaviour - we really don't
+people's devices becoming part of a bot net, losing their cat pictures
+to thieves, etc.
+
+   I've not covered that much in this project, for the simple reasons
+that there is as yet no method of providing user input, but one: the
+proxy. Let's deal with it now.
+
+       The proxy's function is to manage CORS issues by sending data
+requests on to TFL. It does this with a configuration change rather than
+a program I've written. The change simply forwards whatever arrives to
+TFL.
+	As a general thing, whether the Apache program allows attacks
+against it is something that could be detected by me, but would be
+addressed by their project devs. Detecting whether Apache allows an
+attack against it's proxying service has to be outside the scope of this
+project. One could confirm the ordinary security of Apache. I've chosen
+here to assume the ordinary security of Apache - I've known and used it
+since the late 90s.
+      A second security question is about the forwarded traffic. The
+proxy is necessarily revealed by the JavaScript to the end user who can
+then craft such requests as he likes knowing that to the TFL admin, the
+request appears to have come from me. That their API might be
+susceptible to an attack is obviously a question for their own devs.
+However if an attack did arrive to them through my proxy, I'd like to
+point the finger at someone else. For that reason Apache logs are so
+constructed as to keep some data: if necessary, they can give me the
+time of an attack, and I can determine from which IP address it came
+from.
+      Thus, even though this is ostensibly a "read-only" project, in
+fact there are ways in which it can be subverted and so security should
+still be considered positively: "How could I cause mischief?" And not
+blithely hand-waved: "Oh, it's read-only".
+
+Smelly code:
+       This name is used to describe code whose presence seems to indicate
+a much deeper problem, even though it otherwise works.
+
+  This has happened with renderAddDivWithText(). The function originally
+started life as renderAddDiv() whose purpose was to get something into the
+DOM. However that use got expanded to include adding text to that element,
+then classes, and positions, and adjusting margins ... to the point where
+I was forced to look again at what that function was meant to do. It
+started as a way of getting a generic something to the DOM. It's now
+required to get particular things into the DOM. And so the generic
+function renderAddDivWithText() has been forked into functions for
+specific tasks - getting the Bus Route into the DOM: renderBusRoute().
+Likewise renderNearDestination().
+
+	 The code smell dissapates in part if we acknowledge in the
+function name that this is older code, and shouldn't be expanded but copied
+and specialised. renderAddDivWithText() can become renderGenericDiv().
+
+    That done, it still has smell: renderGenericDiv() and renderBusRoute()
+do an awful lot of identical work. Indeed, only one line is different -
+an adjustment to positions based on the ring. This is not 'Generic' at all
+and heavily implies we should either break their commonality into another
+function common to them both, and consider whether something handling that
+one specific change should be on it's own.
+
+And more: the function for renderCountdown() has got separated from
+similar functions. A larger project might contain all of these in different
+files. Here I want to keep them in one file (as reduces bandwidth and
+keeps speed up) and so keep them in sections. Review for any code out of
+section. Major change!
+
+    Another one again: am I handling positioning in two different places
+in the code? Well, it's actually all over the place. As well as duplicated
+effort, there's smell from being inconsistent about what operation I'm
+looking to do. We'll use 'scaleRing' to get from the 1440x2040 egg to the
+360x509 screen. And 'getPositionOnRing' for operations only on the egg.
+And that reveals the big stinker: translatePosToRing3. This seems to be
+doing the work of both scale and getPosition.
+
+Test:
+	Walkies. Not massively impressed with the logarithmic distance.
+Perhaps because not enough to contrast it with, perhaps because the update
+rate is too slow for nuance. It did give me the idea of clicking and
+holding making the selected item grow in size for legibility.
 
 
 
 
 
 ---------------------------------------------------------------
-3. Doc - That this a read-only project
-4.      renderAddDivWithText() is getting /really/ overloaded
 5. lots of names for the same thing (stoppoint vs bus stop vs..)q
 6. margins are a real menace
 7. 'fake' should be shunted off to their own file
-8. smelly code: are we handling positioning in two places when
-   we shouldnt?
-9. Take users heading into account
+9. Take users' heading into account
 10 bumping along the ring

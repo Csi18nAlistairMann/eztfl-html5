@@ -156,3 +156,15 @@ Add fake positioning because geolocation regulalrly failing on desktop
 30 April 2017
 Remove data associated with a bus stop if that bus stop disappears
 Correct html id tags not consistent across reloads
+Use of '@' for bus stops without stop letters
+Use of sans-serif
+
+1 May 2017
+Taking those user's own bearing into account not part of original plan
+  - absolutely perfect reason for mandatory feature creep
+Add bus routes into middle ring
+Account for logarithmic distance too - relearn maths
+
+2 May 2017
+Observations that there are still attack vectors for this, a 'read-only'
+	     project.
