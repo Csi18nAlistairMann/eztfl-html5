@@ -3296,6 +3296,29 @@ Linting
 through JSHint once - and dealt with missing semi-colons because I'm short
 on time. Happily, half those missing were from stack exchange code
 
+Walking test suggestions:
+1. touching the near destination lights up its bus stop
+2. Touching arrivals also lights up stop
+3. persis the fake heading as rendering cancels user's choice
+3a. so that means a way of resetting user's choice
+4. Arrivals from choosing bus stop diverge significantly from that gained
+   from old site + sms code
+5. Unique bus numbers down right hand side
+6. radius line with 50m marks that sees marks move as radius changes
+   |____|____|____|____|____|
+   0   50   100  150  200  250
+
+   |______|______|______|
+   0     200    400    600
+7. Stop colliding colour red for everything, or only make bumped border
+   red
+8. stop name called out some distance before can see stop letter: option
+   to use that instead
+
+Linting:
+	'use strict' is preferred inside the function, just in case of
+sloppy code in a concatenated file. I never even knew you could concat
+.js files.
 
 
 ---------------------------------------------------------------

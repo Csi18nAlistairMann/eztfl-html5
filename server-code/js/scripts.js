@@ -10,11 +10,10 @@
 //
 /* jshint esversion: 6 */
 //
-'use strict';
 //
 // Constants
 //
-const FAKE_POSITION = false;
+const FAKE_POSITION = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -80,6 +79,8 @@ var last_prediction = [null];
 //
 function eztflHtml5_setup()
 {
+    'use strict';
+
     getLocationSetup();
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
 }
@@ -89,6 +90,8 @@ function eztflHtml5_setup()
 //
 function getLocationSetup()
 {
+    'use strict';
+
     if (FAKE_POSITION === true) {
 	runAsFake();
 
@@ -102,6 +105,7 @@ function getLocationSetup()
 
 function cannotWatchPosition(positionError)
 {
+    'use strict';
     var msg;
 
     switch(positionError.code) {
@@ -127,6 +131,7 @@ function cannotWatchPosition(positionError)
 //
 function runAsFake()
 {
+    'use strict';
     var data;
     var position = {};
 
@@ -148,6 +153,8 @@ function runAsFake()
 
 function fakeData(source)
 {
+    'use strict';
+
     switch (source) {
     case (FAKE_SRC_PECKHAM):
 	// 4 local stops
@@ -167,16 +174,22 @@ function fakeData(source)
 //
 function se_deg2rad(deg)
 {
+    'use strict';
+
     return deg * (Math.PI / 180);
 }
 
 function se_rad2deg(n)
 {
+    'use strict';
+
     return n * (180 / Math.PI);
 }
 
 function getAngle(position1, position2)
 {
+    'use strict';
+
     return se_getAngle(position1.coords.latitude,
 		       position1.coords.longitude,
 		       position2.coords.latitude,
@@ -185,6 +198,8 @@ function getAngle(position1, position2)
 
 function se_getAngle(startLat, startLong, endLat, endLong)
 {
+    'use strict';
+
     startLat = se_deg2rad(startLat);
     startLong = se_deg2rad(startLong);
     endLat = se_deg2rad(endLat);
@@ -206,6 +221,7 @@ function se_getAngle(startLat, startLong, endLat, endLong)
 
 function getDistanceInMeters(position1, position2)
 {
+    'use strict';
     return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
 					 position1.coords.longitude,
 					 position2.coords.latitude,
@@ -215,6 +231,7 @@ function getDistanceInMeters(position1, position2)
 
 function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
 {
+    'use strict';
     var R = EARTH_RADIUS_IN_KM;
     var dLat = se_deg2rad(lat2 - lat1);
     var dLon = se_deg2rad(lon2 - lon1);
@@ -229,6 +246,7 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
 
 function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters)
 {
+    'use strict';
     var R = EARTH_RADIUS_IN_KM;
 
     var distance_in_kilometers = distance_in_meters / 1000;
@@ -251,6 +269,7 @@ function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_i
 //
 function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    'use strict';
     // Consider if it would be better to copy this code and shape
     // it to handling a specific element
     var paragraph;
@@ -286,6 +305,7 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
 
 function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    'use strict';
     var scaledPositions;
 
     if (positionArr !== null) {
@@ -296,6 +316,7 @@ function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positio
 
 function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    'use strict';
     var scaledPositions;
 
     if (positionArr !== null) {
@@ -306,6 +327,7 @@ function renderBusStop(parent, name, text, onclick_handler, eztflClass, position
 
 function renderBusStops()
 {
+    'use strict';
     var busstopData = JSON.parse(localStorage.getItem(NOTED_BUSSTOPS_NAME));
     var text;
     var id;
@@ -410,6 +432,7 @@ function renderBusStops()
 
 function renderNearDestination(parent, name, text, onclick_handler, eztflClass, bearing, positionArr)
 {
+    'use strict';
     var scaledPositions;
 
     if (positionArr !== null) {
@@ -420,6 +443,7 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
 
 function renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
+    'use strict';
     var paragraph;
     var node;
     var div;
@@ -456,6 +480,7 @@ function renderNearDestinationCore(parent, name, text, onclick_handler, eztflCla
 
 function renderCountdown(naptan)
 {
+    'use strict';
     var countdownData = JSON.parse(sessionStorage.getItem(NOTED_COUNTDOWN_NAME));
     var text;
     var id;
@@ -490,6 +515,7 @@ function renderCountdown(naptan)
 
 function renderRemoveDivById(id)
 {
+    'use strict';
     var child;
 
     // now we remove the first
@@ -501,6 +527,7 @@ function renderRemoveDivById(id)
 
 function renderRemoveDivByClass(className)
 {
+    'use strict';
     var child;
     var list;
 
@@ -513,6 +540,7 @@ function renderRemoveDivByClass(className)
 
 function renderReplaceDivWithText(dest, source, text)
 {
+    'use strict';
     var paragraph;
     var node;
     var destChild;
@@ -535,6 +563,7 @@ function renderReplaceDivWithText(dest, source, text)
 //
 function getPositionOnRing(bearing)
 {
+    'use strict';
     var bearing;
     var idx;
 
@@ -548,6 +577,7 @@ function getPositionOnRing(bearing)
 
 function scaleRingToRenderfield(positionArr, ringno)
 {
+    'use strict';
     var xoff;
     var yoff;
     var scaledPositionsArr = [];
@@ -621,6 +651,7 @@ function scaleRingToRenderfield(positionArr, ringno)
 
 function scalePositionsUsingLog(bearing, positions, busstopDistance)
 {
+    'use strict';
     var bearing;
     var full;
     var part;
@@ -673,12 +704,14 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 //
 function positionsGetPrediction(num_positions_tracked)
 {
+    'use strict';
     return positionsGetPredictionSimplest(num_positions_tracked);
 }
 
 function positionsGetPredictionSimplest(num_positions_tracked)
 {
     // take first and last coord in stack, ignore rest
+    'use strict';
     var early_position = [];
     var latest_position = [];
     var distance_in_meters;
@@ -744,11 +777,13 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 //
 function loadCountdown(naptan)
 {
+    'use strict';
     getArrivalsFromTfl(naptan);
 }
 
 function capturedKeypress(evt)
 {
+    'use strict';
     var charCode = (evt.which) ? evt.which : evt.keyCode;
     if (charCode == 48) {
 	fakeHeadingRotate(1);
@@ -763,11 +798,13 @@ function capturedKeypress(evt)
 
 function fakeHeadingRotate(step)
 {
+    'use strict';
     fakeHeadingRotateCore(step);
 }
 
 function fakeHeadingRotateCore(headingOffset)
 {
+    'use strict';
     var heading;
 
     heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
@@ -785,11 +822,13 @@ function modulo(value, modulo)
 {
     // required because % on test machine handles negatives
     // in a manner other than I would wish
+    'use strict';
     return ((value % modulo) + modulo) % modulo;
 }
 
 function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
 {
+    'use strict';
     var seconds;
     var mseconds;
 
@@ -814,6 +853,7 @@ function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
 //
 function adjustStopLetter(stopletter)
 {
+    'use strict';
     if (stopletter === undefined) {
 	return '@';
 
@@ -827,6 +867,7 @@ function adjustStopLetter(stopletter)
 //
 function isArrayEqual(arr1, arr2)
 {
+    'use strict';
     var a;
 
     if (arr1.length != arr2.length)
@@ -843,6 +884,7 @@ function isArrayEqual(arr1, arr2)
 //
 function sortArrivalsDataByArrivalIn(data)
 {
+    'use strict';
     var tmp;
     var idx;
     var found;
@@ -872,6 +914,7 @@ function sortArrivalsDataByArrivalIn(data)
 //
 function checkPositionValues(original_position)
 {
+    'use strict';
     var old_ts = original_position.timestamp;
     var new_ts = Date.now();
     var position;
@@ -926,6 +969,7 @@ function checkPositionValues(original_position)
 //
 function receiveNewBusStops()
 {
+    'use strict';
     var show;
 
     if (this.status == HTTP_200) {
@@ -940,6 +984,7 @@ function receiveNewBusStops()
 
 function receiveNewBusStop(currentValue, index, array)
 {
+    'use strict';
     var timeNow;
     var notedBusStops;
     var include_this;
@@ -1001,6 +1046,7 @@ function receiveNewBusStop(currentValue, index, array)
 // getArrivalsFromTfl('490015575X');
 function getArrivalsFromTfl(naptan)
 {
+    'use strict';
     var url;
     var handler;
 
@@ -1017,6 +1063,7 @@ function getArrivalsFromTfl(naptan)
 
 function receiveNewCountdown(naptan)
 {
+    'use strict';
     var data;
 
     if (this.status == HTTP_200) {
@@ -1040,7 +1087,7 @@ function bumpomaticSetup(bumpArray)
     // is a reminder it's an option to benefit from cleaning the
     // old one. What that benefit might be IDK but that's the
     // nature of preparing for the future
-
+    'use strict';
     while (bumpArray.length) {
 	bumpArray.splice(0, 1);
     }
@@ -1048,6 +1095,7 @@ function bumpomaticSetup(bumpArray)
 
 function bumpomaticDeleteById(bumpArray, idName)
 {
+    'use strict';
     var element_idx;
 
     element_idx = 0;
@@ -1063,6 +1111,7 @@ function bumpomaticDeleteById(bumpArray, idName)
 
 function bumpomaticDeleteByClass(bumpArray, className)
 {
+    'use strict';
     var element_idx;
     var class_idx;
     var found;
@@ -1089,6 +1138,7 @@ function bumpomaticDeleteByClass(bumpArray, className)
 
 function bumpomaticAddById(bumpArray, idName)
 {
+    'use strict';
     var html;
     var element;
     var offset;
@@ -1116,6 +1166,7 @@ function bumpomaticAddById(bumpArray, idName)
 
 function bumpomaticCheckIfCollides(bumpArray, element)
 {
+    'use strict';
     var xcollides;
     var ycollides;
     var xoff;
@@ -1166,6 +1217,7 @@ function bumpomaticCheckIfCollides(bumpArray, element)
 //
 function setup_tracked_positions(num_positions)
 {
+    'use strict';
     var a;
 
     for (a = 0; a < num_positions; a++) {
@@ -1175,6 +1227,7 @@ function setup_tracked_positions(num_positions)
 
 function positionPush(num_positions, position)
 {
+    'use strict';
     var count = 0;
     var a;
 
@@ -1194,6 +1247,7 @@ function positionPush(num_positions, position)
 //
 function mainLoop(position)
 {
+    'use strict';
     var num_positions_tracked = 0;
     var prediction = null;
 
