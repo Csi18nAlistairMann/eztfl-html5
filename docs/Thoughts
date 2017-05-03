@@ -3337,6 +3337,7 @@ sloppy code in a concatenated file. I never even knew you could concat
 	      self that this is for use as a callback. Better idea? Allow
 	      callback <function name>(<args>){ } as well as
 	      function <function name>(<args>){ }.
+    Get rid of duplicating declarations. Yup, agree with that too.
 
 
 ---------------------------------------------------------------

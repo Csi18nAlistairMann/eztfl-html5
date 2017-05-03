@@ -564,7 +564,6 @@ function renderReplaceDivWithText(dest, source, text)
 function getPositionOnRing(bearing)
 {
     'use strict';
-    var bearing;
     var idx;
 
     // convert it into the location on the egg
@@ -581,6 +580,14 @@ function scaleRingToRenderfield(positionArr, ringno)
     var xoff;
     var yoff;
     var scaledPositionsArr = [];
+    var bearing;
+    var idx;
+    var x;
+    var y;
+    var ratio;
+    var potential_x;
+    var potential_y;
+    var positions;
 
     if (ringno === 0) {
 	// centre ring for stop letters
@@ -597,17 +604,6 @@ function scaleRingToRenderfield(positionArr, ringno)
 	scaledPositionsArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
 
     } else if (ringno === 2) {
-	var bearing;
-	var idx;
-	var x;
-	var y;
-	var xoff;
-	var yoff;
-	var ratio;
-	var potential_x;
-	var potential_y;
-	var positions;
-
 	scaledPositionsArr[0] = RENDERFIELD_WIDTH / EGG_WIDTH * positionArr[0];
 	scaledPositionsArr[1] = RENDERFIELD_HEIGHT / EGG_HEIGHT * positionArr[1];
 
@@ -652,7 +648,6 @@ function scaleRingToRenderfield(positionArr, ringno)
 function scalePositionsUsingLog(bearing, positions, busstopDistance)
 {
     'use strict';
-    var bearing;
     var full;
     var part;
     var logMultiplier;
@@ -660,7 +655,6 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
     var ringy;
     var originx;
     var originy;
-    var positions;
 
     // positions = getPositionOnRing(bearing, busstop);
     ringx = positions[0];
@@ -972,7 +966,7 @@ function checkPositionValues(original_position)
 //
 function callback_receiveNewBusStops()
 {
-    /*jshint validthis: true */
+    /* jshint validthis: true */
     'use strict';
     var show;
 
@@ -1068,7 +1062,7 @@ function getArrivalsFromTfl(naptan)
 
 function callback_receiveNewCountdown(naptan)
 {
-    /*jshint validthis: true */
+    /* jshint validthis: true */
     'use strict';
     var data;
 
