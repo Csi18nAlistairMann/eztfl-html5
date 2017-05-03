@@ -1,5 +1,11 @@
 /*
   eztfl-html5  Alistair Mann
+
+  In comments, 'middle' and 'front' are used. Front is for front-end and
+  denotes the code in that section is used by the device for getting data
+  onto the screen.
+  Middle interfaces between that front-end and the back-end servers
+  charged with keep the raw data.
 */
 'use strict';
 //
@@ -61,13 +67,13 @@ const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
 
 //
-// Globals
+// Globals (middle)
 //
 var tracked_positions = [];
 var last_prediction = [null];
 
 //
-// setup helpers
+// setup helpers (middle)
 //
 function eztflHtml5_setup()
 {
@@ -76,7 +82,7 @@ function eztflHtml5_setup()
 }
 
 //
-// geolocation helpers
+// geolocation helpers (middle)
 //
 function getLocationSetup()
 {
@@ -114,7 +120,7 @@ function cannotWatchPosition(positionError)
 
 //-------------------------------------------------------------
 //
-// Fake data helpers
+// Fake data helpers (front end)
 //
 function runAsFake()
 {
@@ -154,7 +160,7 @@ function fakeData(source)
 
 //-------------------------------------------------------------
 //
-// trigonometry helpers
+// trigonometry helpers (middle and front)
 //
 function se_deg2rad(deg)
 {
@@ -238,7 +244,7 @@ function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_i
 
 //-------------------------------------------------------------
 //
-// rendering
+// rendering (front)
 //
 function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
@@ -522,7 +528,7 @@ function renderReplaceDivWithText(dest, source, text)
 
 //-------------------------------------------------------------
 //
-// Positioning
+// Positioning (front)
 //
 function getPositionOnRing(bearing)
 {
@@ -660,7 +666,7 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 
 //-------------------------------------------------------------
 //
-// prediction helpers
+// prediction helpers (middle)
 //
 function positionsGetPrediction(num_positions_tracked)
 {
@@ -727,7 +733,7 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 
 //-------------------------------------------------------------
 //
-// User Interface helpers
+// User Interface helpers (front)
 //
 
 //
@@ -773,7 +779,7 @@ function fakeHeadingRotateCore(headingOffset)
 
 //-------------------------------------------------------------
 //
-// other helpers
+// other helpers (middle and front)
 //
 function modulo(value, modulo)
 {
@@ -834,7 +840,7 @@ function isArrayEqual(arr1, arr2)
 
 //-------------------------------------------------------------
 //
-// Sanity check helpers
+// Sanity check helpers (middle)
 //
 
 //
@@ -892,7 +898,7 @@ function checkPositionValues(original_position)
 
 //-------------------------------------------------------------
 //
-// Higher level handling of API
+// Higher level handling of API (middle)
 //
 function receiveNewBusStops()
 {
@@ -999,7 +1005,7 @@ function receiveNewCountdown(naptan)
 
 //-------------------------------------------------------------
 //
-// bump'o'matic
+// bump'o'matic (front)
 //
 function bumpomaticSetup(bumpArray)
 {
@@ -1107,7 +1113,7 @@ function bumpomaticCheckIfCollides(bumpArray, element)
 
 //-------------------------------------------------------------
 //
-// handling the stack of tracked positions
+// handling the stack of tracked positions (middle)
 //
 function setup_tracked_positions(num_positions)
 {
@@ -1135,7 +1141,7 @@ function positionPush(num_positions, position)
 
 //-------------------------------------------------------------
 //
-// mainLoop
+// mainLoop (middle)
 //
 function mainLoop(position)
 {
@@ -1146,11 +1152,4 @@ function mainLoop(position)
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
 
     prediction = positionsGetPrediction(num_positions_tracked);
-
-    // if (prediction === last_prediction) {
-    // 	last_prediction = prediction;
-    // }
-    // if (!isArrayEqual(prediction, last_prediction)) {
-    // 	last_prediction = prediction;
-    // }
 }

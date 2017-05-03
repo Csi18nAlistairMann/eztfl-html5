@@ -11,6 +11,7 @@ html, body {
     display: block;
     font-family: Sans-serif;
     font-size: 12px;
+    margin: 0;
 }
 div#renderingField {
     height: 509px;

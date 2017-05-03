@@ -2932,7 +2932,7 @@ position reliably. Nice fix.
 	 Not convinced by using no logarithm vs using it too. How
 interesting.
 
-2017-05-01 15:40
+2017-05-02 15:40
 Bumping along the ring
 	All the elements have a problem with overwriting: two of them
 occupying the same space will appear one on top of the other. The bus
@@ -3084,6 +3084,154 @@ code live, as well as a touchtable table cells for direction to
 rotate. Aqua and Chocolate for their first letters - Anticlockwise
 and Clockwise.
 
+2017-05-03 00:08
+In its current state, we can return to do some signing off:
+[x] "you are here" in the pink ball position
+[ ] Ring system:
+  [x] Positioning system based on three rings in the centre,
+    middle and edge of the screen such that data can be
+    located on each ring if given either a bearing, or if
+    located on the middle ring and given an inner and outer
+    ring pair it should connect
+  [x] also that given a distance, can arrange for distance from
+   the centre of the screen to be logarithmic so to fit more
+   data on screen
+  [x] Also that the rings may be of arbitrary size, such that
+    one can be given more screen real estate at the expense
+    of the others
+  [x] also that elements occupying the same ring should not
+    overlap but expand around the ring. Two or more elements
+    occupying the same position on the ring should centre
+    around that position on the ring;
+  [x] that the rings be associated with the user's heading such
+    that when the user changes heading, the elements on the
+    rings shift around to match
+  [ ] That elements on the centre ring have lines connecting them
+    from their inner to outer ring
+[x] that bearing and distance be used to associate bus stops with
+  positions on the inner ring
+[x] that those bus stops reflect the red/white code seen on top
+  of bus stops
+[x] that the near destination for each bus stop code occupy the
+  outer ring, initially following the bearing of it's bus stop
+  partner in the inner ring
+[x] That touching a bus stop code in the inner ring will bring
+  up/replace an ordered countdown below the pink ball spot
+So only the lines are missing. I'll add that below.
+
+Margins are a real menace, and so are touchscreens: a crap UI
+	Well, that's written with tongue firmly in cheek. The UX of the
+project is awful. But that's still one step up from where it was at the
+end of the first stage - downright appalling with the data in divs
+ranged down the left hand side. But then if you want a pretty site you
+get a web designer to do it - not a programmer.
+    Crap as the site is, it achieves what I wanted:
+
+1: It demonstrates the hard division between UX coding and the
+Middleware/server-side coding: I've had to make no changes to the latter
+two in order to implement that UX. As isolatable parts of a project, it
+is demonstrated that the two could be run together as long as the
+interface between them has been addressed. It's worth addressing that
+interface at the beginning as it would allow progress front and back to
+happen concurrently.
+
+2. It demonstrates that programming UX may actually be harder than the
+back-end stuff. I find it easy to model network connections, objects
+and process in mind. Accomplishing the ring forced me to relearn the
+actual trigonometry from school; it forced me to reimplement a bumping
+solution similar to one I used twenty years ago.
+
+3. It demonstrates that the character of the work is different to the
+middle and back-end. There, I spent some on a very wide range of skills
+before I could start programming what is a very narrowly demanding
+middle. The UX requires a much wider skill from the programmer. In this
+project at least, it has a much narrower range of ancillary knowledge.
+
+The middle:
+===========
+End           ]Q                  <--- The programming is simple
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+Time          ]Q
+Taken         ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |            ]Q
+ |      _a    ]Q
+ |  ]Q  ]Q    ]Q      _a
+ |  ]Q  ]Q_a  ]Q      ]Q
+ |  ]Q  ]Q]Q  ]Q  ]Q  ]Q_a]Q
+ |  ]Q]Q]Q]Q]Q]Q  ]Q]Q]Q]Q]Q]Q
+ |  )?)?)?)?)?)?)?)?)?)?)?)?)?   <-- At the start a very broad set
+Start-------------------------       of relatively shallow knowledge
+    <---- Range of skills --->       is required for setting up
+
+The front-end:
+==============
+End           ]QQQ               <-- programming skills are thicker because
+ |            ]QQQ                   they were more demanding
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+Time          ]QQQ
+Taken         ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |            ]QQQ
+ |      ]Q    ]QQQ               <-- fewer non-programming skills are needed
+ |      ]Q    ]QQQ                   but what's needed is not likely as shallow
+ |      ]Q    ]QQQ                   as knowing the config location and the
+ |      ]Q    ]QQQ_a                 manpage
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q    ]QQQ]Q
+ |      ]Q  ]Q]QQQ]Q
+ |      ]Q  ]Q]QQQ]Q
+ |      ]Q  ]Q]QQQ]Q
+ |      )?  )?)???)?
+Start-------------------------
+    <---- Range of skills --->
+
+
+
+
+
+
+
 
 ---------------------------------------------------------------
-6. margins are a real menace
+1. Bug: At certain points in the rotation, all three rings have content
+that appears at very top left for a moment, then moevs back into place.
+2. Missing feature: lines connecting bus stop to near destination.
+3. Coundown not ordered.
