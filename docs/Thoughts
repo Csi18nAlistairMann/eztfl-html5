@@ -3223,10 +3223,29 @@ Taken         ]QQQ
 Start-------------------------
     <---- Range of skills --->
 
+And for line counts:
+  21   33  482 a.html
+  31   73 1038 b.html
+   7    8   57 index.html
+  49  125 1284 uu2.html
+  84  226 1977 uu7.html
+  29   55  522 mystyle.css
+ 221  520 5360 total
 
+  53   127  1226 connect.js
+1155  3411 31711 scripts.js
+1208  3538 32937 total
 
+  21    114    731 Goals
+  64    308   2150 UnknownUnknowns
+  46     97    832 Resources
+  46    241   1515 Todo
+ 181   1158   7504 Diary
+3237  24031 144232 Thoughts
+3595  25949 156964 total
 
-
+So: 221 lines of markup, 1208 lines of code excluding 1600 odd lines of
+the egg shape, and 3595 lines of documentation.
 
 
 
