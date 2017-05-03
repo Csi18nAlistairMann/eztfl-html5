@@ -1241,6 +1241,28 @@ function positionPush(num_positions, position)
     return ++count;
 }
 
+
+//-------------------------------------------------------------
+//
+// Reused lower level networking calls
+//
+
+//  Note that these all make CORS requests in the background first, as the
+//  call are all Cross Origin in nature.
+function sendGetCore(url, handler)
+{
+    if (XMLHttpRequest) {
+	var request = new XMLHttpRequest();
+	if('withCredentials' in request) {
+	    request.open('GET', url, true);
+	    request.setRequestHeader('Accept', 'application/json');
+	    request.responseType = 'json';
+	    request.onload = handler;
+	    request.send();
+	}
+    }
+}
+
 //-------------------------------------------------------------
 //
 // mainLoop (middle)

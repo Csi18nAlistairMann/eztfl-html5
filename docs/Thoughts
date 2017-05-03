@@ -3338,7 +3338,7 @@ sloppy code in a concatenated file. I never even knew you could concat
 	      callback <function name>(<args>){ } as well as
 	      function <function name>(<args>){ }.
     Get rid of duplicating declarations. Yup, agree with that too.
-
+    Integrate the XHR code into the main file
 
 ---------------------------------------------------------------
 1. Bug: At certain points in the rotation, all three rings have content
