@@ -207,8 +207,8 @@ function se_getAngle(startLat, startLong, endLat, endLong)
 
     var dLong = endLong - startLong;
 
-    var dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0)
-			/ Math.tan(startLat / 2.0 + Math.PI / 4.0));
+    var dPhi = Math.log(Math.tan(endLat / 2.0 + Math.PI / 4.0) /
+			Math.tan(startLat / 2.0 + Math.PI / 4.0));
     if (Math.abs(dLong) > Math.PI) {
 	if (dLong > 0.0)
 	    dLong = -(2.0 * Math.PI - dLong);
@@ -225,8 +225,8 @@ function getDistanceInMeters(position1, position2)
     return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
 					 position1.coords.longitude,
 					 position2.coords.latitude,
-					 position2.coords.longitude)
-	    * 1000);
+					 position2.coords.longitude) *
+	    1000);
 }
 
 function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
@@ -251,15 +251,15 @@ function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_i
 
     var distance_in_kilometers = distance_in_meters / 1000;
 
-    var lat2 = Math.asin(Math.sin(Math.PI / 180 * lat) * Math.cos(distance_in_kilometers / R)
-			 + Math.cos(Math.PI / 180 * lat) * Math.sin(distance_in_kilometers / R)
-			 * Math.cos(Math.PI / 180 * bearing));
-    var lon2 = Math.PI / 180 * lng + Math.atan2(Math.sin(Math.PI / 180 * bearing)
-						* Math.sin(distance_in_kilometers / R)
-						* Math.cos(Math.PI / 180 * lat ),
-						Math.cos(distance_in_kilometers / R)
-						- Math.sin(Math.PI / 180 * lat)
-						* Math.sin(lat2));
+    var lat2 = Math.asin(Math.sin(Math.PI / 180 * lat) * Math.cos(distance_in_kilometers / R) +
+			 Math.cos(Math.PI / 180 * lat) * Math.sin(distance_in_kilometers / R) *
+			 Math.cos(Math.PI / 180 * bearing));
+    var lon2 = Math.PI / 180 * lng + Math.atan2(Math.sin(Math.PI / 180 * bearing) *
+						Math.sin(distance_in_kilometers / R) *
+						Math.cos(Math.PI / 180 * lat ),
+						Math.cos(distance_in_kilometers / R) -
+						Math.sin(Math.PI / 180 * lat) *
+						Math.sin(lat2));
     return [180 / Math.PI * lat2, 180 / Math.PI * lon2];
 }
 
@@ -727,8 +727,8 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
 
-    early_position = tracked_positions[NUM_TRACKED_POSITIONS
-				       -  num_positions_tracked];
+    early_position = tracked_positions[NUM_TRACKED_POSITIONS -
+				       num_positions_tracked];
     latest_position = tracked_positions[NUM_TRACKED_POSITIONS - 1];
 
     distance_in_meters = getDistanceInMeters(early_position, latest_position);
@@ -744,9 +744,9 @@ function positionsGetPredictionSimplest(num_positions_tracked)
 						     users_heading,
 						     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
-    radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS
-					   - ((latest_position.timestamp - early_position.timestamp)
-					      / 1000));
+    radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS -
+					   ((latest_position.timestamp - early_position.timestamp) /
+					    1000));
     if (radius < MINIMUM_RADIUS_TO_LOOK) {
 	radius = MINIMUM_RADIUS_TO_LOOK;
 
@@ -932,16 +932,16 @@ function checkPositionValues(original_position)
     if (typeof(new_ts) !== 'number') {
 	new_ts = FIRST_TIMESTAMP_EVAH;
 
-    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
-		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH &&
+		 old_ts <= LAST_TIMESTAMP_EVAH)) {
 	new_ts = FIRST_TIMESTAMP_EVAH;
     }
 
     if (typeof(old_ts) !== 'number') {
 	position.timestamp = new_ts;
 
-    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH
-		 && old_ts <= LAST_TIMESTAMP_EVAH)) {
+    } else if (!(old_ts >= FIRST_TIMESTAMP_EVAH &&
+		 old_ts <= LAST_TIMESTAMP_EVAH)) {
 	position.timestamp = new_ts;
     }
 
@@ -950,16 +950,16 @@ function checkPositionValues(original_position)
     if (typeof(position.coords.latitude) !== 'number') {
 	position.coords.latitude = 0;
 
-    } else if (!(position.coords.latitude >= LOWEST_LATITUDE
-		 && position.coords.latitude <= HIGHEST_LATITUDE)) {
+    } else if (!(position.coords.latitude >= LOWEST_LATITUDE &&
+		 position.coords.latitude <= HIGHEST_LATITUDE)) {
 	position.coords.latitude = 0;
     }
 
     if (typeof(position.coords.longitude) !== 'number') {
 	position.coords.longitude = 0;
 
-    } else if (!(position.coords.longitude >= LOWEST_LONGITUDE
-		 && position.coords.longitude <= HIGHEST_LONGITUDE)) {
+    } else if (!(position.coords.longitude >= LOWEST_LONGITUDE &&
+		 position.coords.longitude <= HIGHEST_LONGITUDE)) {
 	position.coords.longitude = 0;
     }
 
@@ -1187,12 +1187,10 @@ function bumpomaticCheckIfCollides(bumpArray, element)
 	    do {
 		xcollides = false;
 		ycollides = false;
-		if (element.xpos + xoff < bumpArray[index].xpos + bumpArray[index].width
-		    &&
+		if (element.xpos + xoff < bumpArray[index].xpos + bumpArray[index].width &&
 		    element.xpos + element.width + xoff > bumpArray[index].xpos) {
 		    xcollides = true;
-		    if (element.ypos + yoff < bumpArray[index].ypos + bumpArray[index].height
-			&&
+		    if (element.ypos + yoff < bumpArray[index].ypos + bumpArray[index].height &&
 			element.ypos + element.height + yoff > bumpArray[index].ypos) {
 			ycollides = true;
 			if (element.height > 0) {
