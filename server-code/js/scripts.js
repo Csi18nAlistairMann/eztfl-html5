@@ -1030,12 +1030,25 @@ function bumpomaticDeleteById(bumpArray, idName)
 function bumpomaticDeleteByClass(bumpArray, className)
 {
     var element_idx;
+    var class_idx;
+    var found;
 
-    for (element_idx in bumpArray) {
-	if (bumpArray[element_idx].classes.indexOf(className)) {
-	    bumpArray.splice(element_idx, 1);
+    // removing elements from the array shifts everything else
+    // in that array down by one. Rescan entire thing when that
+    // happens rather than faff decrementing an incrementing
+    // loop, copying into a new bumpArray & other such solutions
+    do {
+	found = false;
+	for (element_idx = 0; element_idx < bumpArray.length; element_idx++) {
+	    for (class_idx = 0; class_idx < bumpArray[element_idx].classes.length; class_idx++) {
+		if (bumpArray[element_idx].classes[class_idx].indexOf(className) !== -1) {
+		    found = true;
+		    bumpArray.splice(element_idx, 1);
+		    break;
+		}
+	    }
 	}
-    }
+    } while (found === true);
 }
 
 function bumpomaticAddById(bumpArray, idName)
