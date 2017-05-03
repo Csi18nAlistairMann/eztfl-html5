@@ -3319,6 +3319,9 @@ Linting:
 	'use strict' is preferred inside the function, just in case of
 sloppy code in a concatenated file. I never even knew you could concat
 .js files.
+    use === in preference to ==, ok
+    var x = {}; is preferable to var x = new Object(); .... hmm, ok
+
 
 
 ---------------------------------------------------------------

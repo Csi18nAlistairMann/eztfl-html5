@@ -137,14 +137,14 @@ function runAsFake()
 
     data = fakeData(FAKE_DATA_SOURCE);
 
-    position = new Object();
-    position.coords = new Object();
+    position = {};
+    position.coords = {};
     position.coords.latitude = data[0];
     position.coords.longitude = data[1];
     position.timestamp = 1193421444000;
     positionPush(NUM_TRACKED_POSITIONS, position);
-    position = new Object();
-    position.coords = new Object();
+    position = {};
+    position.coords = {};
     position.coords.latitude = data[2];
     position.coords.longitude = data[3];
     position.timestamp = 1193421460000;
@@ -1149,7 +1149,7 @@ function bumpomaticAddById(bumpArray, idName)
 
     html = document.getElementById(idName);
     if (html !== null) {
-	element = new Object();
+	element = {};
 	element.id = idName;
 	element.classes = html.classList;
 	element.xpos = html.offsetLeft;
