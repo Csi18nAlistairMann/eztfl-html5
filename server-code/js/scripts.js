@@ -72,7 +72,6 @@ const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
 // Globals (middle)
 //
 var tracked_positions = [];
-var last_prediction = [null];
 
 //
 // setup helpers (middle)
@@ -342,7 +341,6 @@ function renderBusStops()
     var classname;
     var key;
     var positionsWithLog;
-    var nearDestPos;
     var bearing;
     var positions;
     var heading;
@@ -528,7 +526,6 @@ function renderRemoveDivById(id)
 function renderRemoveDivByClass(className)
 {
     'use strict';
-    var child;
     var list;
 
     // now we remove the first
@@ -581,13 +578,7 @@ function scaleRingToRenderfield(positionArr, ringno)
     var yoff;
     var scaledPositionsArr = [];
     var bearing;
-    var idx;
-    var x;
-    var y;
     var ratio;
-    var potential_x;
-    var potential_y;
-    var positions;
 
     if (ringno === 0) {
 	// centre ring for stop letters
@@ -779,6 +770,7 @@ function capturedKeypress(evt)
 {
     'use strict';
     var charCode = (evt.which) ? evt.which : evt.keyCode;
+
     if (charCode == 48) {
 	fakeHeadingRotate(1);
 
@@ -1252,6 +1244,7 @@ function positionPush(num_positions, position)
 //  call are all Cross Origin in nature.
 function sendGetCore(url, handler)
 {
+    'use strict';
     if (XMLHttpRequest) {
 	var request = new XMLHttpRequest();
 	if('withCredentials' in request) {
