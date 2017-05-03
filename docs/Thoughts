@@ -3327,7 +3327,7 @@ sloppy code in a concatenated file. I never even knew you could concat
 	     idiot, I can see that too
     A clear problem with doing setup only after the code has first
       started, yes sir. Also for..in loops will go awry iterating over
-      arrays, I've already been stung by that.
+      arrays, I've already been stung by that. Stop the others too.
 
 
 

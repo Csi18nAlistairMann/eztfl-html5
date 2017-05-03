@@ -367,7 +367,7 @@ function renderBusStops()
     // Render new bus stop info
     heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
     stop_count = 0;
-    for (busstop in busstopData) {
+    for (busstop = 0; busstop < busstopData.length; busstop++) {
 	// note bus stop going to be used, remove old name if present
 	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
@@ -394,7 +394,6 @@ function renderBusStops()
 
 	// fill in for ring 1 -- the routes serving this stop
 	line_count = 0;
-	// for (routeno in busstopData[busstop].lines) {
 	for (routeno = 0; routeno < busstopData[busstop].lines.length; routeno++) {
 	    // delete old stop letter if present
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
@@ -498,7 +497,7 @@ function renderCountdown(naptan)
 
     // display all the new countdown data
     count = 0;
-    for (arrival in countdownData) {
+    for (arrival = 0; arrival < countdownData.length; arrival++) {
 	id = 'arrival_' + count;
 
 	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
@@ -1183,7 +1182,7 @@ function bumpomaticCheckIfCollides(bumpArray, element)
     yoff = 0;
     do {
 	found = false;
-	for (index in bumpArray) {
+	for (index = 0; index < bumpArray.length; index++) {
 	    // simple: force element down page until it doesn't collide
 	    do {
 		xcollides = false;
