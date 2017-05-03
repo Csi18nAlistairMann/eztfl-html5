@@ -1065,6 +1065,7 @@ function callback_receiveNewCountdown(naptan)
     /* jshint validthis: true */
     'use strict';
     var data;
+    var show;
 
     if (this.status == HTTP_200) {
 	data = sortArrivalsDataByArrivalIn(this.response);
@@ -1072,8 +1073,8 @@ function callback_receiveNewCountdown(naptan)
 	renderCountdown(sessionStorage.getItem(NAPTAN_NAME));
 
     } else {
-	$show = 'Request failed: (' + this.status.toString() + ') ' + name;
-	alert($show);
+	show = 'Request failed: (' + this.status.toString() + ') ' + name;
+	alert(show);
     }
 }
 

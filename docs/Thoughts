@@ -3339,6 +3339,7 @@ sloppy code in a concatenated file. I never even knew you could concat
 	      function <function name>(<args>){ }.
     Get rid of duplicating declarations. Yup, agree with that too.
     Integrate the XHR code into the main file
+    Rename dollar variable to be consistent with my own
 
 ---------------------------------------------------------------
 1. Bug: At certain points in the rotation, all three rings have content
