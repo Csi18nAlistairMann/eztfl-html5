@@ -81,8 +81,8 @@ function eztflHtml5_setup()
 {
     'use strict';
 
-    getLocationSetup();
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
+    getLocationSetup();
 }
 
 //
@@ -394,7 +394,8 @@ function renderBusStops()
 
 	// fill in for ring 1 -- the routes serving this stop
 	line_count = 0;
-	for (routeno in busstopData[busstop].lines) {
+	// for (routeno in busstopData[busstop].lines) {
+	for (routeno = 0; routeno < busstopData[busstop].lines.length; routeno++) {
 	    // delete old stop letter if present
 	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
 	    renderRemoveDivById(id);
@@ -1230,9 +1231,10 @@ function setup_tracked_positions(num_positions)
 function positionPush(num_positions, position)
 {
     'use strict';
-    var count = 0;
+    var count;
     var a;
 
+    count = 0;
     for (a = 0; a < num_positions - 1; a++) {
 	tracked_positions[a] = tracked_positions[a + 1];
 	if (tracked_positions[a] !== null) {

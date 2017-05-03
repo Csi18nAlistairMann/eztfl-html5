@@ -3325,6 +3325,9 @@ sloppy code in a concatenated file. I never even knew you could concat
     "readers may interpret this as an expression boundary" errors. Ok, if
 	     I assume the reader is a peice of software rather than an
 	     idiot, I can see that too
+    A clear problem with doing setup only after the code has first
+      started, yes sir. Also for..in loops will go awry iterating over
+      arrays, I've already been stung by that.
 
 
 
