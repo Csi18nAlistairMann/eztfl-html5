@@ -64,7 +64,7 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
-const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
+const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 
 //
 // Globals (middle)
@@ -838,6 +838,30 @@ function isArrayEqual(arr1, arr2)
     return true;
 }
 
+//
+// Sort by time to arrive at station
+//
+function sortArrivalsDataByArrivalIn(data)
+{
+    var tmp;
+    var idx;
+    var found;
+
+    do {
+	found = false;
+	for (idx = 0; idx < data.length -1; idx++) {
+	    if (data[idx].timeToStation > data[idx + 1].timeToStation) {
+		found = true;
+		tmp = data[idx].timeToStation;
+		data[idx].timeToStation = data[idx + 1].timeToStation;
+		data[idx + 1].timeToStation = tmp;
+	    }
+	}
+    } while (found === true);
+
+    return JSON.stringify(data);
+}
+
 //-------------------------------------------------------------
 //
 // Sanity check helpers (middle)
@@ -993,8 +1017,11 @@ function getArrivalsFromTfl(naptan)
 
 function receiveNewCountdown(naptan)
 {
+    var data;
+
     if (this.status == HTTP_200) {
-	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, JSON.stringify(this.response));
+	data = sortArrivalsDataByArrivalIn(this.response);
+	sessionStorage.setItem(NOTED_COUNTDOWN_NAME, data);
 	renderCountdown(sessionStorage.getItem(NAPTAN_NAME));
 
     } else {
