@@ -3328,7 +3328,15 @@ sloppy code in a concatenated file. I never even knew you could concat
     A clear problem with doing setup only after the code has first
       started, yes sir. Also for..in loops will go awry iterating over
       arrays, I've already been stung by that. Stop the others too.
-
+    functions use as callbacks could also be called normally, and so
+	      'this' references would fail. I wish there was a better way
+	      of handling this than commenting the programmer has checked
+	      that. It could be done as an anonymous function I know, but
+	      I don't like committing to not reusing code like that. Also
+	      changed the function name to make it clearer to my future
+	      self that this is for use as a callback. Better idea? Allow
+	      callback <function name>(<args>){ } as well as
+	      function <function name>(<args>){ }.
 
 
 ---------------------------------------------------------------

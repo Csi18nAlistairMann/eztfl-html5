@@ -761,7 +761,7 @@ function positionsGetPredictionSimplest(num_positions_tracked)
     sessionStorage.setItem(RADIUS_NAME, JSON.stringify(radius));
     sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
     sessionStorage.setItem(LONGITUDE_NAME, JSON.stringify(lon));
-    handler = receiveNewBusStops;
+    handler = callback_receiveNewBusStops;
     sendGetCore(url, handler);
 
     return url;
@@ -970,8 +970,9 @@ function checkPositionValues(original_position)
 //
 // Higher level handling of API (middle)
 //
-function receiveNewBusStops()
+function callback_receiveNewBusStops()
 {
+    /*jshint validthis: true */
     'use strict';
     var show;
 
@@ -1059,14 +1060,15 @@ function getArrivalsFromTfl(naptan)
 
     url = RPROXY_URL_COUNTDOWN_PRE + naptan + RPROXY_URL_COUNTDOWN_POST;
     sessionStorage.setItem(NAPTAN_NAME, naptan);
-    handler = receiveNewCountdown;
+    handler = callback_receiveNewCountdown;
     sendGetCore(url, handler);
 
     return url;
 }
 
-function receiveNewCountdown(naptan)
+function callback_receiveNewCountdown(naptan)
 {
+    /*jshint validthis: true */
     'use strict';
     var data;
 
