@@ -832,18 +832,21 @@ function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
     var seconds;
     var mseconds;
 
-    if (distance_in_meters == 0)
+    if (distance_in_meters === 0) {
 	return 0;
+    }
 
     mseconds = position2.timestamp - position1.timestamp;
 
-    if (mseconds == 0)
+    if (mseconds === 0) {
 	return 0;
+    }
 
     seconds = mseconds / 1000;
 
-    if (seconds == 0)
+    if (seconds === 0) {
 	return 0;
+    }
 
     return distance_in_meters / seconds;
 }
@@ -1050,8 +1053,9 @@ function getArrivalsFromTfl(naptan)
     var url;
     var handler;
 
-    if (naptan == '')
+    if (naptan === '') {
 	return '';
+    }
 
     url = RPROXY_URL_COUNTDOWN_PRE + naptan + RPROXY_URL_COUNTDOWN_POST;
     sessionStorage.setItem(NAPTAN_NAME, naptan);
@@ -1233,8 +1237,9 @@ function positionPush(num_positions, position)
 
     for (a = 0; a < num_positions - 1; a++) {
 	tracked_positions[a] = tracked_positions[a + 1];
-	if (tracked_positions[a] != null)
-	    count++
+	if (tracked_positions[a] !== null) {
+	    count++;
+	}
     }
     tracked_positions[num_positions - 1] = position;
 
