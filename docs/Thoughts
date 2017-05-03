@@ -3247,10 +3247,57 @@ And for line counts:
 So: 221 lines of markup, 1208 lines of code excluding 1600 odd lines of
 the egg shape, and 3595 lines of documentation.
 
+2017-05-03 11:42
+Lines connecting bus stop to near destination
+-------------------------------------------------
+|		barnet			enfield	|
+|		    \			lock	|
+|		     \		       /	|
+|		      43    ---121----/		|
+|		       \   /			|
+|			\ /			|
+|			AB			|
+
+			The original design made it clear that what was
+thought of was a line from the bus stop through the route numbers and on
+to the near destination. In the Trafalgar square situation, that's going
+to mean around 400 lines crossing the screen. In the Peckham situation,
+the near destination is already - except with bumps - on the other side
+of the route number from the bus stop, following an imaginary line along
+the same bearing. In the former case the lines would add nothing but mess
+and in the latter they add nothing that isn't already perceived by the
+user.
+    Lines should really go forward to the next UX review as something that
+should be abandoned.
+
+2017-05-03 13:40
+Bug hunt mode
+    With the UX checklist completed, I'm now operating the project live
+looking for reasons to think the checklist is not complete. An obvious
+problem was the Arrivals data was not being wholly cleaned off screen
+before new content was added. This is a serious bug, as it gives the
+impression of extra data when in fact there is none. As a serious bug,
+I fixed it on seeing it.
+  A secondary bug is that at some point, elements that should appear
+at the top of the screen in fact appear condensed into the top left corner.
+This smells alot like some kind of problem when the angle is 0 or negative.
+This is a less serious bug, as it's not adding or removing data that should
+be present, merely presenting it other than I would wish.
+   "Other than I would wish" also describes how near destinations move
+around the screen - the intent was that they shift smoothly into and out of
+the corners as they rotate. Instead, they seem to cut the corners. Perhap
+Ring 3 is a lot closer in than I thought, instead of far off-screen and
+clipped to the edge.
+	These last two bugs are not so serious and smell trivial to sort
+out. For both I'll leave them to the review.
+
+Linting
+	This is an automated way of discovering That Code Smell. I've run
+through JSHint once - and dealt with missing semi-colons because I'm short
+on time. Happily, half those missing were from stack exchange code
+
 
 
 ---------------------------------------------------------------
 1. Bug: At certain points in the rotation, all three rings have content
-that appears at very top left for a moment, then moevs back into place.
-2. Missing feature: lines connecting bus stop to near destination.
-3. Coundown not ordered.
+that appears at very top left for a moment, then moves back into place.

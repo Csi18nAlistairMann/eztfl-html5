@@ -7,6 +7,9 @@
   Middle interfaces between that front-end and the back-end servers
   charged with keep the raw data.
 */
+//
+/* jshint esversion: 6 */
+//
 'use strict';
 //
 // Constants
@@ -45,9 +48,9 @@ const EGG_WIDTH = 1440;
 const EGG_HEIGHT = 2040;
 const DIVISOR_FOR_RING2 = 6;
 const DIVISOR_FOR_RING3 = 8;
-const RING0 = 0 // centre for bus stops
-const RING1 = 1 // middle for bus routes
-const RING2 = 2 // outside for near destinations
+const RING0 = 0; // centre for bus stops
+const RING1 = 1; // middle for bus routes
+const RING2 = 2; // outside for near destinations
 const USERS_HEADING_NAME = 'usersheading';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
@@ -103,16 +106,16 @@ function cannotWatchPosition(positionError)
 
     switch(positionError.code) {
     case positionError.PERMISSION_DENIED:
-	msg = 'User denied the request for Geolocation.'
+	msg = 'User denied the request for Geolocation.';
 	break;
     case positionError.POSITION_UNAVAILABLE:
-	msg = 'Location information is unavailable.'
+	msg = 'Location information is unavailable.';
 	break;
     case positionError.TIMEOUT:
-	msg = 'The request to get user location timed out.'
+	msg = 'The request to get user location timed out.';
 	break;
     case positionError.UNKNOWN_ERROR:
-	msg = 'An unknown error occurred.'
+	msg = 'An unknown error occurred.';
 	break;
     }
     alert('Failed to start geolocation. Error:"' + msg + '"');
@@ -164,7 +167,7 @@ function fakeData(source)
 //
 function se_deg2rad(deg)
 {
-    return deg * (Math.PI / 180)
+    return deg * (Math.PI / 180);
 }
 
 function se_rad2deg(n)
@@ -540,7 +543,7 @@ function getPositionOnRing(bearing)
     while (RINGMAP[idx] < bearing) {
 	idx += 3;
     }
-    return [RINGMAP[idx + 1], RINGMAP[idx + 2]]
+    return [RINGMAP[idx + 1], RINGMAP[idx + 2]];
 }
 
 function scaleRingToRenderfield(positionArr, ringno)
@@ -746,24 +749,21 @@ function loadCountdown(naptan)
 
 function capturedKeypress(evt)
 {
-    var key;
-
-    var charCode = (evt.which) ? evt.which : evt.keyCode
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
     if (charCode == 48) {
-	fakeHeadingRotate(1)
+	fakeHeadingRotate(1);
 
     } else if (charCode == 49) {
-	fakeHeadingRotate(-1)
+	fakeHeadingRotate(-1);
 
     } else {
 	return;
     }
-
 }
 
 function fakeHeadingRotate(step)
 {
-    fakeHeadingRotateCore(step)
+    fakeHeadingRotateCore(step);
 }
 
 function fakeHeadingRotateCore(headingOffset)

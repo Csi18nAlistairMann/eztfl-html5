@@ -179,3 +179,7 @@ Support for manual rotate of heading
 Observation about the interface between UX and the rest should be
 	    discussed at beginning
 Observation that UX coding is more challenging than the back-end stuff
+Order arrivals by time to station
+Observation that lines should be abandoned
+Bug hunt: serious as misrepresents, not so serious as doesn't
+Discover JSHint - and start some

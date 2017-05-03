@@ -44,3 +44,5 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 
 12. Rotating sees the near destinations rotate other than I expect
     - shouldn't they hug the corner as they go around?
+
+13. Abandon the lines from bus stop to near destination
