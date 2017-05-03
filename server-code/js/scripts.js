@@ -64,7 +64,7 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
-const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
+const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
 
 //
 // Globals (middle)
@@ -464,7 +464,7 @@ function renderCountdown(naptan)
     // remove all existing countdown data
     extants = document.getElementsByClassName(CLASS_COUNTDOWN_NAME);
     for (idx = 0; idx < extants.length; idx++) {
-	extants[idx].parentNode.removeChild(extants[idx]);
+	extants[0].parentNode.removeChild(extants[0]);
     }
 
     // display all the new countdown data
@@ -1036,10 +1036,13 @@ function receiveNewCountdown(naptan)
 //
 function bumpomaticSetup(bumpArray)
 {
-    var element_idx;
+    // yes, I could just used an empty bumpArray. Not doing so
+    // is a reminder it's an option to benefit from cleaning the
+    // old one. What that benefit might be IDK but that's the
+    // nature of preparing for the future
 
-    for (element_idx in bumpArray) {
-	bumpArray.splice(element_idx, 1);
+    while (bumpArray.length) {
+	bumpArray.splice(0, 1);
     }
 }
 
@@ -1047,9 +1050,13 @@ function bumpomaticDeleteById(bumpArray, idName)
 {
     var element_idx;
 
-    for (element_idx in bumpArray) {
+    element_idx = 0;
+    while (element_idx < bumpArray.length) {
 	if (bumpArray[element_idx].id === idName) {
 	    bumpArray.splice(element_idx, 1);
+
+	} else {
+	    element_idx++;
 	}
     }
 }
@@ -1060,22 +1067,24 @@ function bumpomaticDeleteByClass(bumpArray, className)
     var class_idx;
     var found;
 
-    // removing elements from the array shifts everything else
-    // in that array down by one. Rescan entire thing when that
-    // happens rather than faff decrementing an incrementing
-    // loop, copying into a new bumpArray & other such solutions
-    do {
+    element_idx = 0;
+    while (element_idx < bumpArray.length) {
 	found = false;
-	for (element_idx = 0; element_idx < bumpArray.length; element_idx++) {
-	    for (class_idx = 0; class_idx < bumpArray[element_idx].classes.length; class_idx++) {
-		if (bumpArray[element_idx].classes[class_idx].indexOf(className) !== -1) {
-		    found = true;
-		    bumpArray.splice(element_idx, 1);
-		    break;
-		}
+	class_idx = 0;
+	while (class_idx < bumpArray[element_idx].classes.length) {
+	    if (bumpArray[element_idx].classes[class_idx].indexOf(className) !== -1) {
+		bumpArray.splice(element_idx, 1);
+		found = true;
+		break;
+
+	    } else {
+		class_idx++;
 	    }
 	}
-    } while (found === true);
+	if (found === false) {
+	    element_idx++;
+	}
+    }
 }
 
 function bumpomaticAddById(bumpArray, idName)
