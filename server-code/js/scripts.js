@@ -66,7 +66,8 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
-const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
+const FAKE_SRC_HIGHBURYCORNER = 'highburycorner';
+const FAKE_DATA_SOURCE = FAKE_SRC_HIGHBURYCORNER;
 
 //
 // Globals (middle)
@@ -164,6 +165,9 @@ function fakeData(source)
     case (FAKE_SRC_TRAFALGAR):
 	// stop central
 	return [51.505971, -0.129358, 51.506227, -0.129165];
+    case (FAKE_SRC_HIGHBURYCORNER):
+	// where naptan and sms arrivals were different
+	return [51.545838, -0.102309, 51.546098, -0.103039];
     }
 }
 
@@ -883,9 +887,9 @@ function sortArrivalsDataByArrivalIn(data)
 	for (idx = 0; idx < data.length -1; idx++) {
 	    if (data[idx].timeToStation > data[idx + 1].timeToStation) {
 		found = true;
-		tmp = data[idx].timeToStation;
-		data[idx].timeToStation = data[idx + 1].timeToStation;
-		data[idx + 1].timeToStation = tmp;
+		tmp = data[idx];
+		data[idx] = data[idx + 1];
+		data[idx + 1] = tmp;
 	    }
 	}
     } while (found === true);

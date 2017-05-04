@@ -3357,7 +3357,94 @@ has been bumped from it's desired location.
 
 2017may04-swirling-screen.gif also added to the repo: an anigif of the bus
 stops swirling around under manual control. Note that gif has been sped up
-from what was experienced on screen.
+from what was experienced on screen. Also note that the elements turning
+red are doing so to indicate they were bumped from their natural position.
+
+2017-05-04 10:25
+Yesterday's walking test.
+	    I took a journey up and down the Holloway Road to get some
+more live experience with the product both as programmer and UX, and listed
+some suggestions just above.
+     As a programmer, I want to detect bugs, and possibly found one: the
+arrivals data when clicking on a stop letter diverges significantly from the
+arrivals data when retrieved using the SMS code and the old site. Not just
+at one stop, but right along the road. Further, what data was displayed had
+suspicious ordering - somehow each bus route would arrive in a batch before
+the next one. One might be forgiven for thinking the bus route numbers were
+being reassigned from the actual data.
+      That bug defeats the original goal of the project, so needs to be
+addressed before the UX review.
+	  Additionally, and investigating the above, I notice that the
+arrivals data is no longer in order / is leaving old countdown material on
+screen again: the linting process may have reintroduced this. As it's also
+against the project goal, this needs to be looked at before the review too.
+
+[x] eztfl-html5 arrivals not matching eztfl arrivals
+[x] countdown out of order
+
+  As a UX I'm interested in usability, and there's quite alot about the
+project that could be improved. Most immediately, the bus numbers bumping
+everything else out of the way as demonstrated by 2017may03-too-many-bus-numbers.png
+makes it terrifically hard to work out what's going on in a high density
+area. As a matter of urgency, they should be turned off and/or show at the
+bottom. To do so opens up the software for more thorough live testing.
+
+[ ] Move bus numbers to bottom, perhaps in a table
+
+  The remaining UX issues can go to the review.
+
+Bug: eztfl-html5 arrivals not matching eztfl arrivals
+     Running this as a fake test in Peckham, the data is consistent - the
+naptan being used when accessed directly provides the same data. This tells
+me the problem is not misprocessing once the data arrives. Looking up the
+SMS code for that naptan, then searching on the tfl mainsite also shows the
+correct data.
+	As all seems well in testing, let's change to the location I saw
+the failure yesterday: Highbury Corner. - Add co-ords
+    Stop A was where I was waiting. There are two on screen but the right
+one has the expected buses arriving. It has naptan 490000108A.
+    I recorded yesterday that the SMS code on the bus stop was 47396.
+Intriguingly the API reports it should be 47936. No matter.
+	     Using the project I get the arrivals data:
+263 in 4
+263 in 6
+263 in 7
+271 in 8
+271 in 12
+271 in 12
+393 in 15
+393 in 17
+43 in 18
+43 in 20
+43 in 22
+43 in 27
+43 in 28
+   Using the SMS code I get
+271 271 to Highgate Village departing in 4 mins
+43 43 to Friern Barnet departing in 6 mins
+263 263 to Barnet Hospital departing in 7 mins
+393 393 to Chalk Farm departing in 8 mins
+43 43 to Friern Barnet departing in 11 mins
+43 43 to Friern Barnet departing in 12 mins
+271 271 to Highgate Village departing in 15 mins
+263 263 to Barnet Hospital departing in 17 mins
+43 43 to Friern Barnet departing in 17 mins
+393 393 to Chalk Farm departing in 20 mins
+271 271 to Highgate Village departing in 22 mins
+263 263 to Barnet Hospital departing in 27 mins
+43 43 to Friern Barnet departing in 28 mins
+   It can be seen that the departures times are essentially identical. The
+range of bus routes are the same. But the bus route number has been
+assigned against the wrong departure time.
+	 This points the finger firmly at the sorting code. And sure
+enough, I'm swapping the timeToStation not the whole record. Fixed.
+	Further, fixing the one bug fixes the second.
+
+[ ] Move bus numbers to bottom, perhaps in a table
+
+
+
+
 
 
 
