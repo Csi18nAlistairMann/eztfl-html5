@@ -13,7 +13,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = true;
+const FAKE_POSITION = false;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;

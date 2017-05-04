@@ -3387,9 +3387,11 @@ project that could be improved. Most immediately, the bus numbers bumping
 everything else out of the way as demonstrated by 2017may03-too-many-bus-numbers.png
 makes it terrifically hard to work out what's going on in a high density
 area. As a matter of urgency, they should be turned off and/or show at the
-bottom. To do so opens up the software for more thorough live testing.
+bottom. To do so opens up the software for more thorough live testing. These
+are examples of the programmer properly expanding what the code can do for
+the benefit of the project, and not necessarily with UX agreement.
 
-[ ] Move bus numbers to bottom, perhaps in a table
+[x] Move bus numbers to bottom, perhaps in a table
 
   The remaining UX issues can go to the review.
 
@@ -3440,15 +3442,237 @@ assigned against the wrong departure time.
 enough, I'm swapping the timeToStation not the whole record. Fixed.
 	Further, fixing the one bug fixes the second.
 
-[x] Move bus numbers to bottom, perhaps in a table
+ Move bus numbers to bottom, perhaps in a table
   The bus numbers are a mess. Turning them off is a huge help. I'd still
 like to keep them around because 'what are my options' arguably covers
 knowing the bus routes locally, even if not the bus stops. So I'll add
 the routes as a table underneath the manual rotate table. Done.
 
+That bughunt fixes the showstopping logic and user interface issues. The
+remaining issues go forth to the UX review.
 
+2017-05-04 13:30
+UX review
+   Up above, around line 1907 and on, I asserted that there are two subprojects
+- one for the logic: modelling the data the project will use, and a second for
+the UX - the user interface and experience. I asserted that once the logic
+satisfies the project goal ("I'm at X, Y walking in direction Z. What are my
+options?") then it should stay satisfied. The first job of the UX review is to
+check that: does the project, as it stands today, meet it's goal? And the
+answer is Yes. It has a 0.2/10 user experience - an upgrade from the 0.1/10 I
+would award what was there; it has plenty existing issues that could be worked
+on; and a bunch of ideas for improvements. However, if the powers that be have
+run out of money, time, patience etc, could the project go live? The answer must
+be, and is, "Yes."
 
+    Having checked we haven't screwed up from last time, we've now to review the
+review and why we're doing it. Again up above somewhere after line 1907 I said
+that these reviews act to keep us on track as to UX progress, and that these
+were necessary because UX is not susceptible to the same kind of targets as the
+logic itself: the logic is correct, or it is not, it's objective. And if it's
+not objective that speaks to the target given, not to the logic. In contrast,
+the UX is subjective: what works better for one person may not work so well for
+the next. In the context of this project, that "one person" is the UX lead, and
+these reviews are an opporunity for them to manage direction.
 
----------------------------------------------------------------
-1. Bug: At certain points in the rotation, all three rings have content
-that appears at very top left for a moment, then moves back into place.
+      We can next look at whether we've got what we need to move forward. Do we
+have budget, assignable hours, patience in hand? If we start anything now can
+we reasonably get to the next review date? For this project I'll decide we can.
+
+      For this project, the UX lead has the following agenda ahead of him: I've
+written up a better description for the items in following parenthesis:
+[ ] 1. In the densest places, and with the larger predicted ranges - usually
+associated with travelling by vehicle - there are so many things being bumped
+that material is vanishing off the bottom. What to do?
+     (from earlier: there's so much bumping
+going on that near destinations and route numbers vanish off the
+bottom of the display. Worse, bus stops are forced off the bottom too
+although this could be handled by prioritising bus stops. The response
+is much better for Peckham. However a decision about what to do is for
+the next review, not for now.)
+
+[ ] 2. Lines were a requirement but the possibility of 400+ of them shown at once
+would be ludicrous. What to do? NB: 'the lighting up' suggestion below
+      (from earlier: Lines should really go forward to the next UX review as
+something that
+should be abandoned.)
+
+[ ] 3. There is a known bug whereby elements that appear at the top and middle of
+the screen move to the top left corner before returning to place. What to do?
+    (from earlier: a secondary bug is that at some point, elements that should
+appear
+at the top of the screen in fact appear condensed into the top left corner.
+This smells alot like some kind of problem when the angle is 0 or negative.
+This is a less serious bug, as it's not adding or removing data that should
+be present, merely presenting it other than I would wish.)
+
+[ ] 4. There may be a second bug in that near destinations don't stay pressed up
+agains the edges - at the corners they move inland. What to do?
+       (from earlier: "Other than I would wish" also describes how near
+destinations move
+around the screen - the intent was that they shift smoothly into and out of
+the corners as they rotate. Instead, they seem to cut the corners. Perhap
+Ring 3 is a lot closer in than I thought, instead of far off-screen and
+clipped to the edge.)
+
+[ ] 5. Near destinations are still busying up the screen: we could deduplicate
+both as wholes, or even divide out based on commas and 'and'. What to do?
+     (from earlier: the near destinations are duplicating and going bump mad,
+not only dedupe but could also divide by commas and 'and')
+    (this would also resolve #1 above)
+
+[ ] 6. Related to 1 above. When detecting speed in excess of walking, we could
+narrow the predicted range from a big circle to a corridor of smaller cirles:
+			     _aaa/
+		    _yQQQ6/_jQP?4Q6/aQQQ6/
+	     _jQQQ6jQP' )4QQP(   )4QQ? )4Qf
+	    _QP( )4Qf     ]Q/     ]Qf    ]Q
+	    QP    jQQ     QQ6     QQQ     Qf
+ direction ]Q     Q'Qf    Q)Q     Q Q     ]f
+--->------>]f     Q ]f    Q W     Q/Q     jf
+ of travel ]f     Q/]f    Q6Q     4QQ    _Q'
+	   ]Q     46Qf    ]QP     )Q6   _yP
+	    Q6    )QQ     _Q6/   _jQQQajQP(
+	    )Q6/ _jQQ6/ _yQP4Q6ajQP( ???(
+	     )4QQQP()4QQQP'  )???'
+Which could see what's on screen lightened appropriately - roads tend to be
+straight. What to do?
+	  (from earlier: Bus travel sees the range massively expand. if
+travelling at speed narrow it down)
+
+[ ] 7. We're making quite substantial use of the API. Could this represent a
+threat if the project went live?
+       (from: What does this do to the API allowance?)
+
+[ ] 8. We could have clicking the near destination light up it's bus stop.
+  Waht to do?
+  (from earlier: touching the near destination lights up its bus stop)
+
+[ ] 9. We could have touching arrivals also light up the stop. What to do?
+  (from earlier: Touching arrivals also lights up stop)
+
+[ ] 10. Usability of the clockwise/anticlockwise paddles could be increased
+by persisting the user's chosen heading, as each render cancel's the choice
+out. Choosing this also means UI work adding a means to reset the user's
+choice to default. What to do?
+       (from earlier: persis the fake heading as rendering cancels user's
+choice; 3a. so that means a way of resetting user's choice)
+
+[ ] 11. We could add a HUD-style line that demonstrates scale. What to do?
+  (from earlier: radius line with 50m marks that sees marks move as radius
+changes
+   |____|____|____|____|____|
+   0   50   100  150  200  250
+
+   |______|______|______|
+   0     200    400    600)
+
+[ ] 12. As a debug aid we colour bumped stuff red. We could keep it, lose
+it, make the border edge towards the bump colour. Or something else. What
+to do?
+   (from earlier: Stop colliding colour red for everything, or only make
+bumped border red)
+
+[ ] 13. We could replace the stop letter / near distance with the upcoming
+stop common name: buses announce that substantially before the letter is
+visible. What to do?
+	 (from earlier: stop name called out some distance before can see
+stop letter: option to use that instead)
+
+As UX lead I also have some preferences:
+[ ] 14. I would like to see the bearing somewhere, either as text or maybe
+a line somewhere. This would be an effective double check on what the
+device thinks it's doing vs what the user actually is doing
+
+[ ] 15. I'd like to see the bus stop letters larger, as it seems clear
+there's going to be more room available
+
+[ ] 16. I'd also like to change the colour scheme!
+
+[ ] 17. Related to 8 & 9 - we could have touching a bus number light up
+  it's stops
+
+  Back to this text file for a moment: my purpose with this project is not
+to replace readily available apps, but three things:
+1. To answer the project Goal with something 'good enough' as I expect to
+   be the only user
+2. To demonstrate its existence to the person who first suggested it after
+   seeing the original site
+But mostly:
+3. I'm looking forward to analysing how this project went, and what can be
+   learnt from it for use elsewhere.
+Given the above, time and budget will be very short.
+
+      With that in mind, and returning to the UX review we can see those
+16 items divide out by type:
+
+Bugs: 2, 3, 4
+
+Current feature improvements: 5, 8, 9, 17, 10, 12
+
+Feature additions: 6, 11, 13, 14
+
+SWOT: 7 (strengths weaknesses opportunities & threats)
+
+Cosmetic: 15, 16
+
+Other: #1.
+
+       And they also divide out by seriousness 1 (least) to 5 (most)
+1:  4, 11, 13, 14, 17
+
+2:  2, 3, 8, 9, 10, 12, 15, 16,
+
+3:  1, 6,
+
+4:  5, 7,
+
+5:
+
+And this can give us a matrix:
+			   /    /    /    /    /    /
+			  / 1  / 2  / 3  / 4  / 5  /
++------------------------+----+----+----+----+----+
+|SWOT:                   |    |    |    |7   |    |
++------------------------+----+----+----+----+----+
+|Bugs:                   | 4  |2 3 |    |    |    |
++------------------------+----+----+----+----+----+
+|Cosmetic:               |    |15  |    |    |    |
+|                        |    |16  |    |    |    |
++------------------------+----+----+----+----+----+
+|Current feature         |17  |8 10|5   |    |    |
+|improvements            |    |9 12|    |    |    |
++------------------------+----+----+----+----+----+
+|Feature additions:      |11  |    |6   |    |    |
+|                        |13  |    |    |    |    |
+|                        |14  |    |    |    |    |
++------------------------+----+----+----+----+----+
+|Other:                  |    |    |1   |    |    |
++------------------------+----+----+----+----+----+
+
+The types of issues are ordered by potential gamechangeyness, then by
+least gamechangey to most, and reading from top right to bottom left
+suggests the order we should do these:
+7, 2, 3, 15, 16, 5, 4, 8, 10, 9, 12, 6, 17, 1, 11, 13, 14
+
+   We can now argue the toss about one versus the next. For instance,
+I feel 6 could justifiably pushed up the list: improving response when
+in a vehicle gives a better idea of the project's use. We can also see
+some things decided for us: I thought #5 might solve #1. As #1 is
+further down the list, we can comfortably leave it until the next
+review. We can arrange for concurrent running of one issue vs another:
+for instance #7 could be easily be done while travelling rather than
+while at a keyboard. We can also see if some issue is likely to take
+longer than getting to the next review.
+       Rather than hammer out approaches at this review, I'll settle
+for doing that as I go.
+
+So:
+#7 I'll do next time I'm travelling.
+#2 is obsoleted by #8, #9 and #17.
+#3, #15, #16 I can do something about before signing off.
+
+      With no-one else on this project to suggest differences to the
+above plan, the review is over bar agreeing to timing the next meet.
+
+2017-05-05 00:23
