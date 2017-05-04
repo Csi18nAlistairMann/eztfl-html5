@@ -3291,30 +3291,9 @@ clipped to the edge.
 	These last two bugs are not so serious and smell trivial to sort
 out. For both I'll leave them to the review.
 
-Linting
 	This is an automated way of discovering That Code Smell. I've run
 through JSHint once - and dealt with missing semi-colons because I'm short
 on time. Happily, half those missing were from stack exchange code
-
-Walking test suggestions:
-1. touching the near destination lights up its bus stop
-2. Touching arrivals also lights up stop
-3. persis the fake heading as rendering cancels user's choice
-3a. so that means a way of resetting user's choice
-4. Arrivals from choosing bus stop diverge significantly from that gained
-   from old site + sms code
-5. Unique bus numbers down right hand side
-6. radius line with 50m marks that sees marks move as radius changes
-   |____|____|____|____|____|
-   0   50   100  150  200  250
-
-   |______|______|______|
-   0     200    400    600
-7. Stop colliding colour red for everything, or only make bumped border
-   red
-8. stop name called out some distance before can see stop letter: option
-   to use that instead
-
 Linting:
 	'use strict' is preferred inside the function, just in case of
 sloppy code in a concatenated file. I never even knew you could concat
@@ -3340,6 +3319,48 @@ sloppy code in a concatenated file. I never even knew you could concat
     Get rid of duplicating declarations. Yup, agree with that too.
     Integrate the XHR code into the main file
     Rename dollar variable to be consistent with my own
+Linting is a form of second opinion and thus a chance to learn. Not much
+to do, in contrast with some of my very early stuff, but definitely stuff
+worth considering: that I should think of code reading my code, not just
+humans. Shocking that I shouldn't notice that I was only doing set up
+after the first run!
+      Being stricter should make for fewer issues down the road too -
+== vs === is not the same, and you just KNOW that some unusual browser
+implementation will choke on it. In all, 1/3rd of a day well spent.
+
+Walking test suggestions:
+1. touching the near destination lights up its bus stop
+2. Touching arrivals also lights up stop
+3. persis the fake heading as rendering cancels user's choice
+3a. so that means a way of resetting user's choice
+4. Arrivals from choosing bus stop diverge significantly from that gained
+   from old site + sms code
+5. Unique bus numbers down right hand side
+6. radius line with 50m marks that sees marks move as radius changes
+   |____|____|____|____|____|
+   0   50   100  150  200  250
+
+   |______|______|______|
+   0     200    400    600
+7. Stop colliding colour red for everything, or only make bumped border
+   red
+8. stop name called out some distance before can see stop letter: option
+   to use that instead
+
+2017april30-visuals-at-end-programming-middle.png added to the repo to
+demonstrate how the project looked on screen but before any serios UI work
+was done
+
+2017may03-too-many-bus-numbers.png added to the repo demonstrating the
+sheer weight of a problem having the bus numbers cause. Anything in red
+has been bumped from it's desired location.
+
+2017may04-swirling-screen.gif also added to the repo: an anigif of the bus
+stops swirling around under manual control. Note that gif has been sped up
+from what was experienced on screen.
+
+
+
 
 ---------------------------------------------------------------
 1. Bug: At certain points in the rotation, all three rings have content
