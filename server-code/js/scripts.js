@@ -62,12 +62,13 @@ const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
+const ROUTENOS_TABLE_WIDTH = 11;
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_SRC_HIGHBURYCORNER = 'highburycorner';
-const FAKE_DATA_SOURCE = FAKE_SRC_HIGHBURYCORNER;
+const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
 
 //
 // Globals (middle)
@@ -349,6 +350,15 @@ function renderBusStops()
     var positions;
     var heading;
     var bumpArray = [];
+    var routenosArray = [];
+    var routenosArrayIdx = [];
+    var numRoutes;
+    var numOnLine;
+    var div;
+    var tbl;
+    var tbdy;
+    var tr;
+    var td;
 
     bumpomaticSetup(bumpArray);
 
@@ -374,7 +384,7 @@ function renderBusStops()
 	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
 	deletable[busstop_naptan_class] = false;
-	renderRemoveDivById(id);
+	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 
 	// get positioning info
@@ -394,24 +404,25 @@ function renderBusStops()
 		      positionsWithLog);
 	bumpomaticAddById(bumpArray, id);
 
-	// fill in for ring 1 -- the routes serving this stop
-	line_count = 0;
+	// Construct array of unique bus numbers that'll be on screen
 	for (routeno = 0; routeno < busstopData[busstop].lines.length; routeno++) {
-	    // delete old stop letter if present
-	    id = ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name;
-	    renderRemoveDivById(id);
-	    bumpomaticDeleteById(bumpArray, id);
+	    routenosArrayIdx = 0;
+	    while (routenosArrayIdx < routenosArray.length &&
+		   routenosArray[routenosArrayIdx].name !== busstopData[busstop].lines[routeno].name) {
+		routenosArrayIdx++;
+	    }
 
-	    // that we don't change positions guarantees routes overwrite each other
-	    text = busstopData[busstop].lines[routeno].name;
-	    renderBusRoute(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, positions);
-	    bumpomaticAddById(bumpArray, id);
-	    line_count++;
+	    if (routenosArrayIdx === routenosArray.length) {
+		routenosArray.push({
+		    id: ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name,
+		    name: busstopData[busstop].lines[routeno].name
+		});
+	    }
 	}
 
 	// fill in for ring 2 -- the near destinations
 	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
-	renderRemoveDivById(id);
+	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 	text = busstopData[busstop].towards;
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, bearing, positions);
@@ -424,11 +435,36 @@ function renderBusStops()
     for (key in deletable) {
 	if (deletable.hasOwnProperty(key)) {
 	    if (deletable[key] === true) {
-		renderRemoveDivByClass(key);
+		renderRemoveElementsByClass(key);
 		// not strictly needed as no rendering after this point
 		bumpomaticDeleteByClass(bumpArray, key);
 	    }
 	}
+    }
+
+    // now get the route numbers into a table
+    if (routenosArray.length) {
+	sortRoutenosTable(routenosArray);
+	div = document.getElementById('div_table_routenos');
+	tbl = document.createElement('table');
+	tbl.style.width = '100%';
+	tbl.setAttribute('border', '1');
+	tbl.setAttribute('id', 'table_routenos');
+	tbdy = document.createElement('tbody');
+	for (numRoutes = 0; numRoutes < routenosArray.length; numRoutes += ROUTENOS_TABLE_WIDTH) {
+	    tr = document.createElement('tr');
+	    for (numOnLine = numRoutes; numOnLine < numRoutes + ROUTENOS_TABLE_WIDTH; numOnLine++) {
+		if (numOnLine < routenosArray.length) {
+		    td = document.createElement('td');
+		    td.appendChild(document.createTextNode(routenosArray[numOnLine].name));
+		    tr.appendChild(td);
+		}
+	    }
+	    tbdy.appendChild(tr);
+	}
+	tbl.appendChild(tbdy);
+	renderRemoveElementsById('table_routenos');
+	div.appendChild(tbl);
     }
 }
 
@@ -505,7 +541,7 @@ function renderCountdown(naptan)
 	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
 
 	if (text !== '') {
-	    renderRemoveDivById(id);
+	    renderRemoveElementsById(id);
 	    renderGenericDivCore(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
 	}
 
@@ -515,7 +551,7 @@ function renderCountdown(naptan)
 
 // render helpers
 
-function renderRemoveDivById(id)
+function renderRemoveElementsById(id)
 {
     'use strict';
     var child;
@@ -527,7 +563,7 @@ function renderRemoveDivById(id)
     }
 }
 
-function renderRemoveDivByClass(className)
+function renderRemoveElementsByClass(className)
 {
     'use strict';
     var list;
@@ -895,6 +931,29 @@ function sortArrivalsDataByArrivalIn(data)
     } while (found === true);
 
     return JSON.stringify(data);
+}
+
+//
+// Sort by time to arrive at station
+//
+function sortRoutenosTable(data)
+{
+    'use strict';
+    var tmp;
+    var idx;
+    var found;
+
+    do {
+	found = false;
+	for (idx = 0; idx < data.length -1; idx++) {
+	    if (data[idx].name > data[idx + 1].name) {
+		found = true;
+		tmp = data[idx];
+		data[idx] = data[idx + 1];
+		data[idx + 1] = tmp;
+	    }
+	}
+    } while (found === true);
 }
 
 //-------------------------------------------------------------

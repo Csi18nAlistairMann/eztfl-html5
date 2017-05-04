@@ -3440,11 +3440,11 @@ assigned against the wrong departure time.
 enough, I'm swapping the timeToStation not the whole record. Fixed.
 	Further, fixing the one bug fixes the second.
 
-[ ] Move bus numbers to bottom, perhaps in a table
-
-
-
-
+[x] Move bus numbers to bottom, perhaps in a table
+  The bus numbers are a mess. Turning them off is a huge help. I'd still
+like to keep them around because 'what are my options' arguably covers
+knowing the bus routes locally, even if not the bus stops. So I'll add
+the routes as a table underneath the manual rotate table. Done.
 
 
 
