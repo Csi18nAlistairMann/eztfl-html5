@@ -68,7 +68,7 @@ const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_SRC_HIGHBURYCORNER = 'highburycorner';
-const FAKE_DATA_SOURCE = FAKE_SRC_PECKHAM;
+const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 
 //
 // Globals (middle)

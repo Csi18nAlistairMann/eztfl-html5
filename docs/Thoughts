@@ -3676,3 +3676,20 @@ So:
 above plan, the review is over bar agreeing to timing the next meet.
 
 2017-05-05 00:23
+[x] 3. There is a known bug whereby elements that appear at the top and middle of
+the screen move to the top left corner before returning to place. What to do?
+    This is the one smelling like a 0deg or negative bearing issue. I notice that
+it can be replicated within a very few seconds of starting, suggesting and
+rotating right - this means the user's heading is not itself the problem - more
+likely it's the bearing of the element. Further, I notice that it happens to
+bumped and unbumped items alike. As this can be easily replicated, I can easily
+single-step the problem. The angle at the moment of failure is 357.278..deg. This
+sees getPositionsOnRing return badly. I bet this is a 'array is too short' issue!
+Sure enough - the array holding the ring doesn't describe what to do between 356
+and 360deg. Add a new entry that matches the first.
+
+
+
+---------------------------------------------------------
+Simple sounding vs Complex doing
+       Something about that rotate for heading took one line

@@ -188,3 +188,6 @@ Discover JSHint - and start and finish it
 Squish countdown arrivals/sorting bug
 Move bus routes from the middle ring (now defunct) to a table along bottom
 First UX review
+
+5 May 2017
+Bug hunt: fix for no data to describe where to go if bearing > 356deg

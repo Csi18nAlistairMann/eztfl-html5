@@ -1,13 +1,13 @@
-// This is a description of the ring and we'll use it to 
+// This is a description of the ring and we'll use it to
 // determine the position on the ring and thus on the
 // screen will have given a bearing.
-// 
+//
 // The code is in triplets where the first value is the angle,
-// and the second two are the X and Y. 
+// and the second two are the X and Y.
 //
 // The ring exists in a space 1440x2040 in size
 // The centre of the ring from which bearings are made is
-// at 720x477. 
+// at 720x477.
 //
 const RINGMAP = [
 0,720,1,
@@ -1414,4 +1414,5 @@ const RINGMAP = [
 353.97,670,4,
 355.3,681,3,
 356.87,694,2,
+360,720,1
 ];
