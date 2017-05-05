@@ -3688,6 +3688,12 @@ sees getPositionsOnRing return badly. I bet this is a 'array is too short' issue
 Sure enough - the array holding the ring doesn't describe what to do between 356
 and 360deg. Add a new entry that matches the first.
 
+[x] 15. I'd like to see the bus stop letters larger, as it seems clear
+there's going to be more room available
+	Let's make them 40% larger. That makes 1.4em.
+
+[ ] 16. I'd also like to change the colour scheme!
+
 
 
 ---------------------------------------------------------

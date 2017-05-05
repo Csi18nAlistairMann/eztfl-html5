@@ -27,3 +27,6 @@ div#you_are_here_wrapper {
     top: 375px;
     text-align: center;
 }
+p.busstop {
+    font-size: 1.4em;
+}
