@@ -25,6 +25,7 @@ div#anti_and_clockwise {
 div#you_are_here {
     display: inline-block;
     width: 360px;
+    pointer-events:none;
     z-index: 0;
 }
 div#you_are_here_wrapper {
@@ -43,4 +44,11 @@ p.busstop {
     background-color: #dc241f;
     color: #ffffff;
     border-radius: 50%;
+}
+p.neardest {
+    pointer-events:none;
+}
+
+img.rotate_arrow {
+    pointer-events:none;
 }

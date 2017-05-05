@@ -27,11 +27,12 @@ const HIGHEST_LONGITUDE = 180.0;
 const BUS_STOP_EXPIRES_IN_SECS = 10 * 60 * 60;
 const NOTED_BUSSTOPS_NAME = 'notedBusStops';
 const NOTED_COUNTDOWN_NAME = 'notedCountdown';
-const MINIMUM_RADIUS_TO_LOOK = 200;
+const MINIMUM_RADIUS_TO_LOOK = 250;
 const MAXIMUM_RADIUS_TO_LOOK = 500; // only used when fake_position = true
 const CLASS_COUNTDOWN_NAME = 'countdown';
 const CLASS_BUSSTOP_NAME = 'busstop';
 const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
+const CLASS_NEARDEST_NAME = 'neardest';
 const ID_BUSSTOP_NAME = 'busstopno_';
 const ID_NEARDEST_NAME = 'neardestno_';
 const ID_ROUTE_NAME = 'lineno_';
@@ -427,7 +428,7 @@ function renderBusStops()
 	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 	text = busstopData[busstop].towards;
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, busstop_naptan_class, bearing, positions);
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, CLASS_NEARDEST_NAME + ' ' + busstop_naptan_class, bearing, positions);
 	bumpomaticAddById(bumpArray, id);
 
 	stop_count++;
