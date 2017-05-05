@@ -3692,7 +3692,19 @@ and 360deg. Add a new entry that matches the first.
 there's going to be more room available
 	Let's make them 40% larger. That makes 1.4em.
 
-[ ] 16. I'd also like to change the colour scheme!
+[x] 16. I'd also like to change the colour scheme!
+  The page is real garish - random colour choices. I can see all I need for the
+boundary at know that it's effective, so let's colour the background some more
+reasonable shade of grey. And a couple of arrows for the manual rotate. Very
+nice! Reverse direction of the manual rotate to match what arrows can do, and
+turn off events to stop devices assuming touch means copy.
+     [ ] Has arrows shifted the buses down?
+
+[ ] 5. Near destinations are still busying up the screen: we could deduplicate
+both as wholes, or even divide out based on commas and 'and'. What to do?
+
+[ ] 4. There may be a second bug in that near destinations don't stay pressed up
+agains the edges - at the corners they move inland. What to do?
 
 
 

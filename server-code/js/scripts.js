@@ -63,6 +63,8 @@ const RPROXY_URL_COUNTDOWN_POST = '/arrivals';
 const HTTP_200 = 200;
 const RENDERING_FIELD_NAME = 'renderingField';
 const ROUTENOS_TABLE_WIDTH = 11;
+const BUMP_COLOUR_FG = '#e2e2e2';
+const BUMP_COLOUR_BG = '#dc241f';
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
@@ -1212,7 +1214,8 @@ function bumpomaticAddById(bumpArray, idName)
 	offset = bumpomaticCheckIfCollides(bumpArray, element);
 	if (offset !== null) {
 	    // shift html about
-	    html.style.backgroundColor = 'red';
+	    html.style.backgroundColor = BUMP_COLOUR_BG;
+	    html.style.color = BUMP_COLOUR_FG;
 	    html.style.top = html.offsetTop + offset[1] + 'px';
 	    element.ypos = html.offsetTop; // note setting style.top changed this in the last line!
 	}

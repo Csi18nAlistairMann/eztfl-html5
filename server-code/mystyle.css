@@ -6,7 +6,7 @@ html, body {
     vertical-align: baseline;
     width: 359px;
     height: 509px;
-    background-color: green;
+    background-color: #eaeaea;
     overflow: hidden;
     display: block;
     font-family: Sans-serif;
@@ -15,7 +15,7 @@ html, body {
 }
 div#renderingField {
     height: 509px;
-    background-color: pink;
+    background-color: #e7e7e7;
 }
 div#you_are_here {
     display: inline-block;
@@ -29,4 +29,7 @@ div#you_are_here_wrapper {
 }
 p.busstop {
     font-size: 1.4em;
+    background-color: #dc241f;
+    color: #ffffff;
+    border-radius: 50%;
 }
