@@ -42,7 +42,7 @@ const NAPTAN_NAME = 'naptan';
 const RENDERFIELD_WIDTH = 360;
 const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
 const PREDICTION_POINT_Y = 477 / 3;
-const RENDERFIELD_HEIGHT = 509;
+const RENDERFIELD_HEIGHT = 510;
 const EGG_WIDTH = 1440;
 const EGG_HEIGHT = 2040;
 const DIVISOR_FOR_RING2 = 6;
@@ -729,13 +729,13 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 //
 // prediction helpers (middle)
 //
-function positionsGetPrediction(num_positions_tracked)
+function updateForNewPrediction(num_positions_tracked)
 {
     'use strict';
-    return positionsGetPredictionSimplest(num_positions_tracked);
+    return updateForNewPredictionSimplest(num_positions_tracked);
 }
 
-function positionsGetPredictionSimplest(num_positions_tracked)
+function updateForNewPredictionSimplest(num_positions_tracked)
 {
     // take first and last coord in stack, ignore rest
     'use strict';
@@ -1335,6 +1335,5 @@ function mainLoop(position)
 
     position = checkPositionValues(position);
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
-
-    prediction = positionsGetPrediction(num_positions_tracked);
+    updateForNewPrediction(num_positions_tracked);
 }

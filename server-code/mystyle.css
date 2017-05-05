@@ -4,8 +4,8 @@ html, body {
     border: 0;
     outline: 0;
     vertical-align: baseline;
-    width: 359px;
-    height: 509px;
+    width: 360px;
+    height: 510px;
     background-color: #eaeaea;
     overflow: hidden;
     display: block;
@@ -14,12 +14,17 @@ html, body {
     margin: 0;
 }
 div#renderingField {
-    height: 509px;
+    height: 510px;
     background-color: #e7e7e7;
+}
+div#anti_and_clockwise {
+    position: fixed;
+    width: 360px;
+    top: 305px;
 }
 div#you_are_here {
     display: inline-block;
-    width: 359px;
+    width: 360px;
     z-index: 0;
 }
 div#you_are_here_wrapper {
@@ -27,6 +32,12 @@ div#you_are_here_wrapper {
     top: 375px;
     text-align: center;
 }
+div#div_table_routenos {
+    position: fixed;
+    width: 360px;
+    top: 430px;
+}
+
 p.busstop {
     font-size: 1.4em;
     background-color: #dc241f;
