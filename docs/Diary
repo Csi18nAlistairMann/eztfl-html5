@@ -191,3 +191,7 @@ First UX review
 
 5 May 2017
 Bug hunt: fix for no data to describe where to go if bearing > 356deg
+
+6 May 2017
+Bug hunt: fix duplicating near destinations
+Bug hunt: fix near destinations not pushed right to edge

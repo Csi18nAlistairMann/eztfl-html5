@@ -3724,10 +3724,58 @@ dealt with once the busstops are on screen similar to the routenos.
       How to average bearings? After much humming and bad code, looked to stack
 exchange again. A geometry problem, not a programming one - I should have guessed.
 
-
-
-[ ] 4. There may be a second bug in that near destinations don't stay pressed up
+[x] 4. There may be a second bug in that near destinations don't stay pressed up
 agains the edges - at the corners they move inland. What to do?
+       Watching the manual rotation closely, it seems obvious that the near
+destinations are being scaled in to an egg that basically fits the renderfield.
+I wanted something slightly different: I wanted the renderfield to fit inside the
+egg, and the near destinations to be posted at a place where its bearing
+intersects the renderfield on the way to the egg. More asciiart:
+
+		C
+
+		aaQQQQQQ6a/
+	     _aQQP?    )?4Q6
+	B   aQP? ]        )?
+	    Q?   ]
+	  B QQQQQ C QQQQWQQQ
+	_  \      \
+	QPQ \     ]
+       jQ Q  \     f
+      ]Q' Q   \    f
+      Qf  Q    \/  ]
+A    ]Q         )/ )/
+     QP?a A      )/ f
+    ]Q      aa    )/]
+    jf    Q   ??aa )j
+    Q'    Q       ??jf
+   ]Q     Q
+   ]f     Q
+   jf     Q
+   Q'     Q
+   Q      Q
+   Q      Q
+   Q      Q
+   Q      Q
+   Q      Q
+
+   That the egg is outside suggests the maths is off, probaby because
+there's a scaling thing happening. 'Bearing' is consistently undefined
+in scaleRingToRenderfield for ring2. Oops. So adjusting out to the edge
+never happens. And that was exactly the problem, and solution.
+
+[ ] 8. We could have clicking the near destination light up it's bus stop.
+
+[ ] 9. We could have touching arrivals also light up the stop.
+
+[ ] 10. Usability of the clockwise/anticlockwise paddles could be increased
+by persisting the user's chosen heading, as each render cancel's the choice
+out. Choosing this also means UI work adding a means to reset the user's
+choice to default.
+
+[ ] 12. As a debug aid we colour bumped stuff red. We could keep it, lose
+it, make the border edge towards the bump colour. Or something else.
+
 
 
 

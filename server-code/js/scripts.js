@@ -13,7 +13,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = true;
+const FAKE_POSITION = false;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -333,7 +333,7 @@ function renderBusStop(parent, name, text, onclick_handler, eztflClass, position
     var scaledPositions;
 
     if (positionArr !== null) {
-	scaledPositions = scaleRingToRenderfield(positionArr, RING0);
+	scaledPositions = scaleRingToRenderfield(positionArr, RING0, null);
     }
     renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
 }
@@ -526,7 +526,7 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
     var scaledPositions;
 
     if (positionArr !== null) {
-	scaledPositions = scaleRingToRenderfield(positionArr, RING2);
+	scaledPositions = scaleRingToRenderfield(positionArr, RING2, bearing);
     }
     renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
 }
@@ -663,7 +663,7 @@ function getPositionOnRing(bearing)
     return [RINGMAP[idx + 1], RINGMAP[idx + 2]];
 }
 
-function scaleRingToRenderfield(positionArr, ringno)
+function scaleRingToRenderfield(positionArr, ringno, bearing)
 {
     'use strict';
     var xoff;
@@ -687,14 +687,16 @@ function scaleRingToRenderfield(positionArr, ringno)
 	scaledPositionsArr[1] = positionArr[1] / DIVISOR_FOR_RING2 + yoff;
 
     } else if (ringno === 2) {
+	// scale to within the renderfield
 	scaledPositionsArr[0] = RENDERFIELD_WIDTH / EGG_WIDTH * positionArr[0];
 	scaledPositionsArr[1] = RENDERFIELD_HEIGHT / EGG_HEIGHT * positionArr[1];
 
+	// how far is this point from the prediction point?
 	xoff = Math.abs(PREDICTION_POINT_X - scaledPositionsArr[0]);
 	yoff = Math.abs(PREDICTION_POINT_Y - scaledPositionsArr[1]);
 	ratio = xoff / yoff;
 
-	// this is the bit that could more usefullscaledPositionsArr[1]be done with tangents
+	// adjust that point outwards until we hit the edge
 	if (bearing <= 90) {
 	    while (scaledPositionsArr[0] < RENDERFIELD_WIDTH && scaledPositionsArr[1] > 0) {
 		scaledPositionsArr[0] += ratio;
@@ -719,6 +721,8 @@ function scaleRingToRenderfield(positionArr, ringno)
 		scaledPositionsArr[1]--;
 	    }
 	}
+
+	// clean up if we stepped beyond the renderfield
 	scaledPositionsArr[0] = (scaledPositionsArr[0] < 0) ? 0 : scaledPositionsArr[0];
 	scaledPositionsArr[0] = (scaledPositionsArr[0] > RENDERFIELD_WIDTH) ? RENDERFIELD_WIDTH : scaledPositionsArr[0];
 	scaledPositionsArr[1] = (scaledPositionsArr[1] < 0) ? 0 : scaledPositionsArr[1];
