@@ -3698,10 +3698,33 @@ boundary at know that it's effective, so let's colour the background some more
 reasonable shade of grey. And a couple of arrows for the manual rotate. Very
 nice! Reverse direction of the manual rotate to match what arrows can do, and
 turn off events to stop devices assuming touch means copy.
-     [ ] Has arrows shifted the buses down?
+     [x] Has arrows shifted the buses down?
 
-[ ] 5. Near destinations are still busying up the screen: we could deduplicate
+[x] 5. Near destinations are still busying up the screen: we could deduplicate
 both as wholes, or even divide out based on commas and 'and'. What to do?
+     Also on 'or'.
+     The problem here is that the near destinations have two problems.
+First, if two near destinations have identical text, they still duplicate.
+Second, dissimilar near destinations may still contain duplicates: "Chelsea and
+Kennington or Victoria" and "Hyde Park, Hammersmith and Victoria" both contain
+"Victoria". Solving this second problem solves the first.
+	    My thinking is that the near destination should be split into their
+several near destinations on the boundary of any comma or use of "and" or "or".
+That sub-near destination is the one that gets to screen. (Ideally, tfl should
+supply these near destinations separately.)
+       These sub-near destinations then adopt the average bearing from any busstops
+referencing them. (Although, how does one average in modulo arithmetic?) They also
+then adopt the class of each of those busstops, such that if and when we touch one,
+the browser can tell which busstop(s) gets lit up.
+    In doing this we'll dramatically cut down on duplication, and therefore on
+bumped text. We'll also dramatically cut down on long text as the longest near
+destinations get divided up.
+	     This would probably require making an array of unique elements to be
+dealt with once the busstops are on screen similar to the routenos.
+      How to average bearings? After much humming and bad code, looked to stack
+exchange again. A geometry problem, not a programming one - I should have guessed.
+
+
 
 [ ] 4. There may be a second bug in that near destinations don't stay pressed up
 agains the edges - at the corners they move inland. What to do?
@@ -3711,3 +3734,18 @@ agains the edges - at the corners they move inland. What to do?
 ---------------------------------------------------------
 Simple sounding vs Complex doing
        Something about that rotate for heading took one line
+arrow in coords: 0, 370,
+96, 148,
+552, 0,
+757, 434,
+662, 655,
+512, 330,
+318, 777,
+148, 704,
+340, 254,
+0, 370
+
+Crashes probably to so much work it does on the train! In 3 minutes I could be
+anywhere
+
+Is the delete after 10 readings losing the last known heading?

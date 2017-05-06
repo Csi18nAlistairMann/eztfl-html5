@@ -13,7 +13,7 @@
 //
 // Constants
 //
-const FAKE_POSITION = false;
+const FAKE_POSITION = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -270,6 +270,23 @@ function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_i
     return [180 / Math.PI * lat2, 180 / Math.PI * lon2];
 }
 
+function se_averageBearing(set)
+{
+    'use strict';
+    var x;
+    var y;
+    var idx;
+
+    x = 0;
+    y = 0;
+    for (idx = 0; idx < set.length; idx++) {
+	x += Math.cos(se_deg2rad(set[idx]));
+	y += Math.sin(se_deg2rad(set[idx]));
+    }
+
+    return (se_rad2deg(Math.atan2(y, x)));
+}
+
 //-------------------------------------------------------------
 //
 // rendering (front)
@@ -310,17 +327,6 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
     }
 }
 
-function renderBusRoute(parent, name, text, onclick_handler, eztflClass, positionArr)
-{
-    'use strict';
-    var scaledPositions;
-
-    if (positionArr !== null) {
-	scaledPositions = scaleRingToRenderfield(positionArr, RING1);
-    }
-    renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
-}
-
 function renderBusStop(parent, name, text, onclick_handler, eztflClass, positionArr)
 {
     'use strict';
@@ -338,7 +344,6 @@ function renderBusStops()
     var busstopData = JSON.parse(localStorage.getItem(NOTED_BUSSTOPS_NAME));
     var text;
     var id;
-    var line_count;
     var stop_count;
     var busstop;
     var routeno;
@@ -362,6 +367,13 @@ function renderBusStops()
     var tbdy;
     var tr;
     var td;
+    var nrDstFound;
+    var towardsArr = [];
+    var towardsArrIdx;
+    var newTowardsArr = [];
+    var avgBearing;
+    var classNames;
+    var classNamesIdx;
 
     bumpomaticSetup(bumpArray);
 
@@ -423,13 +435,26 @@ function renderBusStops()
 	    }
 	}
 
-	// fill in for ring 2 -- the near destinations
-	id = ID_NEARDEST_NAME + busstopData[busstop].naptanId;
-	renderRemoveElementsById(id);
-	bumpomaticDeleteById(bumpArray, id);
-	text = busstopData[busstop].towards;
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, CLASS_NEARDEST_NAME + ' ' + busstop_naptan_class, bearing, positions);
-	bumpomaticAddById(bumpArray, id);
+	// construct array of unique near destinations
+	newTowardsArr = decomposeNearDestinations(busstopData[busstop].towards);
+	for (var newTowardsArrIdx = 0; newTowardsArrIdx < newTowardsArr.length; newTowardsArrIdx++) {
+	    nrDstFound = false;
+	    for (towardsArrIdx = 0; towardsArrIdx < towardsArr.length; towardsArrIdx++) {
+		if (towardsArr[towardsArrIdx].towards === newTowardsArr[newTowardsArrIdx]) {
+		    towardsArr[towardsArrIdx].bearing.push(bearing);
+		    towardsArr[towardsArrIdx].classNames.push(busstop_naptan_class);
+		    nrDstFound = true;
+		}
+	    }
+	    if (nrDstFound === false) {
+		towardsArr[towardsArrIdx] = {
+		    towards: newTowardsArr[newTowardsArrIdx],
+		    classNames: [busstop_naptan_class],
+		    bearing: [bearing],
+		    data: busstopData[busstop]
+		};
+	    }
+	}
 
 	stop_count++;
     }
@@ -443,6 +468,30 @@ function renderBusStops()
 		bumpomaticDeleteByClass(bumpArray, key);
 	    }
 	}
+    }
+
+    // fill in the near destinations on ring 2
+    for (towardsArrIdx = 0; towardsArrIdx < towardsArr.length; towardsArrIdx++) {
+	id = ID_NEARDEST_NAME + '_' + towardsArrIdx + ' ' + towardsArr[towardsArrIdx].data.naptanId;
+	renderRemoveElementsById(id);
+	bumpomaticDeleteById(bumpArray, id);
+
+	if (towardsArr[towardsArrIdx].bearing.length === 0) {
+	    alert('No bearings gonna crash');
+	}
+	avgBearing = se_averageBearing(towardsArr[towardsArrIdx].bearing);
+	avgBearing = modulo(avgBearing, 360);
+	positions = getPositionOnRing(avgBearing);
+
+	text = towardsArr[towardsArrIdx].towards;
+
+	classNames = '';
+	for (classNamesIdx = 0; classNamesIdx < towardsArr[towardsArrIdx].classNames.length; classNamesIdx++) {
+	    classNames += towardsArr[towardsArrIdx].classNames[classNamesIdx] + ' ';
+	}
+
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
+	bumpomaticAddById(bumpArray, id);
     }
 
     // now get the route numbers into a table
@@ -847,6 +896,19 @@ function fakeHeadingRotateCore(headingOffset)
 //
 // other helpers (middle and front)
 //
+function decomposeNearDestinations(originalNearDest)
+{
+    'use strict';
+    var towardsArr = [];
+    var idx;
+
+    towardsArr = originalNearDest.split(/,|and |or /);
+    for (idx = 0; idx < towardsArr.length; idx++) {
+	towardsArr[idx] = towardsArr[idx].trim();
+    }
+    return towardsArr;
+}
+
 function modulo(value, modulo)
 {
     // required because % on test machine handles negatives
@@ -1332,7 +1394,6 @@ function mainLoop(position)
 {
     'use strict';
     var num_positions_tracked = 0;
-    var prediction = null;
 
     position = checkPositionValues(position);
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
