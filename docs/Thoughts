@@ -3764,7 +3764,20 @@ there's a scaling thing happening. 'Bearing' is consistently undefined
 in scaleRingToRenderfield for ring2. Oops. So adjusting out to the edge
 never happens. And that was exactly the problem, and solution.
 
-[ ] 8. We could have clicking the near destination light up it's bus stop.
+[ ] 8. We could have clicking the near destination light up it's bus stop(s).
+  I had in mind something like a yellow border appearing around the bus
+stops(s) that go to a particular near destination whenever the latter is
+touched. "border: 5px solid #f7ff00" seems to give me what I want for both
+near destination and bus stop. What's left is to ensure the classes match
+up such that every bus stop that goes to that near destination. Confirmed
+they do. So will need code such that when neardest is touched it gets the
+yellow border, and anything with which it shares a busstop_ border does too.
+That also means turning off any such border for others first. We can do this
+by removing any elements class if that class is the new "selected_border"
+class.
+
+
+
 
 [ ] 9. We could have touching arrivals also light up the stop.
 
@@ -3793,7 +3806,16 @@ arrow in coords: 0, 370,
 340, 254,
 0, 370
 
+-webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+
+
 Crashes probably to so much work it does on the train! In 3 minutes I could be
 anywhere
 
 Is the delete after 10 readings losing the last known heading?
+
+Since rationalising near destinations, are some of them staying on screen for
+a couple more renders before disappearing?
+
+Choking on "Great Portland " because "and ". maybe [A-Za-z\-]?

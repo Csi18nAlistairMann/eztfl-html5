@@ -45,10 +45,10 @@ p.busstop {
     color: #ffffff;
     border-radius: 50%;
 }
-p.neardest {
-    pointer-events:none;
-}
 
 img.rotate_arrow {
     pointer-events:none;
+}
+p.selected_border {
+    border: 5px solid #f7ff00;
 }

@@ -66,12 +66,13 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const ROUTENOS_TABLE_WIDTH = 11;
 const BUMP_COLOUR_FG = '#e2e2e2';
 const BUMP_COLOUR_BG = '#dc241f';
+const CLASS_YELLOW_BORDER = 'selected_border';
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_SRC_HIGHBURYCORNER = 'highburycorner';
-const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
+const FAKE_DATA_SOURCE = FAKE_SRC_PICCADILLY;
 
 //
 // Globals (middle)
@@ -374,6 +375,9 @@ function renderBusStops()
     var avgBearing;
     var classNames;
     var classNamesIdx;
+    var neardest_onclick;
+    var busstopNos;
+    var busstopNosIdx;
 
     bumpomaticSetup(bumpArray);
 
@@ -443,6 +447,7 @@ function renderBusStops()
 		if (towardsArr[towardsArrIdx].towards === newTowardsArr[newTowardsArrIdx]) {
 		    towardsArr[towardsArrIdx].bearing.push(bearing);
 		    towardsArr[towardsArrIdx].classNames.push(busstop_naptan_class);
+		    towardsArr[towardsArrIdx].busstopNos.push(id);
 		    nrDstFound = true;
 		}
 	    }
@@ -451,6 +456,7 @@ function renderBusStops()
 		    towards: newTowardsArr[newTowardsArrIdx],
 		    classNames: [busstop_naptan_class],
 		    bearing: [bearing],
+		    busstopNos: [id],
 		    data: busstopData[busstop]
 		};
 	    }
@@ -490,7 +496,16 @@ function renderBusStops()
 	    classNames += towardsArr[towardsArrIdx].classNames[classNamesIdx] + ' ';
 	}
 
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, null, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
+	busstopNos = '';
+	neardest_onclick = null;
+	for (busstopNosIdx = 0; busstopNosIdx < towardsArr[towardsArrIdx].busstopNos.length; busstopNosIdx++) {
+	    busstopNos += towardsArr[towardsArrIdx].busstopNos[busstopNosIdx] + ' ';
+	}
+	if (busstopNos !== '') {
+	    neardest_onclick = 'selectNearDestination("' + busstopNos.trim() + '")';
+	}
+
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
 	bumpomaticAddById(bumpArray, id);
     }
 
@@ -550,6 +565,9 @@ function renderNearDestinationCore(parent, name, text, onclick_handler, eztflCla
 	}
 	if (eztflClass !== null) {
 	    paragraph.setAttribute('class', eztflClass);
+	}
+	if (onclick_handler !== null) {
+	    paragraph.setAttribute('onclick', onclick_handler);
 	}
 	node = document.createTextNode(text);
 	paragraph.appendChild(node);
@@ -852,6 +870,31 @@ function updateForNewPredictionSimplest(num_positions_tracked)
 //
 // User Interface helpers (front)
 //
+
+//
+// what to do if user clicks on near dest?
+//
+function selectNearDestination(naptans)
+{
+    'use strict'
+    var extants;
+    var naptans;
+    var idx;
+    var el;
+
+    // remove existing use
+    extants = document.getElementsByClassName(CLASS_YELLOW_BORDER);
+    while (extants.length) {
+	extants[0].classList.remove(CLASS_YELLOW_BORDER);
+    }
+
+    // add the new users
+    naptans = naptans.split(' ');
+    for (idx = 0; idx < naptans.length; idx++) {
+	el = document.getElementById(naptans[idx]);
+	el.classList.add(CLASS_YELLOW_BORDER);
+    }
+}
 
 //
 // what to do if user clicks on bus stop?
