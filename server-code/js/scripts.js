@@ -51,7 +51,8 @@ const DIVISOR_FOR_RING3 = 8;
 const RING0 = 0; // centre for bus stops
 const RING1 = 1; // middle for bus routes
 const RING2 = 2; // outside for near destinations
-const USERS_HEADING_NAME = 'usersheading';
+const DEVICES_HEADING_NAME = 'devicesheading';
+const FORCED_HEADING_NAME = 'forcedheading';
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -396,7 +397,7 @@ function renderBusStops()
     }
 
     // Render new bus stop info
-    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
+    heading = getComboHeading();
     stop_count = 0;
     for (busstop = 0; busstop < busstopData.length; busstop++) {
 	// note bus stop going to be used, remove old name if present
@@ -687,7 +688,6 @@ function scaleRingToRenderfield(positionArr, ringno, bearing)
     var xoff;
     var yoff;
     var scaledPositionsArr = [];
-    var bearing;
     var ratio;
 
     if (ringno === 0) {
@@ -761,7 +761,6 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
     var originx;
     var originy;
 
-    // positions = getPositionOnRing(bearing, busstop);
     ringx = positions[0];
     ringy = positions[1];
 
@@ -814,7 +813,7 @@ function updateForNewPredictionSimplest(num_positions_tracked)
     var early_position = [];
     var latest_position = [];
     var distance_in_meters;
-    var users_heading;
+    var devices_heading;
     var speed_in_meters_per_second;
     var url;
     var handler;
@@ -832,15 +831,15 @@ function updateForNewPredictionSimplest(num_positions_tracked)
 
     distance_in_meters = getDistanceInMeters(early_position, latest_position);
 
-    users_heading = getAngle(early_position, latest_position);
-    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(users_heading));
+    devices_heading = getAngle(early_position, latest_position);
+    setDevicesHeading(devices_heading);
 
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
     pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
 						     latest_position.coords.longitude,
-						     users_heading,
+						     devices_heading,
 						     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
     radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS -
@@ -872,13 +871,65 @@ function updateForNewPredictionSimplest(num_positions_tracked)
 //
 
 //
+// what to do if user resets his heading?
+//
+function resetForcedHeading()
+{
+    'use strict';
+    setForcedHeading(null);
+}
+
+function getDevicesHeading()
+{
+    'use strict';
+    return JSON.parse(sessionStorage.getItem(DEVICES_HEADING_NAME));
+}
+
+function setDevicesHeading(devices_heading)
+{
+    'use strict';
+    sessionStorage.setItem(DEVICES_HEADING_NAME, JSON.stringify(devices_heading));
+}
+
+function getForcedHeading()
+{
+    'use strict';
+    var heading;
+
+    heading = sessionStorage.getItem(FORCED_HEADING_NAME);
+    if (heading === null || heading === undefined) {
+	return 0;
+
+    } else {
+	return JSON.parse(sessionStorage.getItem(FORCED_HEADING_NAME));
+    }
+}
+
+function setForcedHeading(forced_choice_heading)
+{
+    'use strict';
+    sessionStorage.setItem(FORCED_HEADING_NAME, JSON.stringify(forced_choice_heading));
+}
+
+function getComboHeading()
+{
+    'use strict';
+    var device;
+    var forced;
+
+    device = getDevicesHeading();
+    forced = getForcedHeading();
+
+    return modulo(device + forced, 360);
+}
+
+//
 // what to do if user clicks on near dest?
 //
 function selectNearDestination(naptans)
 {
-    'use strict'
+    'use strict';
     var extants;
-    var naptans;
     var idx;
     var el;
 
@@ -932,10 +983,11 @@ function fakeHeadingRotateCore(headingOffset)
     'use strict';
     var heading;
 
-    heading = JSON.parse(sessionStorage.getItem(USERS_HEADING_NAME));
+    heading = getForcedHeading();
     heading += headingOffset;
     heading = modulo(heading, 360);
-    sessionStorage.setItem(USERS_HEADING_NAME, JSON.stringify(heading));
+    setForcedHeading(heading);
+
     renderBusStops();
 }
 

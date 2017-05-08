@@ -3764,7 +3764,7 @@ there's a scaling thing happening. 'Bearing' is consistently undefined
 in scaleRingToRenderfield for ring2. Oops. So adjusting out to the edge
 never happens. And that was exactly the problem, and solution.
 
-[ ] 8. We could have clicking the near destination light up it's bus stop(s).
+[x] 8. We could have clicking the near destination light up it's bus stop(s).
   I had in mind something like a yellow border appearing around the bus
 stops(s) that go to a particular near destination whenever the latter is
 touched. "border: 5px solid #f7ff00" seems to give me what I want for both
@@ -3776,15 +3776,29 @@ That also means turning off any such border for others first. We can do this
 by removing any elements class if that class is the new "selected_border"
 class.
 
+[D] 9. We could have touching arrivals also light up the stop.
+  I can't remember why I thought this was useful, and didn't make myself many
+notes for it. Why would I need to know which bus stop applies to the arrivals
+when I must have just clicked on it in order to get those arrivals? Maybe this
+was a question about recognising among a chocka screen
+     I'll put this to one side for now.
 
-
-
-[ ] 9. We could have touching arrivals also light up the stop.
-
-[ ] 10. Usability of the clockwise/anticlockwise paddles could be increased
+[x] 10. Usability of the clockwise/anticlockwise paddles could be increased
 by persisting the user's chosen heading, as each render cancel's the choice
 out. Choosing this also means UI work adding a means to reset the user's
 choice to default.
+       Note that this is a very similar choice to that about deciding whether
+the yellow highlight is also persisted - what solves this problem is very
+likely to solve that one, even if we subsequently don't use it.
+       The obvious way is to persist the value using sessionStorage, with
+null to indicate the lack of bearing, and 0-360 to specify one.
+     The obvious way to reset the value, given we're not using anything even
+approximating a menu system, is an element somewhere whose touching causes
+the reset. This allows us to hide the means by which this element is found,
+later making it part of a menu system. This can be accomplished with an any
+old div. We can repeat more any old divs for future resets. And we can combine
+their calls in a master div for a master reset.
+      Done.
 
 [ ] 12. As a debug aid we colour bumped stuff red. We could keep it, lose
 it, make the border edge towards the bump colour. Or something else.
@@ -3795,7 +3809,10 @@ it, make the border edge towards the bump colour. Or something else.
 ---------------------------------------------------------
 Simple sounding vs Complex doing
        Something about that rotate for heading took one line
-arrow in coords: 0, 370,
+
+Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
+coords:
+0, 370,
 96, 148,
 552, 0,
 757, 434,
@@ -3805,10 +3822,9 @@ arrow in coords: 0, 370,
 148, 704,
 340, 254,
 0, 370
-
+Also a very rough polygon to describe one heading straight up:
 -webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
-
 
 Crashes probably to so much work it does on the train! In 3 minutes I could be
 anywhere
@@ -3819,3 +3835,12 @@ Since rationalising near destinations, are some of them staying on screen for
 a couple more renders before disappearing?
 
 Choking on "Great Portland " because "and ". maybe [A-Za-z\-]?
+
+Selecting doesn't survive re-render. Should it?
+
+The value of not coding a project from the top-down but bottom-up. That is, I
+didn't start with front-end and shoe-horned data to fit it, but started with
+the data and developed it into successively higher forms.
+
+Highlighting a busstop sees it move. 5px. Also consider centering the element
+instead of using top left.

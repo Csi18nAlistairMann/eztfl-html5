@@ -195,3 +195,9 @@ Bug hunt: fix for no data to describe where to go if bearing > 356deg
 6 May 2017
 Bug hunt: fix duplicating near destinations
 Bug hunt: fix near destinations not pushed right to edge
+
+7 May 2017
+Bug hunt: spurious data point in the egg
+Improvement: persist user's rotation, provide means to reset
+
+Also decision not to pursue highight stop from arrivals
