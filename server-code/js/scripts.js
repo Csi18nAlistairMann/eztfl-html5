@@ -67,6 +67,7 @@ const RENDERING_FIELD_NAME = 'renderingField';
 const ROUTENOS_TABLE_WIDTH = 11;
 const BUMP_COLOUR_FG = '#e2e2e2';
 const BUMP_COLOUR_BG = '#dc241f';
+const USE_BUMP_COLOURING = false;
 const CLASS_YELLOW_BORDER = 'selected_border';
 
 const FAKE_SRC_PECKHAM = 'peckham';
@@ -379,6 +380,8 @@ function renderBusStops()
     var neardest_onclick;
     var busstopNos;
     var busstopNosIdx;
+    var naptans;
+    var naptansIdx;
 
     bumpomaticSetup(bumpArray);
 
@@ -435,8 +438,12 @@ function renderBusStops()
 	    if (routenosArrayIdx === routenosArray.length) {
 		routenosArray.push({
 		    id: ID_ROUTE_NAME + busstopData[busstop].naptanId + '_' + busstopData[busstop].lines[routeno].name,
-		    name: busstopData[busstop].lines[routeno].name
+		    name: busstopData[busstop].lines[routeno].name,
+		    naptans: [busstopData[busstop].naptanId]
 		});
+
+	    } else {
+		routenosArray[routenosArrayIdx].naptans.push(busstopData[busstop].naptanId);
 	    }
 	}
 
@@ -524,6 +531,11 @@ function renderBusStops()
 	    for (numOnLine = numRoutes; numOnLine < numRoutes + ROUTENOS_TABLE_WIDTH; numOnLine++) {
 		if (numOnLine < routenosArray.length) {
 		    td = document.createElement('td');
+		    naptans = '';
+		    for (naptansIdx = 0; naptansIdx < routenosArray[numOnLine].naptans.length; naptansIdx++) {
+			naptans += ID_BUSSTOP_NAME + routenosArray[numOnLine].naptans[naptansIdx] + ' ';
+		    }
+		    td.setAttribute('onclick', 'selectBusStop("' + naptans.trim() + '")');
 		    td.appendChild(document.createTextNode(routenosArray[numOnLine].name));
 		    tr.appendChild(td);
 		}
@@ -924,27 +936,25 @@ function getComboHeading()
 }
 
 //
-// what to do if user clicks on near dest?
+// what to do if user selects a route number?
+//
+function selectBusStop(naptans)
+{
+    'use strict';
+
+    clearSelected();
+    makeSelected(naptans);
+}
+
+//
+// what to do if user selects a near destination?
 //
 function selectNearDestination(naptans)
 {
     'use strict';
-    var extants;
-    var idx;
-    var el;
 
-    // remove existing use
-    extants = document.getElementsByClassName(CLASS_YELLOW_BORDER);
-    while (extants.length) {
-	extants[0].classList.remove(CLASS_YELLOW_BORDER);
-    }
-
-    // add the new users
-    naptans = naptans.split(' ');
-    for (idx = 0; idx < naptans.length; idx++) {
-	el = document.getElementById(naptans[idx]);
-	el.classList.add(CLASS_YELLOW_BORDER);
-    }
+    clearSelected();
+    makeSelected(naptans);
 }
 
 //
@@ -989,6 +999,39 @@ function fakeHeadingRotateCore(headingOffset)
     setForcedHeading(heading);
 
     renderBusStops();
+}
+
+//-------------------------------------------------------------
+//
+// selection highlighting helpers
+//
+
+//
+// what to do if user clicks on near dest?
+//
+function clearSelected()
+{
+    'use strict';
+    var extants;
+
+    extants = document.getElementsByClassName(CLASS_YELLOW_BORDER);
+    while (extants.length) {
+	extants[0].classList.remove(CLASS_YELLOW_BORDER);
+    }
+}
+
+function makeSelected(naptans)
+{
+    'use strict';
+    var idx;
+    var el;
+    var naptansArr;
+
+    naptansArr = naptans.split(' ');
+    for (idx = 0; idx < naptansArr.length; idx++) {
+	el = document.getElementById(naptansArr[idx]);
+	el.classList.add(CLASS_YELLOW_BORDER);
+    }
 }
 
 //-------------------------------------------------------------
@@ -1376,8 +1419,10 @@ function bumpomaticAddById(bumpArray, idName)
 	offset = bumpomaticCheckIfCollides(bumpArray, element);
 	if (offset !== null) {
 	    // shift html about
-	    html.style.backgroundColor = BUMP_COLOUR_BG;
-	    html.style.color = BUMP_COLOUR_FG;
+	    if (USE_BUMP_COLOURING === true) {
+		html.style.backgroundColor = BUMP_COLOUR_BG;
+		html.style.color = BUMP_COLOUR_FG;
+	    }
 	    html.style.top = html.offsetTop + offset[1] + 'px';
 	    element.ypos = html.offsetTop; // note setting style.top changed this in the last line!
 	}

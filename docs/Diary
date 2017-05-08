@@ -201,3 +201,7 @@ Bug hunt: spurious data point in the egg
 Improvement: persist user's rotation, provide means to reset
 
 Also decision not to pursue highight stop from arrivals
+
+8 May 2017
+Improvement: touching the bus number now highlights each stop it visits
+Also turn off bump colouring

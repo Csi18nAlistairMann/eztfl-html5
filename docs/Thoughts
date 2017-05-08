@@ -3800,9 +3800,50 @@ old div. We can repeat more any old divs for future resets. And we can combine
 their calls in a master div for a master reset.
       Done.
 
-[ ] 12. As a debug aid we colour bumped stuff red. We could keep it, lose
+[x] 12. As a debug aid we colour bumped stuff red. We could keep it, lose
 it, make the border edge towards the bump colour. Or something else.
+    The major use of bump colouring is the near destinations that are shifted
+    about. However, these are probably the least needed to be coloured - the
+    exact bearing is not something the user will care about moment to moment.
+    Additionally, the bump colouring for the stops themselves are so little
+    different from the normal colourng as to make no difference on the street.
+    We /could/ still bump colour differently, but for now we'll just turn them
+    off.
 
+[x] 17. Related to 8 & 9 - we could have touching a bus number light up
+  it's stops
+  This envisages a javascript event on touching the bus route number on screen
+currently at the bottom; that event turns off any existing selection on screen
+as per [8] above; then turns it back on for those specified. At the moment, the
+bus route numbers themselves don't have any classes associated with them. They'll
+need to have something like loadCountdown("<naptan1> ... <naptann>") to use.
+     To start with then, add an onclick with naptans, then follow as per near
+destinations. Also: bring the z-index for bus stops forward, and make the code
+reusable.
+
+
+
+
+
+
+[ ] 6. Related to 1 above. When detecting speed in excess of walking, we could
+narrow the predicted range from a big circle to a corridor of smaller cirles:
+			     _aaa/
+		    _yQQQ6/_jQP?4Q6/aQQQ6/
+	     _jQQQ6jQP' )4QQP(   )4QQ? )4Qf
+	    _QP( )4Qf     ]Q/     ]Qf    ]Q
+	    QP    jQQ     QQ6     QQQ     Qf
+ direction ]Q     Q'Qf    Q)Q     Q Q     ]f
+--->------>]f     Q ]f    Q W     Q/Q     jf
+ of travel ]f     Q/]f    Q6Q     4QQ    _Q'
+	   ]Q     46Qf    ]QP     )Q6   _yP
+	    Q6    )QQ     _Q6/   _jQQQajQP(
+	    )Q6/ _jQQ6/ _yQP4Q6ajQP( ???(
+	     )4QQQP()4QQQP'  )???'
+Which could see what's on screen lightened appropriately - roads tend to be
+straight. What to do?
+	  (from earlier: Bus travel sees the range massively expand. if
+travelling at speed narrow it down)
 
 
 
@@ -3844,3 +3885,6 @@ the data and developed it into successively higher forms.
 
 Highlighting a busstop sees it move. 5px. Also consider centering the element
 instead of using top left.
+
+neardesno_0<space><naptan> is cause of multiple  copies of the near destination
+appearing. Instead of deleting on that id, delete on neardest class?

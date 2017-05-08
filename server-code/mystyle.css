@@ -51,4 +51,5 @@ img.rotate_arrow {
 }
 p.selected_border {
     border: 5px solid #f7ff00;
+    z-index: 1;
 }
