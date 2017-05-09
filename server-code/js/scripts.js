@@ -70,6 +70,11 @@ const BUMP_COLOUR_BG = '#dc241f';
 const USE_BUMP_COLOURING = false;
 const CLASS_YELLOW_BORDER = 'selected_border';
 
+const PREDICTION_METHOD_NAME = 'prediction-method';
+const PREDICTION_METHOD_SIMPLEST = 'simplest';
+const PREDICTION_METHOD_RECTANGLE_IN_RADIUS = 'rectinrad';
+const USE_PREDICTION_METHOD = PREDICTION_METHOD_RECTANGLE_IN_RADIUS;
+
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
@@ -115,7 +120,7 @@ function cannotWatchPosition(positionError)
     'use strict';
     var msg;
 
-    switch(positionError.code) {
+    switch (positionError.code) {
     case positionError.PERMISSION_DENIED:
 	msg = 'User denied the request for Geolocation.';
 	break;
@@ -813,7 +818,14 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 //
 // prediction helpers (middle)
 //
-function updateForNewPrediction(num_positions_tracked)
+function do_something_that_knocks_out_all_but_rectangle()
+{
+    'use strict';
+
+    alert('hello world!');
+}
+
+function updateForNewPrediction(num_positions_tracked, prediction_method)
 {
     'use strict';
     var early_position = [];
@@ -844,10 +856,18 @@ function updateForNewPrediction(num_positions_tracked)
 							     devices_heading,
 							     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
 
-    return updateForNewPredictionSimplest(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair);
+    switch (prediction_method) {
+	// I'm thinking here of cases that don't involve an initial
+	// radius look-up at tfl
+
+	// And these cases that do
+    case PREDICTION_METHOD_SIMPLEST:
+    case PREDICTION_METHOD_RECTANGLE_IN_RADIUS:
+	return updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair, prediction_method);
+    }
 }
 
-function updateForNewPredictionSimplest(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair)
+function updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair, prediction_method)
 {
     // take first and last coord in stack, ignore rest
     'use strict';
@@ -874,8 +894,8 @@ function updateForNewPredictionSimplest(num_positions_tracked, early_position, l
     sessionStorage.setItem(RADIUS_NAME, JSON.stringify(radius));
     sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
     sessionStorage.setItem(LONGITUDE_NAME, JSON.stringify(lon));
-    handler = callback_receiveNewBusStops;
-    sendGetCore(url, handler);
+    sessionStorage.setItem(PREDICTION_METHOD_NAME, JSON.stringify(prediction_method));
+    sendGetCore(url, callback_receiveNewBusStopsFromRadius);
 
     return url;
 }
@@ -1251,7 +1271,7 @@ function checkPositionValues(original_position)
 //
 // Higher level handling of API (middle)
 //
-function callback_receiveNewBusStops()
+function callback_receiveNewBusStopsFromRadius()
 {
     /* jshint validthis: true */
     'use strict';
@@ -1259,6 +1279,15 @@ function callback_receiveNewBusStops()
 
     if (this.status == HTTP_200) {
 	this.response.stopPoints.forEach(receiveNewBusStop);
+
+	switch (JSON.parse(sessionStorage.getItem(PREDICTION_METHOD_NAME))) {
+	case PREDICTION_METHOD_RECTANGLE_IN_RADIUS:
+	    do_something_that_knocks_out_all_but_rectangle();
+	    break;
+	case PREDICTION_METHOD_SIMPLEST:
+	default:
+	}
+
 	renderBusStops();
 
     } else {
@@ -1557,5 +1586,5 @@ function mainLoop(position)
 
     position = checkPositionValues(position);
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
-    updateForNewPrediction(num_positions_tracked);
+    updateForNewPrediction(num_positions_tracked, USE_PREDICTION_METHOD);
 }

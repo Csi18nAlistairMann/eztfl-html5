@@ -3913,6 +3913,9 @@ solution would be better for a number of reasons.
 First, this means refactoring how we do predictions. The code already
 expects this. A review makes it obvious first I should divest the main
 prediction routine of code that will be common to the rectangle solution.
+Second, arrange for alternative code that uses the radius look-up data as
+a starting point but then allows for post-processing down to the
+rectangle
 
 
 
