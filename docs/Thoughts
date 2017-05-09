@@ -3821,11 +3821,6 @@ need to have something like loadCountdown("<naptan1> ... <naptann>") to use.
 destinations. Also: bring the z-index for bus stops forward, and make the code
 reusable.
 
-
-
-
-
-
 [ ] 6. Related to 1 above. When detecting speed in excess of walking, we could
 narrow the predicted range from a big circle to a corridor of smaller cirles:
 			     _aaa/
@@ -3842,8 +3837,83 @@ narrow the predicted range from a big circle to a corridor of smaller cirles:
 	     )4QQQP()4QQQP'  )???'
 Which could see what's on screen lightened appropriately - roads tend to be
 straight. What to do?
-	  (from earlier: Bus travel sees the range massively expand. if
-travelling at speed narrow it down)
+	  The problem to address here is that as the mode of transport changes
+(from foot, to bus, to train) the speed of the device's involvement in the
+prediction rapidly expands the diameter to be checked from 200m probably well
+into the thousands. This causes the screen to go chocka: where I could be in
+three minutes is very different at 40mph instead of 3mph.
+      The nature of the transport mode is that the mode is much more likely
+in future to be dead ahead of where the device starts off: bus routes tend to
+be straight, and there are fewer turns still on train lines. Given this, it
+makes sense to show something different where such a speed is detected.
+      According to https://www.eurotransportmagazine.com/17254/news/industry-news/passenger-watchdog-reveals-average-speed-of-london-buses/
+the average bus speed varies from 5.4mph to 23.1mpg. According to
+https://tfl.gov.uk/corporate/about-tfl/what-we-do/london-underground/facts-and-figures
+the average train speed is just over 20mph.
+    We already know walking speed can get close to 3.5mph.
+    Let's try a cut off about 15mph
+< 2 meters per second is walking
+>= 2 meters per second & < 7 meters per second is bus/road vehicle
+>= 7 meters per second is train.
+   The tfl api doesn't allow for anything but fetching bus stops in a radius,
+ie, we can't use a rectangular section: the best bet would either be to obtain
+a series of circles as above, or obtain a massive radius and locally process
+only the bus stops we want from an internal rectangular section:
+
+		     _aaaaaa
+		  _aQQP????QQ6a
+		 aQP?       )?Q6/
+	       _jQ?           )4Qa
+	      _QP'              ?Q6
+	     _QP                 )W6
+	     jP                   )W/
+	    ]Q'                    4Q
+	    Q6aaaaaaaaaaaaaaaaaaaaa/Qf
+	   ]Q?????????????????????4f]Q
+	   jQ                     ]f Q/
+	   QQ                     ]f 4f
+	  _QQ                     ]f ]6  A = the device
+	  ]PQ                     ]f )Q  B = predicted
+direction ]fQ                     ]f  Q      position
+-->--->-->]fQ  A              B   ]f  Q
+of travel ]fQ                     ]f  Q
+	  ]fQ                     ]f  Q
+	  ]QQ                     ]f ]Q
+	   QQ                     ]f ]f
+	   QQ                     ]f Qf
+	   ]Qaaaaaaaaaaaaaaaaaaaaajf_Q
+	   )WP?????????????????????'jP
+	    46                     _Q'
+	    )Q[                    QP
+	     ]Q/                  jQ
+	      4Q/                jQ'
+	       4Q6             _QQ'
+		)WW/          jQP
+		  4QQa/    ajQQ'
+		    ?4QQWWWQ?
+
+		    From our point of view the rectangle in a radius
+solution would be better for a number of reasons.
+1. A series of radii would mean a series of expensive look-ups to tfl
+   whereas the rectangle trades look-up costs against tfl's server costs.
+2. The rectangle solution is elegant in that it expands the possibilities
+   for the project. A possible future concern is that there's a constant
+   barrage of requests going to tfl for a radius look-up. We could trade
+   memory for those look-ups by downloading a vast radius (or even all
+   available bus stops) and locally processing out the subset we want,
+   as a radius, a rectangle, triangle or however we want. Solving using
+   this method thus lines up the project for a later potentially
+   valuable improvement.
+	    Just for the sake of it, a thought is that the radius could
+   encompass all of London (or be a series of them to the same effect)
+   that saw preprocessing down to just the data the project needs. The
+   resulting file could be stored on the project server until called for
+   at infrequent intervals.
+   I'll take this second options.
+First, this means refactoring how we do predictions. The code already
+expects this. A review makes it obvious first I should divest the main
+prediction routine of code that will be common to the rectangle solution.
+
 
 
 
@@ -3875,7 +3945,8 @@ Is the delete after 10 readings losing the last known heading?
 Since rationalising near destinations, are some of them staying on screen for
 a couple more renders before disappearing?
 
-Choking on "Great Portland " because "and ". maybe [A-Za-z\-]?
+Choking on "Great Portland " because "and ". maybe [A-Za-z\-]? Also choking on
+Manor House
 
 Selecting doesn't survive re-render. Should it?
 

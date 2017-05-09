@@ -344,7 +344,7 @@ function renderBusStop(parent, name, text, onclick_handler, eztflClass, position
 function renderBusStops()
 {
     'use strict';
-    var busstopData = JSON.parse(localStorage.getItem(NOTED_BUSSTOPS_NAME));
+    var busstopData;
     var text;
     var id;
     var stop_count;
@@ -383,6 +383,7 @@ function renderBusStops()
     var naptans;
     var naptansIdx;
 
+    busstopData = getNotedBusStops();
     bumpomaticSetup(bumpArray);
 
     // html that could be deleted when a busstop goes out of range
@@ -815,24 +816,13 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 function updateForNewPrediction(num_positions_tracked)
 {
     'use strict';
-    return updateForNewPredictionSimplest(num_positions_tracked);
-}
-
-function updateForNewPredictionSimplest(num_positions_tracked)
-{
-    // take first and last coord in stack, ignore rest
-    'use strict';
     var early_position = [];
     var latest_position = [];
     var distance_in_meters;
     var devices_heading;
     var speed_in_meters_per_second;
-    var url;
-    var handler;
-    var pair;
+    var lat_lon_pair;
     var radius;
-    var lat;
-    var lon;
 
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
@@ -849,10 +839,23 @@ function updateForNewPredictionSimplest(num_positions_tracked)
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
-    pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
-						     latest_position.coords.longitude,
-						     devices_heading,
-						     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
+    lat_lon_pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
+							     latest_position.coords.longitude,
+							     devices_heading,
+							     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
+
+    return updateForNewPredictionSimplest(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair);
+}
+
+function updateForNewPredictionSimplest(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair)
+{
+    // take first and last coord in stack, ignore rest
+    'use strict';
+    var url;
+    var handler;
+    var radius;
+    var lat;
+    var lon;
 
     radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS -
 					   ((latest_position.timestamp - early_position.timestamp) /
@@ -865,8 +868,8 @@ function updateForNewPredictionSimplest(num_positions_tracked)
     }
     radius = Math.round(radius);
 
-    lat = pair[0];
-    lon = pair[1];
+    lat = lat_lon_pair[0];
+    lon = lat_lon_pair[1];
     url = RPROXY_URL_BUSSTOPS + '&radius=' + radius + '&lat=' + lat + '&lon=' + lon;
     sessionStorage.setItem(RADIUS_NAME, JSON.stringify(radius));
     sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
@@ -933,6 +936,28 @@ function getComboHeading()
     forced = getForcedHeading();
 
     return modulo(device + forced, 360);
+}
+
+function setNotedBusStops(notedBusStops)
+{
+    'use strict';
+
+    localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
+}
+
+function getNotedBusStops()
+{
+    'use strict';
+    var busstopData;
+
+    busstopData = localStorage.getItem(NOTED_BUSSTOPS_NAME);
+    if (busstopData === null || busstopData === undefined) {
+	busstopData = [];
+
+    } else {
+	busstopData = JSON.parse(busstopData);
+    }
+    return busstopData;
 }
 
 //
@@ -1258,21 +1283,13 @@ function receiveNewBusStop(currentValue, index, array)
     }
 
     timeNow = Date.now();
-    notedBusStops = localStorage.getItem(NOTED_BUSSTOPS_NAME);
+    notedBusStops = getNotedBusStops();
 
     currentValue.originLatitude = sessionStorage.getItem(LATITUDE_NAME);
     currentValue.originLongitude = sessionStorage.getItem(LONGITUDE_NAME);
 
     // we'll use this to expire old bus stops
     currentValue.timestamp = timeNow;
-
-    // retrieve or create the storage we're after
-    if (notedBusStops === null) {
-	notedBusStops = [];
-
-    } else {
-	notedBusStops = JSON.parse(notedBusStops);
-    }
 
     towards = '';
     for (additionalPropertyIdx in currentValue.additionalProperties) {
@@ -1299,7 +1316,7 @@ function receiveNewBusStop(currentValue, index, array)
 	notedBusStops.push(currentValue);
     }
 
-    localStorage.setItem(NOTED_BUSSTOPS_NAME, JSON.stringify(notedBusStops));
+    setNotedBusStops(notedBusStops);
 }
 
 //
@@ -1506,7 +1523,6 @@ function positionPush(num_positions, position)
 
     return ++count;
 }
-
 
 //-------------------------------------------------------------
 //
