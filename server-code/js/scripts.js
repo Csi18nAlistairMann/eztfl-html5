@@ -73,7 +73,11 @@ const CLASS_YELLOW_BORDER = 'selected_border';
 const PREDICTION_METHOD_NAME = 'prediction-method';
 const PREDICTION_METHOD_SIMPLEST = 'simplest';
 const PREDICTION_METHOD_RECTANGLE_IN_RADIUS = 'rectinrad';
-const USE_PREDICTION_METHOD = PREDICTION_METHOD_RECTANGLE_IN_RADIUS;
+if (FAKE_POSITION === true) {
+    const USE_PREDICTION_METHOD = PREDICTION_METHOD_RECTANGLE_IN_RADIUS;
+} else {
+    const USE_PREDICTION_METHOD = PREDICTION_METHOD_SIMPLEST;
+}
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
@@ -821,8 +825,37 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 function do_something_that_knocks_out_all_but_rectangle()
 {
     'use strict';
+    var just_these;
+    var likely_these;
+    var all_london;
 
+    all_london = getNotedBusStops();
+    likely_these = getMostLikely(all_london);
+    just_these = getInRectangle(likely_these);
+
+    setNotedBusStops(just_these);
     alert('hello world!');
+}
+
+function getMostLikely(all)
+{
+    // We might start with all of London - here we could get just those
+    // likely to be in area.
+    // For the mo, skip this step
+    'use strict';
+    var some;
+
+    some = all;
+    return some;
+}
+
+function getInRectangle(likely_these)
+{
+    'use strict';
+    var just_these;
+
+    just_these = likely_these;
+    return just_these;
 }
 
 function updateForNewPrediction(num_positions_tracked, prediction_method)
