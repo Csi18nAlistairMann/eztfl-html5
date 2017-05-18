@@ -69,15 +69,12 @@ const BUMP_COLOUR_FG = '#e2e2e2';
 const BUMP_COLOUR_BG = '#dc241f';
 const USE_BUMP_COLOURING = false;
 const CLASS_YELLOW_BORDER = 'selected_border';
+const GUESSED_TRANSPORT_MODE_NAME = 'guessed_transport_mode';
 
 const PREDICTION_METHOD_NAME = 'prediction-method';
 const PREDICTION_METHOD_SIMPLEST = 'simplest';
 const PREDICTION_METHOD_RECTANGLE_IN_RADIUS = 'rectinrad';
-if (FAKE_POSITION === true) {
-    const USE_PREDICTION_METHOD = PREDICTION_METHOD_RECTANGLE_IN_RADIUS;
-} else {
-    const USE_PREDICTION_METHOD = PREDICTION_METHOD_SIMPLEST;
-}
+const USE_PREDICTION_METHOD = PREDICTION_METHOD_SIMPLEST;
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
@@ -884,6 +881,8 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
     speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
 							   latest_position,
 							   distance_in_meters);
+    setGuessedTransportMode(speed_in_meters_per_second);
+
     lat_lon_pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
 							     latest_position.coords.longitude,
 							     devices_heading,
@@ -1077,6 +1076,32 @@ function fakeHeadingRotateCore(headingOffset)
     setForcedHeading(heading);
 
     renderBusStops();
+}
+
+function setGuessedTransportMode(speed_in_metersps)
+{
+    'use strict';
+    var guess;
+    var el;
+
+    if (isNaN(speed_in_metersps)) {
+	guess = 'undetermined';
+
+    } else if (speed_in_metersps < 0.1) {
+	guess = 'stationary';
+
+    } else if (speed_in_metersps < 2) {
+	guess = 'walking';
+
+    } else if (speed_in_metersps < 7) {
+	guess = 'road vehicle';
+
+    } else {
+	guesss = 'train';
+    }
+
+    el = document.getElementById(GUESSED_TRANSPORT_MODE_NAME);
+    el.innerHTML = guess;
 }
 
 //-------------------------------------------------------------

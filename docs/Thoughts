@@ -3849,7 +3849,8 @@ makes sense to show something different where such a speed is detected.
       According to https://www.eurotransportmagazine.com/17254/news/industry-news/passenger-watchdog-reveals-average-speed-of-london-buses/
 the average bus speed varies from 5.4mph to 23.1mpg. According to
 https://tfl.gov.uk/corporate/about-tfl/what-we-do/london-underground/facts-and-figures
-the average train speed is just over 20mph.
+the average train speed is just over 20mph. My normal british rail train goes
+to 100mph. Eurostars can apparently get to 186mph.
     We already know walking speed can get close to 3.5mph.
     Let's try a cut off about 15mph
 < 2 meters per second is walking
@@ -3913,9 +3914,11 @@ solution would be better for a number of reasons.
 First, this means refactoring how we do predictions. The code already
 expects this. A review makes it obvious first I should divest the main
 prediction routine of code that will be common to the rectangle solution.
+ [x] done.
 Second, arrange for alternative code that uses the radius look-up data as
 a starting point but then allows for post-processing down to the
 rectangle
+ [x] done.
 Third, we now want to discard some items. we're taking a rectangle here,
 but we want to leave room for other shapes in future. In future, we might
 want at first to obtain a second radius of stops likely to be nearby as
@@ -3923,9 +3926,10 @@ we step down from London size to locality. We would second want to iterate
 over remaining stops. With each stop we would ask a function if it's in
 or out. The "in" set gets to go forward. Set up infrastructure code to
 support this capacity, although the logic itself is for later.
+ [x] done.
+[x] a div to flash up walking / road vehicle / train according to speed
 
-
-
+Next: the logic of inside/outside an arbitrarily oriented rectangle.
 
 ---------------------------------------------------------
 Simple sounding vs Complex doing
@@ -3969,3 +3973,17 @@ instead of using top left.
 
 neardesno_0<space><naptan> is cause of multiple  copies of the near destination
 appearing. Instead of deleting on that id, delete on neardest class?
+
+Some locations use "/" as well as "and" and "or"
+
+There;s not certainty about the accuracy - stops seem to vanish too fast and
+do not appear to be in the correct location for where the device is.
+
+it's unexpected behaviour that travelling at 100mph towards London, on the
+other side of Colchester, that I should see only responses from around my
+usual location in London
+
+reset heading should say something else until the heading is resettable,. That
+would give the user a feedback mechanism for once the heading has been reset
+
+does original eztfl properly use api?
