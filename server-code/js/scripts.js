@@ -76,6 +76,19 @@ const PREDICTION_METHOD_SIMPLEST = 'simplest';
 const PREDICTION_METHOD_RECTANGLE_IN_RADIUS = 'rectinrad';
 const USE_PREDICTION_METHOD = PREDICTION_METHOD_SIMPLEST;
 
+const SPEED_STATIONARY_BELOW = 0.1;
+const SPEED_GUESS_TEXT_STATIONARY = 'stationary';
+const SPEED_WALKING_BELOW = 3;
+const SPEED_GUESS_TEXT_WALKING = 'walking';
+const SPEED_IN_CITY_BELOW = 7;
+const SPEED_GUESS_TEXT_IN_CITY = 'city transit';
+const SPEED_TEXT = 'Metres per sec: ';
+const SPEED_DISPLAY_DECIMAL_PLACES = 2;
+const SPEED_GUESS_TEXT_NAN = 'undetermined';
+const SPEED_GUESS_TEXT_VFAST = 'intercity travel';
+const SPEED_METRES_PS_TEXT_NAN = 'n/a';
+const SPEED_MPS_NAME = 'speed_mps';
+
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
@@ -235,7 +248,7 @@ function se_getAngle(startLat, startLong, endLat, endLong)
     return (se_rad2deg(Math.atan2(dLong, dPhi)) + 360.0) % 360.0;
 }
 
-function getDistanceInMeters(position1, position2)
+function getDistanceInMetres(position1, position2)
 {
     'use strict';
     return (se_getDistanceFromLatLonInKm(position1.coords.latitude,
@@ -260,20 +273,20 @@ function se_getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2)
     return d;
 }
 
-function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_meters)
+function se_calculateNewPostionFromBearingDistance(lat, lng, bearing, distance_in_metres)
 {
     'use strict';
     var R = EARTH_RADIUS_IN_KM;
 
-    var distance_in_kilometers = distance_in_meters / 1000;
+    var distance_in_kilometres = distance_in_metres / 1000;
 
-    var lat2 = Math.asin(Math.sin(Math.PI / 180 * lat) * Math.cos(distance_in_kilometers / R) +
-			 Math.cos(Math.PI / 180 * lat) * Math.sin(distance_in_kilometers / R) *
+    var lat2 = Math.asin(Math.sin(Math.PI / 180 * lat) * Math.cos(distance_in_kilometres / R) +
+			 Math.cos(Math.PI / 180 * lat) * Math.sin(distance_in_kilometres / R) *
 			 Math.cos(Math.PI / 180 * bearing));
     var lon2 = Math.PI / 180 * lng + Math.atan2(Math.sin(Math.PI / 180 * bearing) *
-						Math.sin(distance_in_kilometers / R) *
+						Math.sin(distance_in_kilometres / R) *
 						Math.cos(Math.PI / 180 * lat ),
-						Math.cos(distance_in_kilometers / R) -
+						Math.cos(distance_in_kilometres / R) -
 						Math.sin(Math.PI / 180 * lat) *
 						Math.sin(lat2));
     return [180 / Math.PI * lat2, 180 / Math.PI * lon2];
@@ -860,9 +873,9 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
     'use strict';
     var early_position = [];
     var latest_position = [];
-    var distance_in_meters;
+    var distance_in_metres;
     var devices_heading;
-    var speed_in_meters_per_second;
+    var speed_in_metres_per_second;
     var lat_lon_pair;
     var radius;
 
@@ -873,20 +886,21 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
 				       num_positions_tracked];
     latest_position = tracked_positions[NUM_TRACKED_POSITIONS - 1];
 
-    distance_in_meters = getDistanceInMeters(early_position, latest_position);
+    distance_in_metres = getDistanceInMetres(early_position, latest_position);
 
     devices_heading = getAngle(early_position, latest_position);
     setDevicesHeading(devices_heading);
 
-    speed_in_meters_per_second = getSpeedInMetersPerSecond(early_position,
+    speed_in_metres_per_second = getSpeedInMetresPerSecond(early_position,
 							   latest_position,
-							   distance_in_meters);
-    setGuessedTransportMode(speed_in_meters_per_second);
+							   distance_in_metres);
+    setSpeedDisplayed(speed_in_metres_per_second);
+    setGuessedTransportMode(speed_in_metres_per_second);
 
     lat_lon_pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
 							     latest_position.coords.longitude,
 							     devices_heading,
-							     speed_in_meters_per_second * DEFAULT_LOOKAHEAD_SECS);
+							     speed_in_metres_per_second * DEFAULT_LOOKAHEAD_SECS);
 
     switch (prediction_method) {
 	// I'm thinking here of cases that don't involve an initial
@@ -895,11 +909,11 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
 	// And these cases that do
     case PREDICTION_METHOD_SIMPLEST:
     case PREDICTION_METHOD_RECTANGLE_IN_RADIUS:
-	return updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair, prediction_method);
+	return updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_metres, devices_heading, speed_in_metres_per_second, lat_lon_pair, prediction_method);
     }
 }
 
-function updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_meters, devices_heading, speed_in_meters_per_second, lat_lon_pair, prediction_method)
+function updateForNewPredictionGenericRadius(num_positions_tracked, early_position, latest_position, distance_in_metres, devices_heading, speed_in_metres_per_second, lat_lon_pair, prediction_method)
 {
     // take first and last coord in stack, ignore rest
     'use strict';
@@ -909,7 +923,7 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
     var lat;
     var lon;
 
-    radius = speed_in_meters_per_second * (DEFAULT_LOOKAHEAD_SECS -
+    radius = speed_in_metres_per_second * (DEFAULT_LOOKAHEAD_SECS -
 					   ((latest_position.timestamp - early_position.timestamp) /
 					    1000));
     if (radius < MINIMUM_RADIUS_TO_LOOK) {
@@ -1078,30 +1092,47 @@ function fakeHeadingRotateCore(headingOffset)
     renderBusStops();
 }
 
-function setGuessedTransportMode(speed_in_metersps)
+function setGuessedTransportMode(speed_in_metres_ps)
 {
     'use strict';
     var guess;
     var el;
 
-    if (isNaN(speed_in_metersps)) {
-	guess = 'undetermined';
+    if (isNaN(speed_in_metres_ps)) {
+	guess = SPEED_GUESS_TEXT_NAN;
 
-    } else if (speed_in_metersps < 0.1) {
-	guess = 'stationary';
+    } else if (speed_in_metres_ps < SPEED_STATIONARY_BELOW) {
+	guess = SPEED_GUESS_TEXT_STATIONARY;
 
-    } else if (speed_in_metersps < 2) {
-	guess = 'walking';
+    } else if (speed_in_metres_ps < SPEED_WALKING_BELOW) {
+	guess = SPEED_GUESS_TEXT_WALKING;
 
-    } else if (speed_in_metersps < 7) {
-	guess = 'road vehicle';
+    } else if (speed_in_metres_ps < SPEED_IN_CITY_BELOW) {
+	guess = SPEED_GUESS_TEXT_IN_CITY;
 
     } else {
-	guesss = 'train';
+	guess = SPEED_GUESS_TEXT_VFAST;
     }
 
     el = document.getElementById(GUESSED_TRANSPORT_MODE_NAME);
     el.innerHTML = guess;
+}
+
+function setSpeedDisplayed(speed_in_metres_ps)
+{
+    'use strict';
+    var val;
+    var el;
+
+    if (isNaN(speed_in_metres_ps)) {
+	val = SPEED_METRES_PS_TEXT_NAN;
+
+    } else {
+	val = speed_in_metres_ps.toFixed(SPEED_DISPLAY_DECIMAL_PLACES);
+    }
+
+    el = document.getElementById(SPEED_MPS_NAME);
+    el.innerHTML = SPEED_TEXT + val;
 }
 
 //-------------------------------------------------------------
@@ -1162,13 +1193,13 @@ function modulo(value, modulo)
     return ((value % modulo) + modulo) % modulo;
 }
 
-function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
+function getSpeedInMetresPerSecond(position1, position2, distance_in_metres)
 {
     'use strict';
     var seconds;
     var mseconds;
 
-    if (distance_in_meters === 0) {
+    if (distance_in_metres === 0) {
 	return 0;
     }
 
@@ -1184,7 +1215,7 @@ function getSpeedInMetersPerSecond(position1, position2, distance_in_meters)
 	return 0;
     }
 
-    return distance_in_meters / seconds;
+    return distance_in_metres / seconds;
 }
 
 //

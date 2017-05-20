@@ -3928,8 +3928,307 @@ or out. The "in" set gets to go forward. Set up infrastructure code to
 support this capacity, although the logic itself is for later.
  [x] done.
 [x] a div to flash up walking / road vehicle / train according to speed
+[x] move to constants for speed test. Also I can walk faster than 2
+meters per second downhill and with following wind and position luck, kick
+walking speed up to 3 meters per second
 
 Next: the logic of inside/outside an arbitrarily oriented rectangle.
+How to determine if a point is inside or outside an aribtrarily defined space?
+There are a number of methods that increase in complexity as the complexity of
+the shape itself increases.
+
+A simple 2D rectangle that lies directly left-right or up-down would be the
+simplest: see if the point lies left of, right of, above or down below the sides.
+If it does, it's outside, otherwise it must be inside. This is such a vital
+technique that I'll name it the Gross Box Technique.
+
+					 Any point above this on the Y axis must
+    ditto				 be outside regardless of the X position
+      ->|                                |
+					 V
+	QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ -
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+	Q                              Q
+     -  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
+     ^
+     |                                 |<- Any point right of this on the X axis
+   ditto				   must not be inside, regardless of the
+					   Y position
+
+
+If the 2D rectangle is rotated so it does not lie flat, or if the shape is not
+a rectangle, it becomes a multistep process: first, apply the Gross Box Technique
+to an imaginary 2D rectangle that does lie flat and exactly encompasses the
+shape.
+
+  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ First exclude if outside this rectangle
+  Q                     .            Q
+  Q                    jm,           Q
+  Q                   <@"Q/          Q
+  Q                  _W' -Wc         Q
+  Q              |  _Q'   -$L        Q
+  Q              | .m(      4g. B    Q
+  Q              | yf        4m,     Q
+  Q              |jP          )Q,    Q
+  Q              jD            "Q/   Q
+  Q             <@`             -$a  Q
+  Q            _W'               -$L Q
+  Q           _Q'|   Only if not   4gQ
+  Q       A  .m( |  outside the   .m[Q
+  Q          df  | first          jF Q
+  Q         jP   | rectangle do  jP  Q
+  Q        jP    | we consider  ]D   Q
+  Q       <D`    |  these      _@`   Q
+  Q      _W'     |            _Q'    Q
+  Q     _m(      |           .m(     Q
+  Q    .m[       |           m[      Q
+  Q    jF        |          jF       Q
+  Q   jP         |         jP        Q
+  Q  ]@          |        <@         Q
+  Q _@`          |       _W'         Q
+  Q_Q'           |      _W' D        Q
+  Q-$c           |     .m(           Q
+  Q -$L          |     yf            Q
+  Q   4g.             jF             Q
+  Q ---?m,------ M --jP---           Q
+  Q     )Q,         <@`              Q
+  Q      "Qc     | _W'               Q
+  Q    C  -$a    |_Q'                Q
+  Q        -4g   .m(                 Q
+  Q          4g. yf                  Q
+  Q           ?mjP                   Q
+  Q            )D|                   Q
+  QQQQQQQQQQQQQQQ|QQQQQQQQQQQQQQQQQQQQ
+		 |
+		 |
+  If not outside the initial rectangle, then consider the straight lines
+that make up the initial shape. Here, they're named A, B, C and D. The
+principle is the same for any shape that a: has no curves b: does not
+turn back and overlap itself. Holes are allowed.
+     Consider point M and notice that it will have its axes also
+transversed by the A, C and D vectors. B, however, does not. This is identical
+to putting the flat box we've been using around each vector in turn and so
+discovering point M shares no axis with B.
+
+		       QQQQQQQQQQQQQQ
+		       Qm,          Q
+		      <QPQ/         Q
+		     _W4f-Wc        Q
+		    _Q'Q -$L        Q
+		   .m( Q   4g.      Q
+		   yf  Q    4m,     Q
+		  jP   Q     )Q,    Q
+		 jD    Q      "Q/   Q
+		<@`    Q       -$a  Q
+	       _W'     Q        -$L Q
+	      _Q'      Q          4fQ
+	     .m(       QQQQQQQQQQQQQQ
+	     df                   jF
+	    jP                   jP
+	   jP                   ]D
+	  <D`                  _@`
+	 _W'                  _Q'
+	_m(                  .m(
+       .m[                   m[
+       jF                   jF
+      jP                   jP.
+     ]@                   <@
+    _@`                  _W'
+   _Q'                  _Q'
+   -$c                 .m(
+    -$L                yf
+      4g.             jF
+       ?m,       M   jP
+	)Q,         <@`
+	 "Qc       _W'
+	  -$a     _Q'
+	   -4g   .m(
+	     4g. yf
+	      ?mjP
+	       )D
+
+  With this knowledge we create two arrays of data - one for each axis - with
+the coordinate where that axis is traversed. Taking the X axis for example:
+
+     4g.             jF
+   ---?m,------ M --jP---
+       )Q,         <@`
+
+       ^        ^   ^
+     x = 5     12   15
+
+ Looking at that array then, we can determine there's an odd number of traversals
+between M and either end of the array. This tells us that M, on the X axis, is
+inside. Were there an even number of traversals, M would be outside. Why odd and
+even? Then we can accomodate any 2D shape:
+	    a/
+	   jQQQQaa/
+	  jP )??QQQQQaa/
+	 _Q'      )??QQQQQ6aa
+	_Q'            )??4QQQQ6aa
+       _Q'     _jQ6aa        ??4QQQQ6a
+       jP    _jQP?4QQQQaa/        ??4Qf
+      jP   _jQP'     ??QWQQQaa       Qf
+     jP  _yQP'           )??QQQQ6a  ]Q
+    _Q'  QP'        aQa       ??4Qf ]Q
+   _Q'  ]Q        aQQ?QQ6/      _Q' ]Q
+  _Q'   jP      aQQ?   ?4Q6a    ]Q  ]Q
+  jP    Qf    aQQ?       )4QQa  ]Q  Qf
+ jP    ]Q   aQQ?            ?Qf jP  Qf
+ 46    Qf _QQ?      _/      _Q' Qf  Qf
+ ]Q   _Q' QP       _QQQ6a   ]Q  Qf _Q'
+ )Q/  ]Q  ]Q      jQ')?4Qf  jP _Q' ]Q
+  Qf   Qf )W/    jP'   ]Q   Qf ]Q  ]Q
+--]Q---46--46----4g-M--jP---Qf-]Q--]Q---
+  )W/  ]Q  ]Q    ]Q    Qf  ]Q  jP  Qf
+   Qf   Qf  Qf   )Q/  _Q'  ]Q  Qf  Qf
+   46   Qf  46    Qf  ]Q   Qf  Qf  Qf
+   ]Q   ]Q  ]Q    ]Q  Qf   Qf _Q'  Qf
+    Qf  )W/  Qf   )W/_Q'  ]Q  ]Q  ]Q
+    46   Qf  ]Q    Qf)Q/  ]Q  jP  ]Q
+    ]Q   ]Q  )W/   46 )W/ jP  Qf  ]Q
+    )Q/  )W/  Qf   ]Q  ]Q Qf ]Q   jP
+     Qf   Qf  ]Q    Q[  46Q' Qf   Qf
+     ]Q   ]Q   Qf   46   4Q _Q'   Qf
+     ]Q   )W/  46   ]Q    ' ]Q    Qf
+      Qf   Qf  ]Q   )Qaaa   Qf   ]Q
+      46   46   Qf   4QWQQQQQ    ]Q
+      ]Q   ]Q   46       ???'    ]Q
+       Qf   Qf  )Q/              ]Q
+       Qf   Q6   Qf              Qf
+       ]QjQQQP   ]QQQWWWQQQQQQQQQQf
+       )QP??      ????????????????
+
+  Qf   Qf )W/    jP'   ]Q   Qf ]Q  ]Q
+--]Q---46--46----4g-M--jP---Qf-]Q--]Q---
+  )W/  ]Q  ]Q    ]Q    Qf  ]Q  jP  Qf
+   ^    ^   ^    ^      ^   ^   ^  ^
+  odd even odd even    even odd even odd
+
+In the above complex 2D shape, there are an even number of traversals along the
+X axis before we get to M. This tells us M is /outside/ the shape:
+
+	    a/      |
+	   jQQQQaa/ |
+	  jQQQQQQQQQQaa/
+	 _QQQQQQQQQQQQQQQQ6aa
+outside _QQQ inside QQQQQQQQQQQQ6aa
+       _QQQQQQQQQQQQQQQQQQQQQQQQQQQQ6a
+       jQQQQQQQQP?4QQQQQQQQQQQQQQQQQQQf
+      jQQQQQQQP'    |??QQQQQQQQQQQQQQQf
+     jQQQQQQP'      |    )??QQQQQQQQQQ
+    _QQQQQP'        aQa       ??4QQQQQ
+   _QQQQQQ        aQQQQQ6/      _QQQQQ
+  _QQQQQQP      aQQQQQQQQQ6a    ]QQQQQ
+  jQQQQQQf    aQQQQQQQQQQQQQQa  ]QQQQf
+ jQQQQQQQ   aQQQQQQQQQQQQQQQQQf jQQQQf
+ 4QQQQQQf _QQQQQQQQQQQQQQQQQQQ' QQQQQf
+ ]QQQQQQ' QQQQQQQQQQQQQQQQQQQQ  QQQQQ'
+ )QQQQQQ  ]QQQQQQQQQ')?4QQQQQP _QQQQQ
+  QQQQQQf )WQQQQQQP'|  ]QQQQQf ]QQQQQ
+--]QQQQQ6--4QQQQQQ6-M--jQQQQQf-]QQQQQ---
+  )WQQQQQ  ]QQQQQQQ |  QQQQQQ  jQQQQf
+   QQQQQQf  QQQQQQQ/| _QQQQQQ  QQQQQf
+   4QQQQQf  4QQQQQQf| ]QQQQQf  QQQQQf
+   ]QQQQQQ  ]QQQQQQQ| QQQQQQf _QQQQQf
+    QQQQQQ/  QQQQQQQ/_QQQQQQ  ]QQQQQ
+    4QQQQQf  ]QQQQQQf)QQQQQQ  jQQQQQ
+    ]QQQQQQ  )WQQQQQ6 )WQQQP  QQQQQQ
+    )QQQQQQ/  QQQQQQQ  ]QQQf ]QQQQQP
+     QQQQQQf  ]QQQQQQ[  4QQ' QQQQQQf
+     ]QQQQQQ   QQQQQQ6   4Q _QQQQQQf
+     ]QQQQQQ/  4QQQQQQ    ' ]QQQQQQf
+      QQQQQQf  ]QQQQQQaaa   QQQQQQQ
+      4QQQQQ6   QQQQQQQWQQQQQQQQQQQ
+      ]QQQQQQ   4QQQQQQQQQQQQQQQQQQ
+       QQQQQQf  )QQQQQQQQQQQQQQQQQQ
+       QQQQQQ6   QQQQQQQQQQQQQQQQQf
+       ]QQQQQP   ]QQQQQQQQQQQQQQQQf
+       )WP??      ????????????????
+		   |
+		   |
+
+ Also note we only need to check one axis, and even then, only up to the point
+of interest as the odd/even cannot be different for each axis, nor different
+for going one way on an axis rather than another.
+    Given the above, we now knows to find the shortest distance between the
+point and the nearest edge of the original all-encompassing rectangle, and then
+discover traversals along it. This is likely to be the least work for the
+program.
+ Returning to the original example:
+  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ First exclude if outside this rectangle
+  Q                     .            Q
+  Q                    jm,           Q
+  Q                   <@"Q/          Q
+  Q                  _W' -Wc         Q
+  Q              |  _Q'   -$L        Q
+  Q              | .m(      4g. B    Q
+  Q              | yf        4m,     Q
+  Q              |jP          )Q,    Q
+  Q              jD            "Q/   Q
+  Q             <@`             -$a  Q
+  Q            _W'               -$L Q
+  Q           _Q'|   Only if not   4gQ
+  Q       A  .m( |  outside the   .m[Q
+  Q          df  | first          jF Q
+  Q         jP   | rectangle do  jP  Q
+  Q        jP    | we consider  ]D   Q
+  Q       <D`    |  these      _@`   Q
+  Q      _W'     |            _Q'    Q
+  Q     _m(      |           .m(     Q
+  Q    .m[       |           m[      Q
+  Q    jF        |          jF       Q
+  Q   jP         |         jP        Q
+  Q  ]@          |        <@         Q
+  Q _@`          |       _W'         Q
+  Q_Q'           |      _W' D        Q
+  Q-$c           |     .m(           Q
+  Q -$L          |     yf            Q
+  Q   4g.             jF             Q
+  Q ---?m,------ M --jP---           Q
+  Q     )Q,         <@`              Q
+  Q      "Qc     | _W'               Q
+  Q    C  -$a    |_Q'                Q
+  Q        -4g   .m(                 Q
+  Q          4g. yf                  Q
+  Q           ?mjP                   Q
+  Q            )D|                   Q
+  QQQQQQQQQQQQQQQ|QQQQQQQQQQQQQQQQQQQQ
+		 |
+		 |
+  We can see that, using ascii characters as the basis of the coordinate system,
+"M" is 15 characters from the left edge, 20 characters from the right edge, 29
+characters from the top edge and 7 characters from the bottom edge. We will
+therefore look at traversals only between M and the bottom edge.
+	  We start with a true/false toggle: $inside=false.
+	  We apply the gross box to each vector in the shape to discover if that
+vector shares an axis with M. If not, we move on. If only the X axis in this case
+we also move on.
+   For each that does share the Y axis, we want to know if the traversal lies
+between M and the bottom edge. If not, we move on. If it does, we toggle $inside
+back and forth. Every odd share sees it toggled to true, every even share toggles
+back to false.
+     Determining if the traversal counts requires us to calculate the y-position
+for the x-position used by M. This can be worked out using the percentage
+distance M is from x1 along the axis to x2 as applied to the distance y1 to y2.
+
+
+
+
+
 
 ---------------------------------------------------------
 Simple sounding vs Complex doing
@@ -3986,4 +4285,11 @@ usual location in London
 reset heading should say something else until the heading is resettable,. That
 would give the user a feedback mechanism for once the heading has been reset
 
-does original eztfl properly use api?
+an heartbeat showing connection to tfl ..|..||.|..|||.....|..
+
+a means by which localstorage can be cleared
+
+Would be great to "freeze" display from updating further: rapid updates can see
+selection lost too quickly
+
+Record and replay inputs, the better to work out WTH is going on
