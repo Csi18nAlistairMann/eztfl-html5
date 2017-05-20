@@ -53,3 +53,16 @@ p.selected_border {
     border: 5px solid #f7ff00;
     z-index: 1;
 }
+
+div#wheres_north_arrow {
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-bottom: 13px solid red;
+  transform: rotate(0deg);
+}
+
+td#radius_scale {
+    background-color: #cdcdcd;
+}

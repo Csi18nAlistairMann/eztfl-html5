@@ -14,6 +14,7 @@
 // Constants
 //
 const FAKE_POSITION = false;
+const USE_BUMPOMATIC = true;
 
 const NUM_TRACKED_POSITIONS = 10;
 const DEFAULT_LOOKAHEAD_SECS = 180;
@@ -88,6 +89,9 @@ const SPEED_GUESS_TEXT_NAN = 'undetermined';
 const SPEED_GUESS_TEXT_VFAST = 'intercity travel';
 const SPEED_METRES_PS_TEXT_NAN = 'n/a';
 const SPEED_MPS_NAME = 'speed_mps';
+
+const WHERES_NORTH_ARROW_NAME = 'wheres_north_arrow';
+const RADIUS_SCALE_NAME = 'radius_scale';
 
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
@@ -421,6 +425,8 @@ function renderBusStops()
 
     // Render new bus stop info
     heading = getComboHeading();
+    setWheresNorthArrow(heading);
+
     stop_count = 0;
     for (busstop = 0; busstop < busstopData.length; busstop++) {
 	// note bus stop going to be used, remove old name if present
@@ -933,6 +939,7 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
 	radius = MAXIMUM_RADIUS_TO_LOOK;
     }
     radius = Math.round(radius);
+    setRadiusScale(radius);
 
     lat = lat_lon_pair[0];
     lon = lat_lon_pair[1];
@@ -1133,6 +1140,34 @@ function setSpeedDisplayed(speed_in_metres_ps)
 
     el = document.getElementById(SPEED_MPS_NAME);
     el.innerHTML = SPEED_TEXT + val;
+}
+
+function setWheresNorthArrow(heading)
+{
+    'use strict';
+    var el;
+
+    el = document.getElementById(WHERES_NORTH_ARROW_NAME);
+    el.style.transform = 'rotate(' + (360 - heading) + 'deg)';
+}
+
+function setRadiusScale(radius)
+{
+    'use strict';
+    var el;
+    var val;
+
+    if (isNaN(radius)) {
+	val = 1;
+
+    } else {
+	val = 1 / radius * 10000;
+	val = (val > 100) ? 100 : val;
+	val = (val < 0) ? 0 : val;
+    }
+
+    el = document.getElementById(RADIUS_SCALE_NAME);
+    el.width = val + '%';
 }
 
 //-------------------------------------------------------------
@@ -1486,6 +1521,10 @@ function bumpomaticSetup(bumpArray)
     // old one. What that benefit might be IDK but that's the
     // nature of preparing for the future
     'use strict';
+    if (!USE_BUMPOMATIC) {
+	return;
+    }
+
     while (bumpArray.length) {
 	bumpArray.splice(0, 1);
     }
@@ -1495,6 +1534,10 @@ function bumpomaticDeleteById(bumpArray, idName)
 {
     'use strict';
     var element_idx;
+
+    if (!USE_BUMPOMATIC) {
+	return;
+    }
 
     element_idx = 0;
     while (element_idx < bumpArray.length) {
@@ -1513,6 +1556,10 @@ function bumpomaticDeleteByClass(bumpArray, className)
     var element_idx;
     var class_idx;
     var found;
+
+    if (!USE_BUMPOMATIC) {
+	return;
+    }
 
     element_idx = 0;
     while (element_idx < bumpArray.length) {
@@ -1540,6 +1587,10 @@ function bumpomaticAddById(bumpArray, idName)
     var html;
     var element;
     var offset;
+
+    if (!USE_BUMPOMATIC) {
+	return;
+    }
 
     html = document.getElementById(idName);
     if (html !== null) {
@@ -1574,6 +1625,10 @@ function bumpomaticCheckIfCollides(bumpArray, element)
     var yoff;
     var index;
     var found;
+
+    if (!USE_BUMPOMATIC) {
+	return;
+    }
 
     xoff = 0;
     yoff = 0;

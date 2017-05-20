@@ -4293,3 +4293,10 @@ Would be great to "freeze" display from updating further: rapid updates can see
 selection lost too quickly
 
 Record and replay inputs, the better to work out WTH is going on
+
+At very slow speeds (ie, when actually stationary) heading changes far faster
+because of slight changes, causing rotation between renders to elevate
+
+No bumpomatic, instead when focusing on a bus stop, THEN bump any stops nearby
+
+Don't change headoing if speed below X, say 1 metre per sec
