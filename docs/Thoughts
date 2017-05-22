@@ -4381,12 +4381,18 @@ device thinks it's doing vs what the user actually is doing
        This has also already been implemented with the red arrow "where's
 north" indicator
 
-[ ] 13. We could replace the stop letter / near distance with the upcoming
+22 May 2017
+
+[x] 13. We could replace the stop letter / near distance with the upcoming
 stop common name: buses announce that substantially before the letter is
 visible. What to do?
 	 (from earlier: stop name called out some distance before can see
 stop letter: option to use that instead)
+     Done. Basically, copied over the code for handling near destinations,
+differentiate them with classes, and provide a mechanism for swapping
+between them.
 
+This concludes the work authorised in the review.
 
 
 
@@ -4467,3 +4473,9 @@ fix on a stop whether or not reported present to guide me to it
 
 toggle bus routes on and off and persist rendering only sees busstops on routes
 shown
+
+show bus stop common name when showing arrivals board
+
+menu toggle for showing top left stuff
+
+can show stations without linking to anything?

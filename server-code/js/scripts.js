@@ -34,8 +34,10 @@ const CLASS_COUNTDOWN_NAME = 'countdown';
 const CLASS_BUSSTOP_NAME = 'busstop';
 const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
 const CLASS_NEARDEST_NAME = 'neardest';
+const CLASS_COMMONNAME_NAME = 'commonnamedir';
 const ID_BUSSTOP_NAME = 'busstopno_';
 const ID_NEARDEST_NAME = 'neardestno_';
+const ID_COMMONNAMEDIR_NAME = 'commonnamedir_';
 const ID_ROUTE_NAME = 'lineno_';
 const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
@@ -91,6 +93,11 @@ const SPEED_MPS_NAME = 'speed_mps';
 
 const WHERES_NORTH_ARROW_NAME = 'wheres_north_arrow';
 const RADIUS_SCALE_NAME = 'radius_scale';
+const TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME = 'show_neardest_commonname';
+const TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST = 'neardest';
+const TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME = 'commonname';
+const TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER = 'neither';
+const TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH = 'both';
 
 const RECT_LAT_NAME = 'rectangle-latitude';
 const RECT_LON_NAME = 'rectangle-longitude';
@@ -407,9 +414,13 @@ function renderBusStops()
     var tr;
     var td;
     var nrDstFound;
+    var cmnNmFound;
     var towardsArr = [];
     var towardsArrIdx;
     var newTowardsArr = [];
+    var commonNameArr = [];
+    var commonNameArrIdx;
+    var newCommonNameArr = [];
     var avgBearing;
     var classNames;
     var classNamesIdx;
@@ -509,6 +520,29 @@ function renderBusStops()
 	    }
 	}
 
+	// construct array of unique common names
+	newCommonNameArr = busstopData[busstop].commonName;
+	for (var newCommonNameArrIdx = 0; newCommonNameArrIdx < newCommonNameArr.length; newCommonNameArrIdx++) {
+	    cmnNmFound = false;
+	    for (commonNameArrIdx = 0; commonNameArrIdx < commonNameArr.length; commonNameArrIdx++) {
+		if (commonNameArr[commonNameArrIdx].commonName === newCommonNameArr[newCommonNameArrIdx]) {
+		    commonNameArr[commonNameArrIdx].bearing.push(bearing);
+		    commonNameArr[commonNameArrIdx].classNames.push(busstop_naptan_class);
+		    commonNameArr[commonNameArrIdx].busstopNos.push(id);
+		    cmnNmFound = true;
+		}
+	    }
+	    if (cmnNmFound === false) {
+		commonNameArr[commonNameArrIdx] = {
+		    commonName: newCommonNameArr[newCommonNameArrIdx],
+		    classNames: [busstop_naptan_class],
+		    bearing: [bearing],
+		    busstopNos: [id],
+		    data: busstopData[busstop]
+		};
+	    }
+	}
+
 	stop_count++;
     }
 
@@ -553,6 +587,39 @@ function renderBusStops()
 	}
 
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
+	bumpomaticAddById(bumpArray, id);
+    }
+
+    // fill in the common names on ring 2
+    for (commonNameArrIdx = 0; commonNameArrIdx < commonNameArr.length; commonNameArrIdx++) {
+	id = ID_COMMONNAMEDIR_NAME + '_' + commonNameArrIdx + ' ' + commonNameArr[commonNameArrIdx].data.naptanId;
+	renderRemoveElementsById(id);
+	bumpomaticDeleteById(bumpArray, id);
+
+	if (commonNameArr[commonNameArrIdx].bearing.length === 0) {
+	    alert('No bearings gonna crash');
+	}
+	avgBearing = se_averageBearing(commonNameArr[commonNameArrIdx].bearing);
+	avgBearing = modulo(avgBearing, 360);
+	positions = getPositionOnRing(avgBearing);
+
+	text = commonNameArr[commonNameArrIdx].commonName;
+
+	classNames = '';
+	for (classNamesIdx = 0; classNamesIdx < commonNameArr[commonNameArrIdx].classNames.length; classNamesIdx++) {
+	    classNames += commonNameArr[commonNameArrIdx].classNames[classNamesIdx] + ' ';
+	}
+
+	busstopNos = '';
+	neardest_onclick = null;
+	for (busstopNosIdx = 0; busstopNosIdx < commonNameArr[commonNameArrIdx].busstopNos.length; busstopNosIdx++) {
+	    busstopNos += commonNameArr[commonNameArrIdx].busstopNos[busstopNosIdx] + ' ';
+	}
+	if (busstopNos !== '') {
+	    neardest_onclick = 'selectNearDestination("' + busstopNos.trim() + '")';
+	}
+
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_COMMONNAME_NAME + ' ' + classNames.trim(), avgBearing, positions);
 	bumpomaticAddById(bumpArray, id);
     }
 
@@ -925,17 +992,12 @@ function getBusstopsInsideArbitraryShape(busstops_arr, shape, lat, lon, heading,
     var idx;
     var dir;
     var min;
-
     var vectors_idx;
-    var init;
-
     var shape_gbt_left, shape_gbt_right, shape_gbt_top, shape_gbt_bottom;
     var dist_to_shape_gbt_l, dist_to_shape_gbt_r, dist_to_shape_gbt_t, dist_to_shape_gbt_b;
-
     var traverse_x, traverse_y;
     var x1_x2, y1_y2;
     var xratio, yratio;
-
     var num_traversals;
 
     // repeat the first coord at the end: this eases last->first calculations
@@ -1137,6 +1199,51 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
 //
 // User Interface helpers (front)
 //
+
+function toggleNeardestCommonname()
+{
+    'use strict';
+    var toggle;
+    var els;
+    var a;
+    var neardest_action;
+    var commonname_action;
+
+    toggle = sessionStorage.getItem(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME);
+
+    if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH	||
+	toggle === null) {
+	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST;
+	neardest_action = 'block';
+	commonname_action = 'none';
+
+    } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST) {
+	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME;
+	neardest_action = 'none';
+	commonname_action = 'block';
+
+    } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME) {
+	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER;
+	neardest_action = 'none';
+	commonname_action = 'none';
+
+    } else {
+	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH;
+	neardest_action = 'block';
+	commonname_action = 'block';
+    }
+
+    els = document.getElementsByClassName(CLASS_NEARDEST_NAME);
+    for(a = 0; a < els.length; a++){
+	els[a].style.display = neardest_action;
+    }
+    els = document.getElementsByClassName(CLASS_COMMONNAME_NAME);
+    for(a = 0; a < els.length; a++){
+	els[a].style.display = commonname_action;
+    }
+
+    sessionStorage.setItem(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME, toggle);
+}
 
 //
 // what to do if user resets his heading?
@@ -1400,6 +1507,30 @@ function decomposeNearDestinations(originalNearDest)
     return towardsArr;
 }
 
+// necessary as two adjacent stops can have the same name
+// so differentiate using direction of travel
+function recomposeCommonNameDir(busstop)
+{
+    'use strict';
+    var commonName;
+    var dir;
+    var a;
+
+    commonName = busstop.commonName;
+    dir = null;
+    for (a = 0; a < busstop.additionalProperties.length; a++) {
+	if (busstop.additionalProperties[a].key === 'CompassPoint') {
+	    dir = busstop.additionalProperties[a].value;
+	}
+    }
+
+    if (dir === null) {
+	return [commonName];
+    } else {
+	return [commonName + '(' + dir + ')'];
+    }
+}
+
 function modulo(value, modulo)
 {
     // required because % on test machine handles negatives
@@ -1643,6 +1774,7 @@ function receiveNewBusStop(currentValue, index, array)
 	}
     }
     currentValue.towards = towards;
+    currentValue.commonName = recomposeCommonNameDir(currentValue);
 
     // see if we already have this bus stop, and expire old
     include_this = true;

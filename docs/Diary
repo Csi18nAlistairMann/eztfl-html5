@@ -215,3 +215,5 @@ Speed, direction, and turn off bumping
 22 May 2017
 Improvement: narrow predicted circle to a long, narrow rectangle immediately
 in front of the device
+Improvement: add common name of bus stops as an option as well as/instead of
+near destinations
