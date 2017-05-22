@@ -75,7 +75,6 @@ const GUESSED_TRANSPORT_MODE_NAME = 'guessed_transport_mode';
 const PREDICTION_METHOD_NAME = 'prediction-method';
 const PREDICTION_METHOD_SIMPLEST = 'simplest';
 const PREDICTION_METHOD_RECTANGLE_IN_RADIUS = 'rectinrad';
-const USE_PREDICTION_METHOD = PREDICTION_METHOD_SIMPLEST;
 
 const SPEED_STATIONARY_BELOW = 0.1;
 const SPEED_GUESS_TEXT_STATIONARY = 'stationary';
@@ -93,11 +92,25 @@ const SPEED_MPS_NAME = 'speed_mps';
 const WHERES_NORTH_ARROW_NAME = 'wheres_north_arrow';
 const RADIUS_SCALE_NAME = 'radius_scale';
 
+const RECT_LAT_NAME = 'rectangle-latitude';
+const RECT_LON_NAME = 'rectangle-longitude';
+const RECT_HEADING_NAME = 'rectangle-heading';
+const RECT_WIDTH_NAME = 'rectangle-width';
+const RECT_LENGTH_NAME = 'rectangle-length';
+const RECT_STANDARD_WIDTH = 200;
+const DIR_LEFT = 'L';
+const DIR_RIGHT = 'R';
+const DIR_TOP = 'T';
+const DIR_BOTTOM = 'B';
+
+const LAT = 0;
+const LON = 1;
+
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
 const FAKE_SRC_HIGHBURYCORNER = 'highburycorner';
-const FAKE_DATA_SOURCE = FAKE_SRC_PICCADILLY;
+const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 
 //
 // Globals (middle)
@@ -838,19 +851,27 @@ function scalePositionsUsingLog(bearing, positions, busstopDistance)
 //
 // prediction helpers (middle)
 //
-function do_something_that_knocks_out_all_but_rectangle()
+function getBusstopsInsideRectangle(lat, lon, heading, width, length)
 {
     'use strict';
     var just_these;
     var likely_these;
     var all_london;
+    var shape = [];
 
     all_london = getNotedBusStops();
     likely_these = getMostLikely(all_london);
-    just_these = getInRectangle(likely_these);
+
+    // create array of coords describing rectangle starting at 3 o'clock positon
+    // from lat,lon and moving clockwise.
+    shape.push(se_calculateNewPostionFromBearingDistance(lat, lon, modulo(heading + 270, 360), width / 2));
+    shape.push(se_calculateNewPostionFromBearingDistance(shape[0][LAT], shape[0][LON], heading, length));
+    shape.push(se_calculateNewPostionFromBearingDistance(shape[1][LAT], shape[1][LON], modulo(heading + 90, 360), width));
+    shape.push(se_calculateNewPostionFromBearingDistance(shape[2][LAT], shape[2][LON], modulo(heading + 180, 360), length));
+
+    just_these = getBusstopsInsideArbitraryShape(likely_these, shape, lat, lon, heading, width, length);
 
     setNotedBusStops(just_these);
-    alert('hello world!');
 }
 
 function getMostLikely(all)
@@ -865,16 +886,163 @@ function getMostLikely(all)
     return some;
 }
 
-function getInRectangle(likely_these)
+// What's the minimum x or y used in the shape?
+function getShapeMin(shape, axis)
 {
     'use strict';
-    var just_these;
+    var min;
+    var a;
 
-    just_these = likely_these;
-    return just_these;
+    min = shape[0][axis];
+    for (a = 1; a < shape.length - 1; a++) {
+	if (shape[a][axis] < min)
+	    min = shape[a][axis];
+    }
+
+    return min;
 }
 
-function updateForNewPrediction(num_positions_tracked, prediction_method)
+// What's the maximum x or y used in the shape?
+function getShapeMax(shape, axis)
+{
+    'use strict';
+    var max;
+    var a;
+
+    max = shape[0][axis];
+    for (a = 1; a < shape.length - 1; a++) {
+	if (shape[a][axis] > max)
+	    max = shape[a][axis];
+    }
+
+    return max;
+}
+
+function getBusstopsInsideArbitraryShape(busstops_arr, shape, lat, lon, heading, width, length)
+{
+    'use strict';
+    var busstops_out_arr = [];
+    var idx;
+    var dir;
+    var min;
+
+    var vectors_idx;
+    var init;
+
+    var shape_gbt_left, shape_gbt_right, shape_gbt_top, shape_gbt_bottom;
+    var dist_to_shape_gbt_l, dist_to_shape_gbt_r, dist_to_shape_gbt_t, dist_to_shape_gbt_b;
+
+    var traverse_x, traverse_y;
+    var x1_x2, y1_y2;
+    var xratio, yratio;
+
+    var num_traversals;
+
+    // repeat the first coord at the end: this eases last->first calculations
+    shape.push(shape[0]);
+    shape_gbt_left = getShapeMin(shape, LON);
+    shape_gbt_right = getShapeMax(shape, LON);
+    shape_gbt_top = getShapeMax(shape, LAT);
+    shape_gbt_bottom = getShapeMin(shape, LAT);
+
+    // consider each bus stop in turn
+    for (idx = 0; idx < busstops_arr.length; idx++) {
+	// gross box applied to whole shape
+	if (busstops_arr[idx].lon < shape_gbt_left) {
+	    continue;
+	}
+	if (busstops_arr[idx].lon > shape_gbt_right) {
+	    continue;
+	}
+	if (busstops_arr[idx].lat > shape_gbt_top) {
+	    continue;
+	}
+	if (busstops_arr[idx].lat < shape_gbt_bottom) {
+	    continue;
+	}
+
+	// Which side of the shape_gbt is nearest to lat/lon? Using that
+	// side likely means less processing as fewer opportunities for
+	// a vector to get between lat/lon and that side
+	dist_to_shape_gbt_l = busstops_arr[idx].lon - shape_gbt_left;
+	dist_to_shape_gbt_r = shape_gbt_right - busstops_arr[idx].lon;
+	dist_to_shape_gbt_t = shape_gbt_top - busstops_arr[idx].lat;
+	dist_to_shape_gbt_b = busstops_arr[idx].lat - shape_gbt_bottom;
+	min = dist_to_shape_gbt_l;
+	dir = DIR_LEFT;
+	if (dist_to_shape_gbt_r < min) {
+	    min  = dist_to_shape_gbt_r;
+	    dir = DIR_RIGHT;
+	}
+	if (dist_to_shape_gbt_t < min) {
+	    min = dist_to_shape_gbt_t;
+	    dir = DIR_TOP;
+	}
+	if (dist_to_shape_gbt_b < min) {
+	    min = dist_to_shape_gbt_b;
+	    dir = DIR_BOTTOM;
+	}
+
+	// look through each vector in the shape to see if affects the inside/outside question
+	num_traversals = 0;
+	for (vectors_idx = 0; vectors_idx < shape.length - 1; vectors_idx++) {
+	    // apply gross box technique to the vector. Could be improved
+	    // by doing Min/Max work before looking at first bus stop
+	    if (busstops_arr[idx].lon > Math.max(shape[vectors_idx][LON], shape[vectors_idx + 1][LON])) {
+		continue;
+	    }
+	    if (busstops_arr[idx].lon < Math.min(shape[vectors_idx][LON], shape[vectors_idx + 1][LON])) {
+		continue;
+	    }
+	    if (busstops_arr[idx].lat < Math.min(shape[vectors_idx][LAT], shape[vectors_idx + 1][LAT])) {
+		continue;
+	    }
+	    if (busstops_arr[idx].lat > Math.max(shape[vectors_idx][LAT], shape[vectors_idx + 1][LAT])) {
+		continue;
+	    }
+
+	    // Lat/lon shares axes with the vector. Calculate if the vector
+	    // traverses the axis between the point and the nearest shape GBT side
+
+	    // Calculate the ratio of X and Y lengths of the vector_gbt
+	    x1_x2 = (Math.abs(shape[vectors_idx][LAT] - shape[vectors_idx + 1][LAT])) / 100;
+	    y1_y2 = (Math.abs(shape[vectors_idx][LON] - shape[vectors_idx + 1][LON])) / 100;
+	    xratio = (busstops_arr[idx].lon - Math.min(shape[vectors_idx][LON], shape[vectors_idx + 1][LON])) * x1_x2;
+	    yratio = (busstops_arr[idx].lat - Math.min(shape[vectors_idx][LAT], shape[vectors_idx + 1][LAT])) * y1_y2;
+
+	    // Calculate the value of Y where the vector traverses M's x-axis, ditto
+	    // for the value of X where the vector traverses M's y-axis
+	    traverse_x = shape[vectors_idx][LAT] + (x1_x2 * yratio);
+	    traverse_y = shape[vectors_idx][LON] + (y1_y2 * xratio);
+
+	    // now we know where it traverses, does it happen between the
+	    // point and the nearest shape_gbt side? If so, we have a
+	    // traversal to count.
+	    if (dir === DIR_LEFT && traverse_x < shape[vectors_idx][LAT]) {
+		num_traversals++;
+
+	    } else if (dir === DIR_RIGHT && traverse_x > shape[vectors_idx + 1][LAT]) {
+		num_traversals++;
+
+	    } else if (dir === DIR_TOP && traverse_y > shape[vectors_idx][LON]) {
+		num_traversals++;
+
+	    } else if (dir === DIR_BOTTOM && traverse_y > shape[vectors_idx + 1][LON]) {
+		num_traversals++;
+	    }
+	}
+
+	// If the number of traversals is odd, then the point lies
+	// inside the area, and so should be counted
+	if (Math.abs(num_traversals % 2) === 1) {
+	    busstops_out_arr.push(busstops_arr[idx]);
+	}
+    }
+
+    return busstops_out_arr;
+}
+
+function updateForNewPrediction(num_positions_tracked)
 {
     'use strict';
     var early_position = [];
@@ -883,7 +1051,7 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
     var devices_heading;
     var speed_in_metres_per_second;
     var lat_lon_pair;
-    var radius;
+    var prediction_method;
 
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
@@ -902,6 +1070,12 @@ function updateForNewPrediction(num_positions_tracked, prediction_method)
 							   distance_in_metres);
     setSpeedDisplayed(speed_in_metres_per_second);
     setGuessedTransportMode(speed_in_metres_per_second);
+    if (speed_in_metres_per_second < SPEED_WALKING_BELOW) {
+	prediction_method = PREDICTION_METHOD_SIMPLEST;
+
+    } else {
+	prediction_method = PREDICTION_METHOD_RECTANGLE_IN_RADIUS;
+    }
 
     lat_lon_pair = se_calculateNewPostionFromBearingDistance(latest_position.coords.latitude,
 							     latest_position.coords.longitude,
@@ -924,7 +1098,6 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
     // take first and last coord in stack, ignore rest
     'use strict';
     var url;
-    var handler;
     var radius;
     var lat;
     var lon;
@@ -941,13 +1114,20 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
     radius = Math.round(radius);
     setRadiusScale(radius);
 
-    lat = lat_lon_pair[0];
-    lon = lat_lon_pair[1];
+    lat = lat_lon_pair[LAT];
+    lon = lat_lon_pair[LON];
     url = RPROXY_URL_BUSSTOPS + '&radius=' + radius + '&lat=' + lat + '&lon=' + lon;
     sessionStorage.setItem(RADIUS_NAME, JSON.stringify(radius));
     sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
     sessionStorage.setItem(LONGITUDE_NAME, JSON.stringify(lon));
     sessionStorage.setItem(PREDICTION_METHOD_NAME, JSON.stringify(prediction_method));
+
+    sessionStorage.setItem(RECT_HEADING_NAME, JSON.stringify(devices_heading));
+    sessionStorage.setItem(RECT_LAT_NAME, JSON.stringify(latest_position.coords.latitude));
+    sessionStorage.setItem(RECT_LON_NAME, JSON.stringify(latest_position.coords.longitude));
+    sessionStorage.setItem(RECT_WIDTH_NAME, JSON.stringify(RECT_STANDARD_WIDTH));
+    sessionStorage.setItem(RECT_LENGTH_NAME, JSON.stringify(radius * 2));
+
     sendGetCore(url, callback_receiveNewBusStopsFromRadius);
 
     return url;
@@ -1401,14 +1581,26 @@ function callback_receiveNewBusStopsFromRadius()
     'use strict';
     var show;
 
+    var lat;
+    var lon;
+    var heading;
+    var width;
+    var length;
+
     if (this.status == HTTP_200) {
 	this.response.stopPoints.forEach(receiveNewBusStop);
 
 	switch (JSON.parse(sessionStorage.getItem(PREDICTION_METHOD_NAME))) {
 	case PREDICTION_METHOD_RECTANGLE_IN_RADIUS:
-	    do_something_that_knocks_out_all_but_rectangle();
+	    lat = JSON.parse(sessionStorage.getItem(RECT_LAT_NAME));
+	    lon = JSON.parse(sessionStorage.getItem(RECT_LON_NAME));
+	    heading = JSON.parse(sessionStorage.getItem(RECT_HEADING_NAME));
+	    width = JSON.parse(sessionStorage.getItem(RECT_WIDTH_NAME));
+	    length = JSON.parse(sessionStorage.getItem(RECT_LENGTH_NAME));
+	    getBusstopsInsideRectangle(lat, lon, heading, width, length);
 	    break;
 	case PREDICTION_METHOD_SIMPLEST:
+	    break;
 	default:
 	}
 
@@ -1730,5 +1922,5 @@ function mainLoop(position)
 
     position = checkPositionValues(position);
     num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
-    updateForNewPrediction(num_positions_tracked, USE_PREDICTION_METHOD);
+    updateForNewPrediction(num_positions_tracked);
 }

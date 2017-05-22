@@ -3821,7 +3821,7 @@ need to have something like loadCountdown("<naptan1> ... <naptann>") to use.
 destinations. Also: bring the z-index for bus stops forward, and make the code
 reusable.
 
-[ ] 6. Related to 1 above. When detecting speed in excess of walking, we could
+[x] 6. Related to 1 above. When detecting speed in excess of walking, we could
 narrow the predicted range from a big circle to a corridor of smaller cirles:
 			     _aaa/
 		    _yQQQ6/_jQP?4Q6/aQQQ6/
@@ -4019,7 +4019,7 @@ that make up the initial shape. Here, they're named A, B, C and D. The
 principle is the same for any shape that a: has no curves b: does not
 turn back and overlap itself. Holes are allowed.
      Consider point M and notice that it will have its axes also
-transversed by the A, C and D vectors. B, however, does not. This is identical
+traversed by the A, C and D vectors. B, however, does not. This is identical
 to putting the flat box we've been using around each vector in turn and so
 discovering point M shares no axis with B.
 
@@ -4225,7 +4225,167 @@ back to false.
 for the x-position used by M. This can be worked out using the percentage
 distance M is from x1 along the axis to x2 as applied to the distance y1 to y2.
 
+Step 1: calculate the coordinates of the rectangle.
+Step 2: run gross box technique against M and exclude if necc
+Step 3: find nearest edge
+Step 4: calculate the xpos and ypos where the rectangle traverses.
+Step 5: track if in, or out.
 
+Language would be helpful here.
+
+"X,Y": We're using a two-dimensional co-oordinate system where we have the x-axis
+from left to right and the y-axis from top to bottom with the origin (0, 0) assumed
+to be at the bottom left, unless required otherwise.
+
+That x,y system marries nicely with the "latitude, longitude" system which itself
+increases south to north (latitude) and increases west to east (longitude.)
+
+Radians/Degrees. I use metres to describe distances and lengths. With most of them
+being no bigger in scale than London itself, I don't do extra work to accomodate
+that we're moving over a sphere. Code that I've bought in does, though.
+
+"Shape": The shape is used to describe the area in which we're interested in knowing
+if there are bus stops.
+
+"Vectors" The shape is at this time made up solely of vectors, that is, no curves,
+etc. The shape is allowed to contain holes. The shape should not be constructed to
+overlap on itself: if it does, that overlapped area is treated as inverted. That
+is, if the area overlapped area is inside, the overlapped areas is treated as outside.
+
+"GBT/ Gross Box Technique" Collision detection is a big part of this project: "does
+a given point exist inside or outside an area?" The GBT is a simple method of
+excluding a huge number of points because they are too far left or right, up and down
+to possibly be inside.
+
+Shape_GBT. The Gross Box Technique when applied to the whole Shape.
+
+Vector_GBT. The Gross Box Technique when applied to a vector within the shape.
+
+Traverse. When a vector crosses a given axis, it's said to traverse that axis. This
+info can be used to determine if a point lies on one side of that vector, or the other.
+
+Some more notes about collision detection:
+
+We can do this for even more complex situations. The searchlight shape below is
+characterised by straight edges that form a triangle, and a curve that forms
+half an oval. A reasonable approach would be to apply the Gross Box Technique
+to it first; then to merge two sets: the set of points described just by the
+triangle A -> B -> C -> A; then create a set of points described by the box
+A -> E -> F -> B -> A, and then only those points that are contained with the
+ellipse centred on G, of major axis A -> B and minor axis 2 * (A -> E). The
+process has already excluded items below A -> B (which the triangle took care
+of.) The two sets are merged together, and that forms the data set to be carried
+forward.
+
+  E                                 F
+	      _ajQQQQQQQaa
+	    aQQP?'     ??QQ6/
+	  aQQ?            )4Q6/
+	 jQ?                )4Q/
+	jQ'                   4Q/
+       jQ'                     4Q/
+      _Q'                       46
+      jP                       )Q/
+     _Q'                         46
+  A  ]P            G             "Q B
+     ]f                          _Q
+     ]k                          dQ
+     )Q/                        _Q'
+      ]Q/*                     *QP
+       46   *              *    ]Q
+       )Q/       *    *       _Qf
+	4Q                    jP
+	 Q6                  ]Q'
+	 )W/                _Qf
+	  4Q                jP
+	   Q6              ]Q'
+	   )W/            _Qf
+	    4Q            jP
+	     Qf          ]Q'
+	     ]Q/        _Qf
+	      46        jP
+	      )Qf      ]Q'
+	       ]Q/    _Qf
+		46    jP
+		)Qf  _Q'
+		 ]Q  QP
+		  Q6jQ
+		  )QQ'
+		   ??
+
+		   C
+
+It's also worth noting that this technique can be expanded into further dimensions:
+we won't do it here, but cubes are susceptible to this kind of processing, as are
+hypercubes and so on. Perhaps the only use this project could make of it is
+determining if we're within 200m of a platform below ground.
+
+We can also fake curves instead of using them. Here we have a curve that could be
+used with trigonometry. However we could also use a series of straight lines that
+ape the curve.
+
+	      aaQQQQQQQ6a/
+	   ajQQ??     )?4QQa/
+	 _QQ?'            ?4Q6
+	jQP                 )WQ/
+      _QQ'                    4Q6
+     _QP                       )W6
+     jP                         )W/
+    ]Q'                          4Q
+   _Qf                            Q6
+   ]P                             )W
+   Qf                              Qf
+  _Q                               ]6
+  ]P                               )W
+  ]f                                Q
+  )'                                ?
+
+Now the same curve as six straight lines with gaps for emphasis:
+
+		 _a  a/
+	      4QQQP  4QQQ'
+	   a               6/
+	 _jQ?             )4Q6/
+       _yQP'                )4Q6
+      _QP'                    )WW
+       ?                        '_/
+
+    _Q                           ]Q
+    jP                            Qf
+   _Q'                            ]Q
+   ]P                              Q/
+   Qf                              46
+  ]Q                               )Q
+  ]f                                Q
+
+The boundary described is slightly different to that described by the
+curve. However the straight lines could well be faster for processing
+purposes than the curves.
+
+[x] 11. We could add a HUD-style line that demonstrates scale. What to do?
+  (from earlier: radius line with 50m marks that sees marks move as radius
+changes
+   |____|____|____|____|____|
+   0   50   100  150  200  250
+
+   |______|______|______|
+   0     200    400    600)
+   In fact, this was already implemented by accident when I set up the
+radius line - it demonstrates scale by being small when the radius is wide
+and large when the range is low.
+
+As UX lead I also have some preferences:
+[x] 14. I would like to see the bearing somewhere, either as text or maybe
+a line somewhere. This would be an effective double check on what the
+device thinks it's doing vs what the user actually is doing
+       This has also already been implemented with the red arrow "where's
+north" indicator
+
+[ ] 13. We could replace the stop letter / near distance with the upcoming
+stop common name: buses announce that substantially before the letter is
+visible. What to do?
+	 (from earlier: stop name called out some distance before can see
+stop letter: option to use that instead)
 
 
 
@@ -4300,3 +4460,10 @@ because of slight changes, causing rotation between renders to elevate
 No bumpomatic, instead when focusing on a bus stop, THEN bump any stops nearby
 
 Don't change headoing if speed below X, say 1 metre per sec
+
+Allow change between near dest and local dest
+
+fix on a stop whether or not reported present to guide me to it
+
+toggle bus routes on and off and persist rendering only sees busstops on routes
+shown
