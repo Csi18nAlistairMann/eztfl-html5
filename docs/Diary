@@ -219,5 +219,6 @@ Improvement: add common name of bus stops as an option as well as/instead of
 near destinations
 
 24 May 2017
-Bug fix: commonnames and near destinations duplicating on screen
 Second UX review
+Bug fix: commonnames and near destinations duplicating on screen
+Bug fix: "and", "or" within a name were being used as EOL

@@ -1538,7 +1538,7 @@ function decomposeNearDestinations(originalNearDest)
     var towardsArr = [];
     var idx;
 
-    towardsArr = originalNearDest.split(/,|and |or /);
+    towardsArr = originalNearDest.split(/,|\Wand\W|\Wor\W/);
     for (idx = 0; idx < towardsArr.length; idx++) {
 	towardsArr[idx] = towardsArr[idx].trim();
     }

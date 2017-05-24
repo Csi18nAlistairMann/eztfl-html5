@@ -4656,7 +4656,7 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 This time out I'll not do any of the NEW, and I may not do 1s maybe 2s. Otherwise
 though, like last time I'll generally do top right to bottom left.
 
-[ ] 3  [BUG] neardesno_0<space><naptan> is cause of multiple copies of the near destination
+[PEND] 3  [BUG] neardesno_0<space><naptan> is cause of multiple copies of the near destination
 appearing. Instead of deleting on that id, delete on neardest class?
 
 This may also solve:
@@ -4682,9 +4682,20 @@ at each render, and delete the rest.
 
    That looks done for 3, also 6 & 22. Test later to sign off.
 
-[ ] 4  [BUG] it's unexpected behaviour that travelling at 100mph towards London, on the
+[PEND] 4  [BUG] it's unexpected behaviour that travelling at 100mph towards London, on the
 other side of Colchester, that I should see only responses from around my
 usual location in London
+      What seems curious is that this seemed to survive the local & session storage being
+cleared. It'll be some time before I can test that exact situation again, so in the meantime I'll
+just keep an eye out for similar situations.
+
+[x] 2  [BUG] Choking on "Great Portland " because "and ". maybe [A-Za-z\-]? Also choking on
+Manor House
+      done.
+
+5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
+
+
 
 
 
