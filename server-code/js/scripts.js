@@ -429,6 +429,8 @@ function renderBusStops()
     var busstopNosIdx;
     var naptans;
     var naptansIdx;
+    var el;
+    var del_id;
 
     busstopData = getNotedBusStops();
     bumpomaticSetup(bumpArray);
@@ -557,9 +559,18 @@ function renderBusStops()
 	}
     }
 
+    // get a list of near destinations the DOM has in use
+    deletable = [];
+    extants = document.getElementsByClassName(CLASS_NEARDEST_NAME);
+    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
+	deletable.push(extants[elementmatch].id);
+	deletable[extants[elementmatch].id] = id;
+    }
+
     // fill in the near destinations on ring 2
     for (towardsArrIdx = 0; towardsArrIdx < towardsArr.length; towardsArrIdx++) {
-	id = ID_NEARDEST_NAME + '_' + towardsArrIdx + ' ' + towardsArr[towardsArrIdx].data.naptanId;
+	id = ID_NEARDEST_NAME + towardsArr[towardsArrIdx].data.naptanId;
+	deletable[id] = false;
 	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 
@@ -590,9 +601,27 @@ function renderBusStops()
 	bumpomaticAddById(bumpArray, id);
     }
 
+    // now delete any untouched near destinations
+    while(deletable.length) {
+	del_id = deletable.shift();
+	if (deletable[del_id] !== false) {
+	    el = document.getElementById(del_id);
+	    el.parentNode.removeChild(el);
+	}
+    }
+
+    // get a list of common names the DOM has in use
+    deletable = [];
+    extants = document.getElementsByClassName(CLASS_COMMONNAME_NAME);
+    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
+	deletable.push(extants[elementmatch].id);
+	deletable[extants[elementmatch].id] = id;
+    }
+
     // fill in the common names on ring 2
     for (commonNameArrIdx = 0; commonNameArrIdx < commonNameArr.length; commonNameArrIdx++) {
-	id = ID_COMMONNAMEDIR_NAME + '_' + commonNameArrIdx + ' ' + commonNameArr[commonNameArrIdx].data.naptanId;
+	id = ID_COMMONNAMEDIR_NAME + commonNameArr[commonNameArrIdx].data.naptanId;
+	deletable[id] = false;
 	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 
@@ -621,6 +650,15 @@ function renderBusStops()
 
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_COMMONNAME_NAME + ' ' + classNames.trim(), avgBearing, positions);
 	bumpomaticAddById(bumpArray, id);
+    }
+
+    // now delete any untouched near destinations
+    while(deletable.length) {
+	del_id = deletable.shift();
+	if (deletable[del_id] !== false) {
+	    el = document.getElementById(del_id);
+	    el.parentNode.removeChild(el);
+	}
     }
 
     // now get the route numbers into a table

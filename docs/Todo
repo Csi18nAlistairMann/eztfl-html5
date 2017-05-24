@@ -29,6 +29,7 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 6. Have Apache try to RewriteRule to add app_key etc, then proxy
    pass again
    Thouhghts:1530
+   [closed]
 
 7. Call API for bus stops in local mile once, then scan that per the
    prediction and range. Lightens load on API
@@ -44,5 +45,7 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 
 12. Rotating sees the near destinations rotate other than I expect
     - shouldn't they hug the corner as they go around?
+    [closed]
 
 13. Abandon the lines from bus stop to near destination
+    [done!]

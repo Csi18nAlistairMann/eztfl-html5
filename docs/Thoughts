@@ -4394,11 +4394,26 @@ between them.
 
 This concludes the work authorised in the review.
 
+24 May 2017
+Second UX review.
+The starting point of this second review is the same as for the first: the
+overall project goal ("I'm at X, Y walking in direction Z. What are my
+options?") should still be satisifed. Is it? Yes. I'll upgrade it from
+0.2/10 to a 0.5/10 user experience. Could it go live if so chosen? Answer
+is also Yes.
 
+What is the UX review for, again? It's because UX targets are subjective,
+not objective. The UX lead has to determine if targets are being met. In a
+bigger project, I as UX lead might look at what was agreed at the last
+review and sign them off. I'll skip that because I know what I've done.
 
----------------------------------------------------------
-Simple sounding vs Complex doing
-       Something about that rotate for heading took one line
+Thirdly, do we have enough budget, hours and patience to do more and get
+to a third review date? Again I'll decide that we can, but I really want
+to avoid major feature changes as the time to go live draws near.
+
+What's the agenda?
+Basically this lot below:
+   -------------
 
 Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
 coords:
@@ -4428,13 +4443,6 @@ Choking on "Great Portland " because "and ". maybe [A-Za-z\-]? Also choking on
 Manor House
 
 Selecting doesn't survive re-render. Should it?
-
-The value of not coding a project from the top-down but bottom-up. That is, I
-didn't start with front-end and shoe-horned data to fit it, but started with
-the data and developed it into successively higher forms.
-
-Highlighting a busstop sees it move. 5px. Also consider centering the element
-instead of using top left.
 
 neardesno_0<space><naptan> is cause of multiple  copies of the near destination
 appearing. Instead of deleting on that id, delete on neardest class?
@@ -4467,8 +4475,6 @@ No bumpomatic, instead when focusing on a bus stop, THEN bump any stops nearby
 
 Don't change headoing if speed below X, say 1 metre per sec
 
-Allow change between near dest and local dest
-
 fix on a stop whether or not reported present to guide me to it
 
 toggle bus routes on and off and persist rendering only sees busstops on routes
@@ -4479,3 +4485,215 @@ show bus stop common name when showing arrivals board
 menu toggle for showing top left stuff
 
 can show stations without linking to anything?
+
+neardest and commonname choice doesn't survive re-render
+
+commonname doubles the trouble of neardest duplications
+
+not splitting on "and", "or" etc, but would be useful to newline on them
+   -------------
+We can also look into the current Todo list for anything extra.
+   -------------
+
+I want to order things by:
+[SWOT] - Strengths, weaknesses, opportunities, threats.
+     These things could further make or break the project.
+
+[BUG] - deleterious problems with existing code
+
+[COS]metic - tiny changes that have an outsize effect
+
+[CFI] Current feature improvements - larger changes to existing features
+
+[NEW] Feature additions - wholly new functionality.
+
+ So let's do that first to the existing Todo first, then the above:
+
+1  [SWOT] Call API for bus stops in local mile once, then scan that per the
+   prediction and range. Lightens load on API
+   Thoughts: 1632
+
+2  [BUG] Choking on "Great Portland " because "and ". maybe [A-Za-z\-]? Also choking on
+Manor House
+
+3  [BUG] neardesno_0<space><naptan> is cause of multiple  copies of the near destination
+appearing. Instead of deleting on that id, delete on neardest class?
+
+4  [BUG] it's unexpected behaviour that travelling at 100mph towards London, on the
+other side of Colchester, that I should see only responses from around my
+usual location in London
+
+5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
+
+6  [BUG] commonname doubles the trouble of neardest duplications
+
+7  [COS] Utilise OS speed and head if avail
+
+8  [COS] nearer icons larger than further icons
+
+9  [COS] Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
+coords:
+0, 370,
+96, 148,
+552, 0,
+757, 434,
+662, 655,
+512, 330,
+318, 777,
+148, 704,
+340, 254,
+0, 370
+Also a very rough polygon to describe one heading straight up:
+-webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+
+10 [COS] Selecting doesn't survive re-render. Should it?
+
+11 [COS] reset heading should say something else until the heading is resettable,. That
+would give the user a feedback mechanism for once the heading has been reset
+
+12 [COS] a means by which localstorage can be cleared
+
+13 [COS] Would be great to "freeze" display from updating further: rapid updates can see
+selection lost too quickly
+
+14 [COS] Don't change headoing if speed below X, say 1 metre per sec
+
+15 [COS] toggle bus routes (along bottom) on and off and persist rendering only sees busstops
+on routes shown
+
+16 [COS] show bus stop common name when showing arrivals board
+
+17 [COS] menu toggle for showing top left stuff. By this intend an encompassing div which
+would appear on top of the renderfield
+
+18 [COS] not splitting on "and", "or" etc, but would be useful to newline on them
+
+19 [CFI] More accurately account for location.
+Use best fit analysis over a series of readings might offer a more
+accurate way to obtain coords
+
+20 [CFI] Crashes probably to so much work it does on the train! In 3 minutes I could be
+anywhere
+Consider: force limit number of bus stops that could appear
+
+21 [CFI] Is the delete after 10 readings losing the last known heading?
+Or is this the not-moving-enough-heading-goes-berserk issue? (solved by 14?)
+
+22 [CFI] Since rationalising near destinations, are some of them staying on screen for
+a couple more renders before disappearing? (Solved by 3?)
+
+23 [CFI] Some locations use "/" as well as "and" and "or"
+
+24 [CFI] There;s not certainty about the accuracy - stops seem to vanish too fast and
+do not appear to be in the correct location for where the device is.
+
+25 [CFI] At very slow speeds (ie, when actually stationary) heading changes far faster
+because of slight changes, causing rotation between renders to elevate (Solved by 14?)
+
+26 [NEW] Response differently depending on accuracy
+If the accuracy is 1400m, I may just want to skip predicting where
+I'll be and go right ahead to discovering bus stops in the nearest
+1400m.
+Or, could tell user to wait until accuracy is better.
+Or if 65m AND iOS, suggest user looks at location services allowed
+
+27 [NEW] Where's the object? Pushing the position on to the stack
+   automatically updating the various others, rather than processing
+   one thing after another.
+   This is about a rewrite of code which would improve implementation
+   issues later
+   Thoughts: 933
+   Thoughts: 839
+   Thoughts: 1184
+
+28 [NEW] Have local stops link to each other
+   Thoughts: 1388
+
+29 [NEW] expire bus stop list faster when travelling at speed
+
+30 [NEW] Clicking and holding icon makes it larger for legibility
+
+31 [NEW] an heartbeat showing connection to tfl ..|..||.|..|||.....|..
+
+32 [NEW] Record and replay inputs, the better to work out WTH is going on
+
+33 [NEW] No bumpomatic, instead when focusing on a bus stop, THEN bump any stops nearby
+
+34 [NEW] fix on a stop whether or not reported present to guide me to it
+
+35 [NEW] can show stations without linking to anything?
+
+  And now we can make up a matrix for grading them by importance
+
+			   /least /      /      /      /  most/
+			  / 1    / 2    / 3    / 4    / 5    /
++------------------------+------+------+------+------+------+
+|SWOT:                   |1     |      |      |      |      |
+|                        |      |      |      |      |      |
+|                        |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+|Bugs:                   |      |2 5   |4     |      |3 6   |
+|                        |      |      |      |      |      |
+|                        |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+|Cosmetic:               |8     |7 15  |10 11 |9 12  |      |
+|                        |      |18    |13 16 |14    |      |
+|                        |      |      |17    |      |      |
+|                        |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+|Current feature         |19 21 |20    |22    |      |23    |
+|improvements            |24 25 |      |      |      |      |
+|                        |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+|Feature additions:      |27 28 |29 30 |26 33 |31 32 |      |
+|                        |35    |      |34    |      |      |
+|                        |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+|Other:                  |      |      |      |      |      |
++------------------------+------+------+------+------+------+
+
+This time out I'll not do any of the NEW, and I may not do 1s maybe 2s. Otherwise
+though, like last time I'll generally do top right to bottom left.
+
+[ ] 3  [BUG] neardesno_0<space><naptan> is cause of multiple copies of the near destination
+appearing. Instead of deleting on that id, delete on neardest class?
+
+This may also solve:
+6  [BUG] commonname doubles the trouble of neardest duplications
+22 [CFI] Since rationalising near destinations, are some of them staying on screen for
+a couple more renders before disappearing? (Solved by 3?)
+
+The problem seems to be that in some circumstances, neardest text, and now common name text,
+is duplicated on the renderfield causing a big mess. My suspicion with Bug 3 is that this
+is because of using "neardestno__X<space><naptan>" as the id. Are spaces even allowed in an
+html id? Not according to https://www.w3.org/TR/html5/dom.html#the-id-attribute. And what's
+with "X" anyway? If smells like that id would change as soon as the order changed. It comes
+from: "ID_NEARDEST_NAME + '_' + towardsArrIdx + ' ' + towardsArr[towardsArrIdx].data.naptanId;"
+That first '_' can be removed as the const already contains it. The space can be removed too
+as they aren't allowed in ids.
+"towardsArrIdx" is a loop counter for position in the array of items to show. Why are we
+adding it to the id at all? The naptan is unique ... isn't it? The array is empty at the
+start of each rerender. An element in the DOM that matches by ID is removed but only if it's
+seen this new time round as well. So if it was lost, the old element would stay on screen. The
+class is not used to remove them either. Ideally I do not want to delete them en masse, as I
+might want to persist something about them. That means I have to track which ones I've accessed
+at each render, and delete the rest.
+
+   That looks done for 3, also 6 & 22. Test later to sign off.
+
+[ ] 4  [BUG] it's unexpected behaviour that travelling at 100mph towards London, on the
+other side of Colchester, that I should see only responses from around my
+usual location in London
+
+
+
+
+----------------------------------------------------------
+
+Simple sounding vs Complex doing
+       Something about that rotate for heading took one line
+
+The value of not coding a project from the top-down but bottom-up. That is, I
+didn't start with front-end and shoe-horned data to fit it, but started with
+the data and developed it into successively higher forms.
