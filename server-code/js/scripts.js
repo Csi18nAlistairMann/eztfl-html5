@@ -39,6 +39,7 @@ const ID_BUSSTOP_NAME = 'busstopno_';
 const ID_NEARDEST_NAME = 'neardestno_';
 const ID_COMMONNAMEDIR_NAME = 'commonnamedir_';
 const ID_ROUTE_NAME = 'lineno_';
+const ID_ARRIVAL_NAME = 'arrival_';
 const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
@@ -429,8 +430,6 @@ function renderBusStops()
     var busstopNosIdx;
     var naptans;
     var naptansIdx;
-    var el;
-    var del_id;
 
     busstopData = getNotedBusStops();
     bumpomaticSetup(bumpArray);
@@ -559,15 +558,8 @@ function renderBusStops()
 	}
     }
 
-    // get a list of near destinations the DOM has in use
-    deletable = [];
-    extants = document.getElementsByClassName(CLASS_NEARDEST_NAME);
-    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
-	deletable.push(extants[elementmatch].id);
-	deletable[extants[elementmatch].id] = id;
-    }
-
     // fill in the near destinations on ring 2
+    deletable = getDeletableForClass(CLASS_NEARDEST_NAME);
     for (towardsArrIdx = 0; towardsArrIdx < towardsArr.length; towardsArrIdx++) {
 	id = ID_NEARDEST_NAME + towardsArr[towardsArrIdx].data.naptanId;
 	deletable[id] = false;
@@ -600,25 +592,10 @@ function renderBusStops()
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
 	bumpomaticAddById(bumpArray, id);
     }
-
-    // now delete any untouched near destinations
-    while(deletable.length) {
-	del_id = deletable.shift();
-	if (deletable[del_id] !== false) {
-	    el = document.getElementById(del_id);
-	    el.parentNode.removeChild(el);
-	}
-    }
-
-    // get a list of common names the DOM has in use
-    deletable = [];
-    extants = document.getElementsByClassName(CLASS_COMMONNAME_NAME);
-    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
-	deletable.push(extants[elementmatch].id);
-	deletable[extants[elementmatch].id] = id;
-    }
+    cleanDeletable(deletable);
 
     // fill in the common names on ring 2
+    deletable = getDeletableForClass(CLASS_COMMONNAME_NAME);
     for (commonNameArrIdx = 0; commonNameArrIdx < commonNameArr.length; commonNameArrIdx++) {
 	id = ID_COMMONNAMEDIR_NAME + commonNameArr[commonNameArrIdx].data.naptanId;
 	deletable[id] = false;
@@ -651,15 +628,7 @@ function renderBusStops()
 	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_COMMONNAME_NAME + ' ' + classNames.trim(), avgBearing, positions);
 	bumpomaticAddById(bumpArray, id);
     }
-
-    // now delete any untouched near destinations
-    while(deletable.length) {
-	del_id = deletable.shift();
-	if (deletable[del_id] !== false) {
-	    el = document.getElementById(del_id);
-	    el.parentNode.removeChild(el);
-	}
-    }
+    cleanDeletable(deletable);
 
     // now get the route numbers into a table
     if (routenosArray.length) {
@@ -751,19 +720,14 @@ function renderCountdown(naptan)
     var id;
     var arrival;
     var count;
-    var extants;
-    var idx;
-
-    // remove all existing countdown data
-    extants = document.getElementsByClassName(CLASS_COUNTDOWN_NAME);
-    for (idx = 0; idx < extants.length; idx++) {
-	extants[0].parentNode.removeChild(extants[0]);
-    }
+    var deletable;
 
     // display all the new countdown data
+    deletable = getDeletableForClass(CLASS_COUNTDOWN_NAME);
     count = 0;
     for (arrival = 0; arrival < countdownData.length; arrival++) {
-	id = 'arrival_' + count;
+	id = ID_ARRIVAL_NAME + countdownData[arrival].id;
+	deletable[id] = false;
 
 	text = countdownData[arrival].lineName + ' in ' + Math.round(countdownData[arrival].timeToStation / 60);
 
@@ -774,6 +738,7 @@ function renderCountdown(naptan)
 
 	count++;
     }
+    cleanDeletable(deletable);
 }
 
 // render helpers
@@ -784,6 +749,7 @@ function renderRemoveElementsById(id)
     var child;
 
     // now we remove the first
+    // removeChild_4
     if (document.getElementById(id)) {
 	child = document.getElementById(id);
 	child.parentNode.removeChild(child);
@@ -796,6 +762,7 @@ function renderRemoveElementsByClass(className)
     var list;
 
     // now we remove the first
+    // removeChild_5
     list = document.getElementsByClassName(className);
     while(list.length) {
 	list[0].parentNode.removeChild(list[0]);
@@ -1237,6 +1204,38 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
 //
 // User Interface helpers (front)
 //
+
+function getDeletableForClass(classname)
+{
+    'use strict';
+    var deletable;
+    var extants;
+    var idx;
+
+    deletable = [];
+    extants = document.getElementsByClassName(classname);
+    for (idx = 0; idx < extants.length; idx++) {
+	deletable.push(extants[idx].id);
+	deletable[extants[idx].id] = extants[idx].id;
+    }
+
+    return deletable;
+}
+
+function cleanDeletable(deletable)
+{
+    'use strict';
+    var id;
+    var el;
+
+    while(deletable.length) {
+	id = deletable.shift();
+	if (deletable[id] !== false) {
+	    el = document.getElementById(id);
+	    el.parentNode.removeChild(el);
+	}
+    }
+}
 
 function toggleNeardestCommonname()
 {

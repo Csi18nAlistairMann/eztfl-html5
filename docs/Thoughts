@@ -4656,12 +4656,12 @@ Or if 65m AND iOS, suggest user looks at location services allowed
 This time out I'll not do any of the NEW, and I may not do 1s maybe 2s. Otherwise
 though, like last time I'll generally do top right to bottom left.
 
-[PEND] 3  [BUG] neardesno_0<space><naptan> is cause of multiple copies of the near destination
+[x] 3  [BUG] neardesno_0<space><naptan> is cause of multiple copies of the near destination
 appearing. Instead of deleting on that id, delete on neardest class?
 
 This may also solve:
-6  [BUG] commonname doubles the trouble of neardest duplications
-22 [CFI] Since rationalising near destinations, are some of them staying on screen for
+[x] 6  [BUG] commonname doubles the trouble of neardest duplications
+[x] 22 [CFI] Since rationalising near destinations, are some of them staying on screen for
 a couple more renders before disappearing? (Solved by 3?)
 
 The problem seems to be that in some circumstances, neardest text, and now common name text,
@@ -4681,6 +4681,7 @@ might want to persist something about them. That means I have to track which one
 at each render, and delete the rest.
 
    That looks done for 3, also 6 & 22. Test later to sign off.
+   Tested good later, signed off.
 
 [PEND] 4  [BUG] it's unexpected behaviour that travelling at 100mph towards London, on the
 other side of Colchester, that I should see only responses from around my
@@ -4693,8 +4694,52 @@ just keep an eye out for similar situations.
 Manor House
       done.
 
-5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
+[ ] 5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
+  The toggle is stored in sessionStorage. Why doesn't it survive? Or does it, and it's being
+ignored?
+	 The toggle does seem to work as intended. So is being ignored? Yes. The actions to be
+applied are applied only once the toggle is changed. Those elements seem to be removed and
+rerendered, thus ignoring the toggle. Either we update rather than remove, re-render; or we
+observe the toggle having re-rendered. Look at updating first.
+	Yup, clear from renderGenericDivCore and parents that at each re-render I'm deleting
+what's already in the dom and recreating, which makes those things absent any DOM changes such
+as the selection, and this bug, the neardest/commonname choice.
+   This creates a Major Change. The change is from recreating objects in the DOM to persisting
+those objects instead, applying updates at each render. This change is Major as its not explicit
+in the code. Rather it's implicit and only revealed upon comprehending the code.
+   This raises the possibility both that there's /other/ code that implements an expectaton of
+remove & recreate, but also that there might be code that does not. Fortunately this is easy to
+determine: elements in the DOM are persisted by default, they must be manually removed. As they
+are removed using *.parentNode.removeChild(*) refactoring to handle these instances when found
+will be sufficient to have the project persist and update, allowing this bug to be addressed.
+There are five uses of removeChild.
+1. remove and recreate near destinations
+   removeChild is used to get rid of a near destination if there was no data to suggest either
+   an update, or that the near destination now exists.
+2. ditto common names
+   Ditto reason to keep to remove expired common names
+3. destroying countdown data (arrivals board)
+   This happens in renderCountdown()
+   This is called in response to new data from TFL. A reasonable question is: why would we want
+   to persist that data? On the other hand, that's what's got us to this point. Assuming that
+   we might later want to persist it, for whatever reason, are we able to persist it now? The
+   central task: can we uniquely identify an arrival? Yes: tfl supply an id with each arrival
+   that persists across calls. We can therefore add this id to the DOM element id. I'll also
+   note that the tfl id can be a negative number. What does the W3 say about hyphens in ids?
+   That there are "no other restrictions". So we can add it right in to "arrival_-12345".
+   Done.
+4. renderRemoveElementsById()
+   Used in renderBusStops ro remove a busstop
+			  to remove a near dest
+			  ro remove a common name
+			  to remove the table of routenos
+   Also in renderCountdown to remove a previous arrival
+5. renderRemoveElementsByClass()
+   Used in renderBusStops rto remove old bus stops that were not updated
 
+In each case - except the last maybe - we no longer want to delete what's there, but update it
+with whatever updates need making. First off, we change the removeChild on everything to use
+the delete-what-we-didn't-update system instead.
 
 
 
