@@ -35,6 +35,9 @@ const CLASS_BUSSTOP_NAME = 'busstop';
 const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
 const CLASS_NEARDEST_NAME = 'neardest';
 const CLASS_COMMONNAME_NAME = 'commonnamedir';
+const CLASS_ROUTE_NAME = 'lineno';
+const ID_ROUTE_TABLE_NAME = 'table_routenos';
+const ID_ROUTE_DIV_NAME = 'div_table_routenos';
 const ID_BUSSTOP_NAME = 'busstopno_';
 const ID_NEARDEST_NAME = 'neardestno_';
 const ID_COMMONNAMEDIR_NAME = 'commonnamedir_';
@@ -99,6 +102,8 @@ const TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST = 'neardest';
 const TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME = 'commonname';
 const TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER = 'neither';
 const TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH = 'both';
+const TOGGLE_LOOKING_AT_NEARDEST = 'neardest';
+const TOGGLE_LOOKING_AT_COMMONNAME = 'commonname';
 
 const RECT_LAT_NAME = 'rectangle-latitude';
 const RECT_LON_NAME = 'rectangle-longitude';
@@ -134,6 +139,7 @@ function eztflHtml5_setup()
 
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
     getLocationSetup();
+    setToggleNeardestCommonname(TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH);
 }
 
 //
@@ -346,9 +352,11 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
     var paragraph;
     var node;
     var div;
+    var el;
 
     // second time around, so test if we've already got it 1st
-    if (!document.getElementById(name)) {
+    el = document.getElementById(name);
+    if (!el) {
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
@@ -371,6 +379,14 @@ function renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, p
 
 	div = document.getElementById(parent);
 	div.appendChild(paragraph);
+
+    } else {
+	// second time around so update instead
+	paragraph = el;
+	if (positionArr !== null) {
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
+	}
     }
 }
 
@@ -381,6 +397,9 @@ function renderBusStop(parent, name, text, onclick_handler, eztflClass, position
 
     if (positionArr !== null) {
 	scaledPositions = scaleRingToRenderfield(positionArr, RING0, null);
+
+    } else {
+	scaledPositions = null;
     }
     renderGenericDivCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
 }
@@ -395,11 +414,7 @@ function renderBusStops()
     var busstop;
     var routeno;
     var busstop_naptan_class;
-    var extants;
     var deletable;
-    var elementmatch;
-    var classname;
-    var key;
     var positionsWithLog;
     var bearing;
     var positions;
@@ -430,35 +445,28 @@ function renderBusStops()
     var busstopNosIdx;
     var naptans;
     var naptansIdx;
+    var toggle;
+    var toggle_action;
+    var orphans;
+    var list;
+    var found;
+    var a;
+    var tmp;
 
     busstopData = getNotedBusStops();
     bumpomaticSetup(bumpArray);
 
-    // html that could be deleted when a busstop goes out of range
-    // is distinguished by having class busstop_<naptan>. Get an
-    // array of all such currently present in the DOM - we'll delete
-    // any that don't get updated
-    deletable = [];
-    extants = document.getElementsByClassName(CLASS_BUSSTOP_NAME);
-    for (elementmatch = 0; elementmatch < extants.length; elementmatch++) {
-	for (classname = 0; classname < extants[elementmatch].classList.length; classname++) {
-	    if (extants[elementmatch].classList[classname].substring(0, 8) === CLASS_BUSSTOP_NAPTAN_NAME) {
-		deletable[extants[elementmatch].classList[classname]] = true;
-	    }
-	}
-    }
-
     // Render new bus stop info
     heading = getComboHeading();
     setWheresNorthArrow(heading);
+    deletable = getDeletableForClass(CLASS_BUSSTOP_NAME);
 
     stop_count = 0;
     for (busstop = 0; busstop < busstopData.length; busstop++) {
 	// note bus stop going to be used, remove old name if present
 	busstop_naptan_class = CLASS_BUSSTOP_NAPTAN_NAME + busstopData[busstop].naptanId;
 	id = ID_BUSSTOP_NAME + busstopData[busstop].naptanId;
-	deletable[busstop_naptan_class] = false;
-	renderRemoveElementsById(id);
+	deletable[id] = false;
 	bumpomaticDeleteById(bumpArray, id);
 
 	// get positioning info
@@ -546,24 +554,15 @@ function renderBusStops()
 
 	stop_count++;
     }
-
-    // and delete any old items that didn't get updated
-    for (key in deletable) {
-	if (deletable.hasOwnProperty(key)) {
-	    if (deletable[key] === true) {
-		renderRemoveElementsByClass(key);
-		// not strictly needed as no rendering after this point
-		bumpomaticDeleteByClass(bumpArray, key);
-	    }
-	}
-    }
+    cleanDeletable(deletable);
 
     // fill in the near destinations on ring 2
+    toggle = getToggleNeardestCommonname(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME);
+    toggle_action = getToggleAction(toggle, TOGGLE_LOOKING_AT_NEARDEST);
     deletable = getDeletableForClass(CLASS_NEARDEST_NAME);
     for (towardsArrIdx = 0; towardsArrIdx < towardsArr.length; towardsArrIdx++) {
 	id = ID_NEARDEST_NAME + towardsArr[towardsArrIdx].data.naptanId;
 	deletable[id] = false;
-	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 
 	if (towardsArr[towardsArrIdx].bearing.length === 0) {
@@ -589,17 +588,17 @@ function renderBusStops()
 	    neardest_onclick = 'selectNearDestination("' + busstopNos.trim() + '")';
 	}
 
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions);
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_NEARDEST_NAME + ' ' + classNames.trim(), avgBearing, positions, toggle_action);
 	bumpomaticAddById(bumpArray, id);
     }
     cleanDeletable(deletable);
 
     // fill in the common names on ring 2
     deletable = getDeletableForClass(CLASS_COMMONNAME_NAME);
+    toggle_action = getToggleAction(toggle, TOGGLE_LOOKING_AT_COMMONNAME);
     for (commonNameArrIdx = 0; commonNameArrIdx < commonNameArr.length; commonNameArrIdx++) {
 	id = ID_COMMONNAMEDIR_NAME + commonNameArr[commonNameArrIdx].data.naptanId;
 	deletable[id] = false;
-	renderRemoveElementsById(id);
 	bumpomaticDeleteById(bumpArray, id);
 
 	if (commonNameArr[commonNameArrIdx].bearing.length === 0) {
@@ -625,43 +624,83 @@ function renderBusStops()
 	    neardest_onclick = 'selectNearDestination("' + busstopNos.trim() + '")';
 	}
 
-	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_COMMONNAME_NAME + ' ' + classNames.trim(), avgBearing, positions);
+	renderNearDestination(RENDERING_FIELD_NAME, id, text, neardest_onclick, CLASS_COMMONNAME_NAME + ' ' + classNames.trim(), avgBearing, positions, toggle_action);
 	bumpomaticAddById(bumpArray, id);
     }
     cleanDeletable(deletable);
 
-    // now get the route numbers into a table
+    // now get the route numbers into new or existing paragraphs
+    deletable = getDeletableForClass(CLASS_ROUTE_NAME);
     if (routenosArray.length) {
 	sortRoutenosTable(routenosArray);
-	div = document.getElementById('div_table_routenos');
+	for (numRoutes = 0; numRoutes < routenosArray.length; numRoutes += ROUTENOS_TABLE_WIDTH) {
+	    for (numOnLine = numRoutes; numOnLine < numRoutes + ROUTENOS_TABLE_WIDTH; numOnLine++) {
+		if (numOnLine < routenosArray.length) {
+		    naptans = '';
+		    for (naptansIdx = 0; naptansIdx < routenosArray[numOnLine].naptans.length; naptansIdx++) {
+			naptans += ID_BUSSTOP_NAME + routenosArray[numOnLine].naptans[naptansIdx] + ' ';
+		    }
+		    id = ID_ROUTE_NAME + routenosArray[numOnLine].name;
+		    deletable[id] = false;
+		    text = routenosArray[numOnLine].name;
+		    renderBusStop(RENDERING_FIELD_NAME, id, text,
+				  'selectBusStop("' + naptans.trim() + '")',
+				  CLASS_ROUTE_NAME,
+				  null);
+		}
+	    }
+	}
+    }
+    cleanDeletable(deletable);
+
+    // if those paragraphs are in the existing table, remove them
+    orphans = [];
+    list = document.getElementsByClassName(CLASS_ROUTE_NAME);
+    while(list.length) {
+	orphans.push(list[0].parentNode.removeChild(list[0]));
+    }
+    found = true;
+    while(found) {
+	found = false;
+	for (a = 0; a < orphans.length - 1; a++) {
+	    if (orphans[a].id > orphans[a + 1].id) {
+		tmp = orphans[a];
+		orphans[a] = orphans[a + 1];
+		orphans[a + 1] = tmp;
+		found = true;
+	    }
+	}
+    }
+
+    // remove the existing table structure wholesale
+    renderRemoveElementsById(ID_ROUTE_TABLE_NAME);
+    renderRemoveElementsByClass(ID_ROUTE_DIV_NAME);
+
+    // now reattach the paragraphs into a whole new table
+    if (routenosArray.length) {
+	div = document.getElementById(ID_ROUTE_DIV_NAME);
 	tbl = document.createElement('table');
 	tbl.style.width = '100%';
 	tbl.setAttribute('border', '1');
-	tbl.setAttribute('id', 'table_routenos');
+	tbl.setAttribute('id', ID_ROUTE_TABLE_NAME);
 	tbdy = document.createElement('tbody');
 	for (numRoutes = 0; numRoutes < routenosArray.length; numRoutes += ROUTENOS_TABLE_WIDTH) {
 	    tr = document.createElement('tr');
 	    for (numOnLine = numRoutes; numOnLine < numRoutes + ROUTENOS_TABLE_WIDTH; numOnLine++) {
 		if (numOnLine < routenosArray.length) {
 		    td = document.createElement('td');
-		    naptans = '';
-		    for (naptansIdx = 0; naptansIdx < routenosArray[numOnLine].naptans.length; naptansIdx++) {
-			naptans += ID_BUSSTOP_NAME + routenosArray[numOnLine].naptans[naptansIdx] + ' ';
-		    }
-		    td.setAttribute('onclick', 'selectBusStop("' + naptans.trim() + '")');
-		    td.appendChild(document.createTextNode(routenosArray[numOnLine].name));
+		    td.appendChild(orphans.shift());
 		    tr.appendChild(td);
 		}
 	    }
 	    tbdy.appendChild(tr);
 	}
 	tbl.appendChild(tbdy);
-	renderRemoveElementsById('table_routenos');
 	div.appendChild(tbl);
     }
 }
 
-function renderNearDestination(parent, name, text, onclick_handler, eztflClass, bearing, positionArr)
+function renderNearDestination(parent, name, text, onclick_handler, eztflClass, bearing, positionArr, toggle_action)
 {
     'use strict';
     var scaledPositions;
@@ -669,18 +708,20 @@ function renderNearDestination(parent, name, text, onclick_handler, eztflClass, 
     if (positionArr !== null) {
 	scaledPositions = scaleRingToRenderfield(positionArr, RING2, bearing);
     }
-    renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, scaledPositions);
+    renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, scaledPositions, toggle_action);
 }
 
-function renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, positionArr)
+function renderNearDestinationCore(parent, name, text, onclick_handler, eztflClass, positionArr, toggle_action)
 {
     'use strict';
     var paragraph;
     var node;
     var div;
+    var el;
 
     // second time around, so test if we've already got it 1st
-    if (!document.getElementById(name)) {
+    el = document.getElementById(name);
+    if (!el) {
 	// first time around there are no divs to look at so create them.
 	paragraph = document.createElement('p');
 	paragraph.setAttribute('id', name);
@@ -709,7 +750,23 @@ function renderNearDestinationCore(parent, name, text, onclick_handler, eztflCla
 	}
 	paragraph.style.marginTop = '0px';
 	paragraph.style.marginBottom = '0px';
+
+    } else {
+	// Otherwise we do have them, so merely update them
+	paragraph = el;
+	if (positionArr !== null) {
+	    paragraph.style.left = positionArr[0] + 'px';
+	    paragraph.style.top = positionArr[1] + 'px';
+	}
+	if (paragraph.offsetLeft + paragraph.clientWidth > RENDERFIELD_WIDTH) {
+	    paragraph.style.left = RENDERFIELD_WIDTH - paragraph.clientWidth + 'px';
+	}
+	if (paragraph.offsetTop + paragraph.clientHeight > RENDERFIELD_HEIGHT) {
+	    paragraph.style.top = RENDERFIELD_HEIGHT - paragraph.clientHeight + 'px';
+	}
     }
+
+    paragraph.style.display = toggle_action;
 }
 
 function renderCountdown(naptan)
@@ -766,25 +823,6 @@ function renderRemoveElementsByClass(className)
     list = document.getElementsByClassName(className);
     while(list.length) {
 	list[0].parentNode.removeChild(list[0]);
-    }
-}
-
-function renderReplaceDivWithText(dest, source, text)
-{
-    'use strict';
-    var paragraph;
-    var node;
-    var destChild;
-
-    // now we replace the second
-    if (!document.getElementById(source)) {
-	paragraph = document.createElement('p');
-	paragraph.setAttribute('id', source);
-	node = document.createTextNode(text);
-	paragraph.appendChild(node);
-
-	destChild = document.getElementById(dest);
-	destChild.parentNode.replaceChild(node, destChild);
     }
 }
 
@@ -1237,37 +1275,67 @@ function cleanDeletable(deletable)
     }
 }
 
-function toggleNeardestCommonname()
+function getToggleNeardestCommonname(name)
 {
     'use strict';
     var toggle;
-    var els;
-    var a;
-    var neardest_action;
-    var commonname_action;
 
-    toggle = sessionStorage.getItem(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME);
+    toggle = JSON.parse(sessionStorage.getItem(name));
+    if (toggle === null) {
+	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH;
+    }
+    return toggle;
+}
 
-    if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH	||
-	toggle === null) {
+function setToggleNeardestCommonname(toggle)
+{
+    'use strict';
+
+    sessionStorage.setItem(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME, JSON.stringify(toggle));
+}
+
+function updateToggleNeardestCommonname(toggle)
+{
+    'use strict';
+
+    if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH) {
 	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST;
-	neardest_action = 'block';
-	commonname_action = 'none';
 
     } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST) {
 	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME;
-	neardest_action = 'none';
-	commonname_action = 'block';
 
     } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME) {
 	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER;
-	neardest_action = 'none';
-	commonname_action = 'none';
 
     } else {
 	toggle = TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH;
+    }
+    return toggle;
+}
+
+function applyToggleNeardestCommonnameAction(toggle)
+{
+    'use strict';
+    var neardest_action;
+    var commonname_action;
+    var els;
+    var a;
+
+    if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH) {
 	neardest_action = 'block';
 	commonname_action = 'block';
+
+    } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST) {
+	neardest_action = 'block';
+	commonname_action = 'none';
+
+    } else if (toggle === TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME) {
+	neardest_action = 'none';
+	commonname_action = 'block';
+
+    } else {
+	neardest_action = 'none';
+	commonname_action = 'none';
     }
 
     els = document.getElementsByClassName(CLASS_NEARDEST_NAME);
@@ -1278,8 +1346,54 @@ function toggleNeardestCommonname()
     for(a = 0; a < els.length; a++){
 	els[a].style.display = commonname_action;
     }
+}
 
-    sessionStorage.setItem(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME, toggle);
+function getToggleAction(toggle, name)
+{
+    'use strict';
+    var action;
+
+    action = null;
+    if (name === TOGGLE_LOOKING_AT_NEARDEST) {
+	switch (toggle) {
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH:
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST:
+	    action = 'block';
+	    break;
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER:
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME:
+	    action = 'none';
+	    break;
+
+	default:
+	}
+
+    } else if (name === TOGGLE_LOOKING_AT_COMMONNAME) {
+	switch (toggle) {
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH:
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_COMMONNAME:
+	    action = 'block';
+	    break;
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_NEITHER:
+	case TOGGLE_SHOW_NEARDEST_COMMONNAME_NEARDEST:
+	    action = 'none';
+	    break;
+
+	default:
+	}
+    }
+    return action;
+}
+
+function toggleNeardestCommonname()
+{
+    'use strict';
+    var toggle;
+
+    toggle = getToggleNeardestCommonname(TOGGLE_SHOW_NEARDEST_COMMONNAME_NAME);
+    toggle = updateToggleNeardestCommonname(toggle);
+    setToggleNeardestCommonname(toggle);
+    applyToggleNeardestCommonnameAction(toggle);
 }
 
 //
@@ -1948,6 +2062,7 @@ function bumpomaticAddById(bumpArray, idName)
     var html;
     var element;
     var offset;
+    var was_none;
 
     if (!USE_BUMPOMATIC) {
 	return;
@@ -1955,6 +2070,11 @@ function bumpomaticAddById(bumpArray, idName)
 
     html = document.getElementById(idName);
     if (html !== null) {
+	was_none = false;
+	if (html.style.display === 'none') {
+	    was_none = true;
+	    html.style.display = 'block';
+	}
 	element = {};
 	element.id = idName;
 	element.classes = html.classList;
@@ -1972,6 +2092,11 @@ function bumpomaticAddById(bumpArray, idName)
 	    }
 	    html.style.top = html.offsetTop + offset[1] + 'px';
 	    element.ypos = html.offsetTop; // note setting style.top changed this in the last line!
+	}
+	if (was_none === true) {
+	    // this is an awful kludge. Should really completely rerun the
+	    // bumpomatic when toggling neardest/commonnames
+	    html.style.display = 'none';
 	}
 	bumpArray.push(element);
     }

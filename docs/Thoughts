@@ -4694,7 +4694,7 @@ just keep an eye out for similar situations.
 Manor House
       done.
 
-[ ] 5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
+[x] 5  [BUG] neardest and commonname choice doesn't survive re-render (solved by 3?)
   The toggle is stored in sessionStorage. Why doesn't it survive? Or does it, and it's being
 ignored?
 	 The toggle does seem to work as intended. So is being ignored? Yes. The actions to be
@@ -4739,11 +4739,44 @@ There are five uses of removeChild.
 
 In each case - except the last maybe - we no longer want to delete what's there, but update it
 with whatever updates need making. First off, we change the removeChild on everything to use
-the delete-what-we-didn't-update system instead.
+the delete-what-we-didn't-update system instead. Next up, instead of removeChild on individual
+elements, test for the existence and update if found instead.
+	  The last problem is the table of routenos at the bottom. While I can persist the
+routes themselves, how does one handle that they come and go? How does one move a td from
+row 2 cell 3 to row 1 cell 8?
+    Actually, we obviously don't. What we do is contain an element in the <td> and move that
+instead.
+ [x] ALSO: when new near destinations and commonnames are added, they should honour the
+existing toggle.
+
+	 Back to the table. Right now I've wrongly mixed content and style dumping items into
+consecutive rows and tables. They should instead be in a series of paragraphs. Those paragraphs
+can be updated like anything else. Once done, those paragraphs could then be relinked into a
+new table. In this manner we divorce content and style.
+    Done.
+
+[ ] 9  [COS] Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
+coords:
+0, 370,
+96, 148,
+552, 0,
+757, 434,
+662, 655,
+512, 330,
+318, 777,
+148, 704,
+340, 254,
+0, 370
+Also a very rough polygon to describe one heading straight up:
+-webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 
 
 
 
+12 [COS] a means by which localstorage can be cleared
+
+14 [COS] Don't change heading if speed below X, say 1 metre per sec
 
 ----------------------------------------------------------
 
