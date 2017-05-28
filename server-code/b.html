@@ -24,18 +24,18 @@
 <div id="you_are_here">You are here</div>
 </div> <!-- you_are_here_wrapper -->
 <div id="anti_and_clockwise">
-<table border=0 width=100%><tr>
-<td onclick="fakeHeadingRotate(10)" width=50% align=left>
+<table id="tbl_for_arrows"><tr>
+<td id="arrow_left" onclick="fakeHeadingRotate(10)">
   <div id="clip_arrow_upleft" class="rotate_arrow"></div>
 </td>
-<td onclick="fakeHeadingRotate(-10)" width=50% align=right>
+<td id="arrow_right" onclick="fakeHeadingRotate(-10)">
   <div id="clip_arrow_upright" class="rotate_arrow"></div>
 </td>
 </tr></table>
 </div> <!-- anti_and_clockwise -->
 <div id="wheres_north_arrow"></div>
 <div id="radius_line">
-<table border=0 width=100%><tr height=10px>
+<table id="tbl_for_radius"><tr id="tr_for_radius">
 <td></td>
 <td id="radius_scale"></td>
 <td></td>
