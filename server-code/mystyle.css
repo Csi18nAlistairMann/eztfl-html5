@@ -106,3 +106,14 @@ table#tbl_for_radius {
 tr#tr_for_radius {
     height: 10px;
 }
+
+table#table_routenos {
+    border-style: none none dashed dashed;
+    border-width: 1px;
+}
+
+td.cell_lineno {
+    border-style: dashed dashed none none;
+    border-width: 1px;
+    text-align: center;
+}

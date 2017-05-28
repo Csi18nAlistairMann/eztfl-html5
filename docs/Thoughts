@@ -4772,6 +4772,9 @@ kcalc sees this as: 0% 48%, 13% 19%, 72% 0%, 100% 56%, 87% 84%, 68% 42%, 42% 100
 -webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 	   [done]
+[X] From nowhere, w3c validation. table styling moved to CSS.
+[x] w3c validation also saw me add UTF-8 as the default encoding from my apache server.
+
 
 
 

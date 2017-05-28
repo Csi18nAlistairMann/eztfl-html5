@@ -36,6 +36,7 @@ const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
 const CLASS_NEARDEST_NAME = 'neardest';
 const CLASS_COMMONNAME_NAME = 'commonnamedir';
 const CLASS_ROUTE_NAME = 'lineno';
+const CLASS_ROUTE_CELL_NAME = 'cell_lineno'
 const ID_ROUTE_TABLE_NAME = 'table_routenos';
 const ID_ROUTE_DIV_NAME = 'div_table_routenos';
 const ID_BUSSTOP_NAME = 'busstopno_';
@@ -681,7 +682,6 @@ function renderBusStops()
 	div = document.getElementById(ID_ROUTE_DIV_NAME);
 	tbl = document.createElement('table');
 	tbl.style.width = '100%';
-	tbl.setAttribute('border', '1');
 	tbl.setAttribute('id', ID_ROUTE_TABLE_NAME);
 	tbdy = document.createElement('tbody');
 	for (numRoutes = 0; numRoutes < routenosArray.length; numRoutes += ROUTENOS_TABLE_WIDTH) {
@@ -689,6 +689,7 @@ function renderBusStops()
 	    for (numOnLine = numRoutes; numOnLine < numRoutes + ROUTENOS_TABLE_WIDTH; numOnLine++) {
 		if (numOnLine < routenosArray.length) {
 		    td = document.createElement('td');
+		    td.setAttribute('class', CLASS_ROUTE_CELL_NAME);
 		    td.appendChild(orphans.shift());
 		    tr.appendChild(td);
 		}
