@@ -4755,7 +4755,7 @@ can be updated like anything else. Once done, those paragraphs could then be rel
 new table. In this manner we divorce content and style.
     Done.
 
-[ ] 9  [COS] Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
+[x] 9  [COS] Get rid of arrow and lookups with css arrow. Counterclockwise arrow in
 coords:
 0, 370,
 96, 148,
@@ -4767,9 +4767,11 @@ coords:
 148, 704,
 340, 254,
 0, 370
-Also a very rough polygon to describe one heading straight up:
+kcalc sees this as: 0% 48%, 13% 19%, 72% 0%, 100% 56%, 87% 84%, 68% 42%, 42% 100%, 20% 91%, 45% 33%, 0% 48%
+      Also a very rough polygon to describe one heading straight up:
 -webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
+	   [done]
 
 
 

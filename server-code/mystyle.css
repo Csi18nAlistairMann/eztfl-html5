@@ -66,3 +66,19 @@ div#wheres_north_arrow {
 td#radius_scale {
     background-color: #cdcdcd;
 }
+
+div#clip_arrow_upright {
+    width: 110px;
+    height: 113px;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAEAQMAAABx4xdEAAAABlBMVEXNzc3n5+ceT3rBAAAAEElEQVQI12NQYEhgaGBYAAAE6AGh+QYzSAAAAABJRU5ErkJggg==')
+    repeat;
+    clip-path: polygon(0% 48%, 13% 19%, 73% 0%, 100% 56%, 87% 84%, 68% 42%, 42% 100%, 20% 91%, 45% 33%, 0% 48%);
+}
+
+div#clip_arrow_upleft {
+    width: 110px;
+    height: 113px;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAEAQMAAABx4xdEAAAABlBMVEXNzc3n5+ceT3rBAAAAEElEQVQI12NQYEhgaGBYAAAE6AGh+QYzSAAAAABJRU5ErkJggg==')
+    repeat;
+    clip-path: polygon(100% 48%, 87% 19%, 27% 0%, 0% 56%, 13% 84%, 32% 42%, 58% 100%, 80% 91%, 55% 33%, 100% 48%);
+}
