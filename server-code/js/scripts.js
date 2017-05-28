@@ -36,7 +36,7 @@ const CLASS_BUSSTOP_NAPTAN_NAME = 'busstop_';
 const CLASS_NEARDEST_NAME = 'neardest';
 const CLASS_COMMONNAME_NAME = 'commonnamedir';
 const CLASS_ROUTE_NAME = 'lineno';
-const CLASS_ROUTE_CELL_NAME = 'cell_lineno'
+const CLASS_ROUTE_CELL_NAME = 'cell_lineno';
 const ID_ROUTE_TABLE_NAME = 'table_routenos';
 const ID_ROUTE_DIV_NAME = 'div_table_routenos';
 const ID_BUSSTOP_NAME = 'busstopno_';
@@ -61,6 +61,8 @@ const RING1 = 1; // middle for bus routes
 const RING2 = 2; // outside for near destinations
 const DEVICES_HEADING_NAME = 'devicesheading';
 const FORCED_HEADING_NAME = 'forcedheading';
+const OLD_DEVICES_HEADING_NAME = 'old-rectangle-heading';
+const STATIONARY_MAX_HEADING_CHANGE = 18;
 
 const STR_GEOLOC_NOT_SUPPORTED = 'Geolocation is not supported by this browser.';
 const STR_GEOLOC_WAITING = 'Waiting for more data';
@@ -141,6 +143,7 @@ function eztflHtml5_setup()
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
     getLocationSetup();
     setToggleNeardestCommonname(TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH);
+    sessionStorage.setItem(OLD_DEVICES_HEADING_NAME, JSON.stringify(0));
 }
 
 //
@@ -1207,6 +1210,7 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
     var radius;
     var lat;
     var lon;
+    var old_heading;
 
     radius = speed_in_metres_per_second * (DEFAULT_LOOKAHEAD_SECS -
 					   ((latest_position.timestamp - early_position.timestamp) /
@@ -1227,6 +1231,17 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
     sessionStorage.setItem(LATITUDE_NAME, JSON.stringify(lat));
     sessionStorage.setItem(LONGITUDE_NAME, JSON.stringify(lon));
     sessionStorage.setItem(PREDICTION_METHOD_NAME, JSON.stringify(prediction_method));
+
+    old_heading = JSON.parse(sessionStorage.getItem(OLD_DEVICES_HEADING_NAME));
+
+    if (speed_in_metres_per_second < SPEED_STATIONARY_BELOW) {
+	if (devices_heading - old_heading > STATIONARY_MAX_HEADING_CHANGE) {
+	    devices_heading = modulo(devices_heading + STATIONARY_MAX_HEADING_CHANGE, 360);
+
+	} else if (devices_heading - old_heading < -STATIONARY_MAX_HEADING_CHANGE) {
+	    devices_heading = modulo(devices_heading - STATIONARY_MAX_HEADING_CHANGE, 360);
+	}
+    }
 
     sessionStorage.setItem(RECT_HEADING_NAME, JSON.stringify(devices_heading));
     sessionStorage.setItem(RECT_LAT_NAME, JSON.stringify(latest_position.coords.latitude));
@@ -1415,6 +1430,8 @@ function getDevicesHeading()
 function setDevicesHeading(devices_heading)
 {
     'use strict';
+
+    sessionStorage.setItem(OLD_DEVICES_HEADING_NAME, getDevicesHeading());
     sessionStorage.setItem(DEVICES_HEADING_NAME, JSON.stringify(devices_heading));
 }
 

@@ -4767,7 +4767,7 @@ coords:
 148, 704,
 340, 254,
 0, 370
-kcalc sees this as: 0% 48%, 13% 19%, 72% 0%, 100% 56%, 87% 84%, 68% 42%, 42% 100%, 20% 91%, 45% 33%, 0% 48%
+calc sees this as: 0% 48%, 13% 19%, 72% 0%, 100% 56%, 87% 84%, 68% 42%, 42% 100%, 20% 91%, 45% 33%, 0% 48%
       Also a very rough polygon to describe one heading straight up:
 -webkit-clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
 clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 51%, 0% 63%, 0% 37%);
@@ -4775,13 +4775,18 @@ clip-path: polygon(49% 0%, 100% 40%, 100% 65%, 62% 52%, 62% 100%, 38% 100%, 32% 
 [X] From nowhere, w3c validation. table styling moved to CSS.
 [x] w3c validation also saw me add UTF-8 as the default encoding from my apache server.
 
+[pend] 14 [COS] Don't change heading if speed below X, say 1 metre per sec
+   or rather, don't change it by more than, let's say, 18deg from where we are now. That makes it slow to
+turn around, but means one can move 180 deg within 10 renders, at very slow speed. That should make it much
+easier to see what's happening without the compass thrashing.
+       Done. Not able to directly test as the browser speed doesn't get above 0. If I had arranged a facility
+to 'replay' a previous feed, that would have helped but as it is, the logic checks out using calc, and I can
+check out live tomorrow.
 
 
 
 
 12 [COS] a means by which localstorage can be cleared
-
-14 [COS] Don't change heading if speed below X, say 1 metre per sec
 
 ----------------------------------------------------------
 

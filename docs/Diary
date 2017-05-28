@@ -227,3 +227,7 @@ Bug fix: "and", "or" within a name were being used as EOL
 bugfix: commonnames and near destinations not toggling properly
 bugfix: route nos not surviving rerender - even though not yet a feature
 	required
+cosmetic: change rotate arrows for CSS clipped
+Out of interest, correct after running w3c's validator. Visually only changes
+    the route number table border
+cosmetic: at stationary speeds limit speed of heading changing to max 18deg per render
