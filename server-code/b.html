@@ -14,11 +14,12 @@
   <script src="js/EggPositionAngles.js"></script>
 
 </head>
-<body onload="eztflHtml5_setup()" onkeypress="capturedKeypress(event)">
+<body onload="eztflHtml5_setup(false)" onkeypress="capturedKeypress(event)">
 
 <div id="renderingField">
 <div id="reset_forced_heading" onclick="resetForcedHeading()">Reset heading</div>
 <div id="speed_mps"></div>
+<div id="location_accuracy"></div>
 <div id="guessed_transport_mode"></div>
 <div id="you_are_here_wrapper">
 <div id="you_are_here">You are here</div>
@@ -42,6 +43,7 @@
 </tr></table>
 </div> <!-- radius_line -->
 <div onclick="toggleNeardestCommonname()">Toggle neardest & commonname</div>
+<div onclick="eztflHtml5_setup(true)">Full reset</div>
 <div id="div_table_routenos"></div>
 </div> <!-- renderingField -->
 

@@ -47,6 +47,7 @@ const ID_ARRIVAL_NAME = 'arrival_';
 const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
+const ACCURACY_NAME = 'location_accuracy';
 const NAPTAN_NAME = 'naptan';
 const RENDERFIELD_WIDTH = 360;
 const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
@@ -137,9 +138,14 @@ var tracked_positions = [];
 //
 // setup helpers (middle)
 //
-function eztflHtml5_setup()
+function eztflHtml5_setup(reset)
 {
     'use strict';
+
+    if (reset === true) {
+	sessionStorage.clear();
+	localStorage.clear();
+    }
 
     setup_tracked_positions(NUM_TRACKED_POSITIONS);
     getLocationSetup();

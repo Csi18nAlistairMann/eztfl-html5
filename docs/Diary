@@ -231,3 +231,8 @@ cosmetic: change rotate arrows for CSS clipped
 Out of interest, correct after running w3c's validator. Visually only changes
     the route number table border
 cosmetic: at stationary speeds limit speed of heading changing to max 18deg per render
+Apache server: set up to default serve as UTF-8
+
+30 May 2017
+Bugfix: limit speed to 112 metres per second
+Cosmetic: Add full reset to clear both storages
