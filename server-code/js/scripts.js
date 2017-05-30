@@ -49,6 +49,9 @@ const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
 const ACCURACY_NAME = 'location_accuracy';
 const ACCURACY_TEXT = 'Accuracy: ';
+const ACCURACY_UNIT_TEXT = 'm';
+const ACCURACY_UNKNOWN_TEXT = 'n/a';
+const USE_HIGH_ACCURACY = true;
 const NAPTAN_NAME = 'naptan';
 const RENDERFIELD_WIDTH = 360;
 const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
@@ -62,7 +65,11 @@ const RING0 = 0; // centre for bus stops
 const RING1 = 1; // middle for bus routes
 const RING2 = 2; // outside for near destinations
 const DEVICES_HEADING_NAME = 'devicesheading';
+const ID_FORCED_HEADING_NAME = 'reset_forced_heading';
 const FORCED_HEADING_NAME = 'forcedheading';
+const FORCED_HEADING_ZERO_TEXT = 'No forced heading';
+const FORCED_HEADING_NONZERO_TEXT = 'Reset: heading ';
+const FORCED_HEADING_UNIT_TEXT = '&deg;';
 const OLD_DEVICES_HEADING_NAME = 'old-rectangle-heading';
 const STATIONARY_MAX_HEADING_CHANGE = 18;
 
@@ -165,7 +172,7 @@ function getLocationSetup()
 	runAsFake();
 
     } else if (navigator.geolocation) {
-	navigator.geolocation.watchPosition(mainLoop, cannotWatchPosition);
+	navigator.geolocation.watchPosition(mainLoop, cannotWatchPosition, {enableHighAccuracy: USE_HIGH_ACCURACY});
 
     } else {
 	alert(STR_GEOLOC_NOT_SUPPORTED);
@@ -1426,7 +1433,7 @@ function toggleNeardestCommonname()
 function resetForcedHeading()
 {
     'use strict';
-    setForcedHeading(null);
+    sessionStorage.removeItem(FORCED_HEADING_NAME);
 }
 
 function getDevicesHeading()
@@ -1447,14 +1454,24 @@ function getForcedHeading()
 {
     'use strict';
     var heading;
+    var forced_heading;
+    var text;
+    var el;
 
     heading = sessionStorage.getItem(FORCED_HEADING_NAME);
     if (heading === null || heading === undefined) {
-	return 0;
+	forced_heading = 0;
+	text = FORCED_HEADING_ZERO_TEXT;
 
     } else {
-	return JSON.parse(sessionStorage.getItem(FORCED_HEADING_NAME));
+	forced_heading = JSON.parse(sessionStorage.getItem(FORCED_HEADING_NAME));
+	text = FORCED_HEADING_NONZERO_TEXT + forced_heading + FORCED_HEADING_UNIT_TEXT;
     }
+
+    el = document.getElementById(ID_FORCED_HEADING_NAME);
+    el.innerHTML = text;
+
+    return forced_heading;
 }
 
 function setForcedHeading(forced_choice_heading)
@@ -1721,6 +1738,7 @@ function getSpeedInMetresPerSecond(position1, position2, distance_in_metres)
     'use strict';
     var seconds;
     var mseconds;
+    var speed;
 
     if (distance_in_metres === 0) {
 	return 0;
@@ -1887,11 +1905,12 @@ function checkPositionValues(original_position)
 	position.coords.longitude = 0;
     }
 
-    if (typeof(position.coords.accuracy) !== 'number') {
-	val = 'n/a';
+    if (typeof(position.coords.accuracy) !== 'number' ||
+	isNaN(position.coords.accuracy)) {
+	val = ACCURACY_UNKNOWN_TEXT;
 
     } else {
-	val = position.coords.accuracy + 'm';
+	val = Math.round(position.coords.accuracy) + ACCURACY_UNIT_TEXT;
     }
     el = document.getElementById(ACCURACY_NAME);
     el.innerHTML = ACCURACY_TEXT + val;

@@ -4800,6 +4800,26 @@ to generate pretty high latency.
 could implement it for the same reason we might implememnt the replay mode: it's useful for debugging. When
 the ideal world arrives, it could then be disabled.
 
+[-] 10 [COS] Selecting doesn't survive re-render. Should it?
+    Solved by [5] above
+
+11 [COS] reset heading should say something else until the heading is resettable. That
+would give the user a feedback mechanism for once the heading has been reset
+      At the moment I note "Reset heading" whatever the status of the user's forced heading.
+I want something else. How about "No forced heading" when 0, and "Reset: heading Xdeg" when
+not 0.
+    Done.
+
+
+
+13 [COS] Would be great to "freeze" display from updating further: rapid updates can see
+selection lost too quickly
+
+16 [COS] show bus stop common name when showing arrivals board
+
+17 [COS] menu toggle for showing top left stuff. By this intend an encompassing div which
+would appear on top of the renderfield
+
 
 
 ----------------------------------------------------------
@@ -4818,3 +4838,6 @@ clear sessionStorage if more than 60 seconds since last update?
 remove arrivals board if bus stop itself has vanished
 
 I've been thinking about adding some kind of a menu system. Click button, menu appears, choices are made.
+
+Just noticed: iOS 10.3.2 and OSX 10.11.6 (Safari 10.1.1) do not support CSS clip-path so rotate arrows
+are missing in favour of unclipped div squares.
