@@ -48,6 +48,7 @@ const RADIUS_NAME = 'radius';
 const LATITUDE_NAME = 'latitude';
 const LONGITUDE_NAME = 'longitude';
 const ACCURACY_NAME = 'location_accuracy';
+const ACCURACY_TEXT = 'Accuracy: ';
 const NAPTAN_NAME = 'naptan';
 const RENDERFIELD_WIDTH = 360;
 const PREDICTION_POINT_X = RENDERFIELD_WIDTH / 2;
@@ -1835,14 +1836,20 @@ function sortRoutenosTable(data)
 function checkPositionValues(original_position)
 {
     'use strict';
-    var old_ts = original_position.timestamp;
-    var new_ts = Date.now();
+    var old_ts;
+    var new_ts;
     var position;
+    var el;
+    var val;
+
+    old_ts = original_position.timestamp;
+    new_ts = Date.now();
 
     position = Object.assign({}, original_position);
     position.coords = Object.assign({}, original_position.coords);
     position.coords.latitude = original_position.coords.latitude;
     position.coords.longitude = original_position.coords.longitude;
+    position.coords.accuracy = original_position.coords.accuracy;
     position.timestamp = original_position.timestamp;
 
     // the timestamp should reflect a date between 1970 and 9999AD
@@ -1879,6 +1886,15 @@ function checkPositionValues(original_position)
 		 position.coords.longitude <= HIGHEST_LONGITUDE)) {
 	position.coords.longitude = 0;
     }
+
+    if (typeof(position.coords.accuracy) !== 'number') {
+	val = 'n/a';
+
+    } else {
+	val = position.coords.accuracy + 'm';
+    }
+    el = document.getElementById(ACCURACY_NAME);
+    el.innerHTML = ACCURACY_TEXT + val;
 
     return position;
 }

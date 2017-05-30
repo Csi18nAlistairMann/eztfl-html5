@@ -4785,8 +4785,9 @@ check out live tomorrow.
  - day later: Testing was inconclusive about whether this limiting rotation while stationary was
    happenning, largely because lat/lon was all over the place making me look like I was walking when stationary
    and vice versa.
-   [ ] As I wonder if this is an accuracy thing, can I add an accuracy element to the display? Or does that
+   [x] As I wonder if this is an accuracy thing, can I add an accuracy element to the display? Or does that
      rely on using something else?
+     Nope doesn't rely on something else. Done.
 
 [x] from nowhere, limit max speed to 112 metres per second, about speed of fastest helicopters. Reason being
     I've a number of times seen speeds in excess of 1000 metres per second.
