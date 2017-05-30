@@ -4782,11 +4782,27 @@ easier to see what's happening without the compass thrashing.
        Done. Not able to directly test as the browser speed doesn't get above 0. If I had arranged a facility
 to 'replay' a previous feed, that would have helped but as it is, the logic checks out using calc, and I can
 check out live tomorrow.
+ - day later: Testing was inconclusive about whether this limiting rotation while stationary was
+   happenning, largely because lat/lon was all over the place making me look like I was walking when stationary
+   and vice versa.
+   [ ] As I wonder if this is an accuracy thing, can I add an accuracy element to the display? Or does that
+     rely on using something else?
 
 
 
+[x] from nowhere, limit max speed to 112 metres per second, about speed of fastest helicopters. Reason being
+    I've a number of times seen speeds in excess of 1000 metres per second.
 
-12 [COS] a means by which localstorage can be cleared
+[ ] 12 [COS] a means by which localstorage can be cleared
+   I occasionally find myself clearing the storage for the site via my 'phones browser. That might be because
+I've got some mad speed (I've seen 2,236 mph - London to Los Angeles in just under 3 seconds) and that seems
+to generate pretty high latency.
+   In an ideal world there'd be no need for clearing storage that way but this IS an incomplete project, we
+could implement it for the same reason we might implememnt the replay mode: it's useful for debugging. When
+the ideal world arrives, it could then be disabled.
+    I've been thinking about adding some kind of a menu system. Click button, menu appears, choices are made.
+
+
 
 ----------------------------------------------------------
 
@@ -4796,3 +4812,9 @@ Simple sounding vs Complex doing
 The value of not coding a project from the top-down but bottom-up. That is, I
 didn't start with front-end and shoe-horned data to fit it, but started with
 the data and developed it into successively higher forms.
+
+arrivals board appears underneath arrows (this was with the png arrows)
+
+clear sessionStorage if more than 60 seconds since last update?
+
+remove arrivals board if bus stop itself has vanished

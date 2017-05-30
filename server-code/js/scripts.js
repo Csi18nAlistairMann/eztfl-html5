@@ -97,6 +97,7 @@ const SPEED_GUESS_TEXT_NAN = 'undetermined';
 const SPEED_GUESS_TEXT_VFAST = 'intercity travel';
 const SPEED_METRES_PS_TEXT_NAN = 'n/a';
 const SPEED_MPS_NAME = 'speed_mps';
+const SPEED_MAX = 112;
 
 const WHERES_NORTH_ARROW_NAME = 'wheres_north_arrow';
 const RADIUS_SCALE_NAME = 'radius_scale';
@@ -1730,7 +1731,12 @@ function getSpeedInMetresPerSecond(position1, position2, distance_in_metres)
 	return 0;
     }
 
-    return distance_in_metres / seconds;
+    speed = distance_in_metres / seconds;
+    if (speed > SPEED_MAX) {
+	speed = SPEED_MAX;
+    }
+
+    return speed;
 }
 
 //
