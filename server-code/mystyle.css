@@ -22,10 +22,20 @@ div#anti_and_clockwise {
     width: 360px;
     top: 305px;
 }
+div#menu_div {
+    display: inline-block;
+    width: 360px;
+    z-index: 0;
+}
+div#menu_wrapper {
+    position: fixed;
+    top: 275px;
+    text-align: center;
+}
 div#you_are_here {
     display: inline-block;
     width: 360px;
-    pointer-events:none;
+    pointer-events: none;
     z-index: 0;
 }
 div#you_are_here_wrapper {
@@ -55,12 +65,12 @@ p.selected_border {
 }
 
 div#wheres_north_arrow {
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 20px solid red;
-  transform: rotate(0deg);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 20px solid red;
+    transform: rotate(0deg);
 }
 
 td#radius_scale {

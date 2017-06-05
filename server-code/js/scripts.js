@@ -1273,6 +1273,11 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
 //
 // User Interface helpers (front)
 //
+function menuTouched()
+{
+    'use strict';
+    alert("hello world");
+}
 
 function getDeletableForClass(classname)
 {

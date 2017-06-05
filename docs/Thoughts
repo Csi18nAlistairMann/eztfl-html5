@@ -4810,10 +4810,25 @@ I want something else. How about "No forced heading" when 0, and "Reset: heading
 not 0.
     Done.
 
-
-
 13 [COS] Would be great to "freeze" display from updating further: rapid updates can see
 selection lost too quickly
+	  The original problem of selection being lost has now gone away with the solving of [5] above.
+The freeze facility would still make some sense though, as the updates are just about fast enough that
+between decision and selection, elements can have moved. By putting a freeze logo in one place on screen,
+that allows people to freeze first, decide second.
+     The logo could follow the pause/play paradigm: ▋▋ and  ▶. The logo themselves could be just under
+the "you are here" text, with each being used to indicate the offered state: the pause logo is seen
+where currently running and the play logo seen when currently frozen.
+      When frozen I would expect to turn off that callback which sees the code called up when a new location
+becomes present. With no new location callback, there's no opportunity for device-led changes that affect
+the heading, speed etc: only the user could change the former (via the rotation arrows) and unpause for the
+latter.
+	This could also be done with a dual purpose "Menu" element. Touching Menu pauses the updates in the
+same way until the menu is closed. An option within menu allows updates to be turned off even if subsequently
+closed.
+
+
+
 
 16 [COS] show bus stop common name when showing arrivals board
 
@@ -4841,3 +4856,23 @@ I've been thinking about adding some kind of a menu system. Click button, menu a
 
 Just noticed: iOS 10.3.2 and OSX 10.11.6 (Safari 10.1.1) do not support CSS clip-path so rotate arrows
 are missing in favour of unclipped div squares.
+
+idea: still stationary if newpos+accuracy contains oldpos
+
+can limit to first or nearest N through API or post-processing?
+
+stop 47235 didn't cause "or east finchley" and another time no "Muswell hill"
+
+miles per hour for speed too
+
+heavy lag when intercity. tfl throttle? processing of rectangler? profile of time in routine
+
+use the time since last update to draw a pattern that updates indiocation how long things are taking,
+similar to hearrbeat with tfl.
+
+menu | pause. menu temporarily stops, pause actually stops
+
+only show stops for specified directions ("I'm going south - don't show me stops going North")
+
+when actually on a bus, option to brng up sequence of stops, with next stop described with code,
+5 letter, near dest, common name anmd directions, stops when clicked bring up arrivals board

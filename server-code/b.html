@@ -1,51 +1,54 @@
 <!doctype html>
 
 <html lang="en">
-<head>
-  <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
 
-  <title>eztfl-html5</title>
-  <meta name="description" content="eztfl-html5">
-  <meta name="author" content="Alistair Mann">
-  <meta name="viewport" content="width=360, initial-scale=1">
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-  <link rel="stylesheet" type="text/css" href="mystyle.css">
-  <script src="js/scripts.js"></script>
-  <script src="js/EggPositionAngles.js"></script>
+    <title>eztfl-html5</title>
+    <meta name="description" content="eztfl-html5">
+    <meta name="author" content="Alistair Mann">
+    <meta name="viewport" content="width=360, initial-scale=1">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+    <script src="js/scripts.js"></script>
+    <script src="js/EggPositionAngles.js"></script>
 
-</head>
-<body onload="eztflHtml5_setup(false)" onkeypress="capturedKeypress(event)">
+  </head>
+  <body onload="eztflHtml5_setup(false)" onkeypress="capturedKeypress(event)">
 
-<div id="renderingField">
-<div id="reset_forced_heading" onclick="resetForcedHeading()"></div>
-<div id="speed_mps"></div>
-<div id="location_accuracy"></div>
-<div id="guessed_transport_mode"></div>
-<div id="you_are_here_wrapper">
-<div id="you_are_here">You are here</div>
-</div> <!-- you_are_here_wrapper -->
-<div id="anti_and_clockwise">
-<table id="tbl_for_arrows"><tr>
-<td id="arrow_left" onclick="fakeHeadingRotate(10)">
-  <div id="clip_arrow_upleft" class="rotate_arrow"></div>
-</td>
-<td id="arrow_right" onclick="fakeHeadingRotate(-10)">
-  <div id="clip_arrow_upright" class="rotate_arrow"></div>
-</td>
-</tr></table>
-</div> <!-- anti_and_clockwise -->
-<div id="wheres_north_arrow"></div>
-<div id="radius_line">
-<table id="tbl_for_radius"><tr id="tr_for_radius">
-<td></td>
-<td id="radius_scale"></td>
-<td></td>
-</tr></table>
-</div> <!-- radius_line -->
-<div onclick="toggleNeardestCommonname()">Toggle neardest & commonname</div>
-<div onclick="eztflHtml5_setup(true)">Full reset</div>
-<div id="div_table_routenos"></div>
-</div> <!-- renderingField -->
+    <div id="renderingField">
+      <div id="reset_forced_heading" onclick="resetForcedHeading()"></div>
+      <div id="speed_mps"></div>
+      <div id="location_accuracy"></div>
+      <div id="guessed_transport_mode"></div>
+      <div id="menu_wrapper">
+	<div id="menu_div" onclick="menuTouched()">Menu</div>
+      </div> <!-- menu_wrapper -->
+      <div id="you_are_here_wrapper">
+	<div id="you_are_here">You are here</div>
+      </div> <!-- you_are_here_wrapper -->
+      <div id="anti_and_clockwise">
+	<table id="tbl_for_arrows"><tr>
+	    <td id="arrow_left">
+	      <div id="clip_arrow_upleft" class="rotate_arrow" onclick="fakeHeadingRotate(10)"></div>
+	    </td>
+	    <td id="arrow_right">
+	      <div id="clip_arrow_upright" class="rotate_arrow" onclick="fakeHeadingRotate(-10)"></div>
+	    </td>
+	</tr></table>
+      </div> <!-- anti_and_clockwise -->
+      <div id="wheres_north_arrow"></div>
+      <div id="radius_line">
+	<table id="tbl_for_radius"><tr id="tr_for_radius">
+	    <td></td>
+	    <td id="radius_scale"></td>
+	    <td></td>
+	</tr></table>
+      </div> <!-- radius_line -->
+      <div onclick="toggleNeardestCommonname()">Toggle neardest & commonname</div>
+      <div onclick="eztflHtml5_setup(true)">Full reset</div>
+      <div id="div_table_routenos"></div>
+    </div> <!-- renderingField -->
 
-</body>
+  </body>
 </html>
