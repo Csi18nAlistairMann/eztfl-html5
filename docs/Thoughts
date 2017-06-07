@@ -4803,14 +4803,14 @@ the ideal world arrives, it could then be disabled.
 [-] 10 [COS] Selecting doesn't survive re-render. Should it?
     Solved by [5] above
 
-11 [COS] reset heading should say something else until the heading is resettable. That
+[x] 11 [COS] reset heading should say something else until the heading is resettable. That
 would give the user a feedback mechanism for once the heading has been reset
       At the moment I note "Reset heading" whatever the status of the user's forced heading.
 I want something else. How about "No forced heading" when 0, and "Reset: heading Xdeg" when
 not 0.
     Done.
 
-13 [COS] Would be great to "freeze" display from updating further: rapid updates can see
+[x] 13 [COS] Would be great to "freeze" display from updating further: rapid updates can see
 selection lost too quickly
 	  The original problem of selection being lost has now gone away with the solving of [5] above.
 The freeze facility would still make some sense though, as the updates are just about fast enough that
@@ -4826,16 +4826,15 @@ latter.
 	This could also be done with a dual purpose "Menu" element. Touching Menu pauses the updates in the
 same way until the menu is closed. An option within menu allows updates to be turned off even if subsequently
 closed.
+[x] 17 [COS] menu toggle for showing top left stuff. By this intend an encompassing div which
+would appear on top of the renderfield
+	Done. This also neatly adds in 17, a couple of the immediate todos below. And also starts along
+the "use objects" desire from the docs/Todo file
 
 
 
 
 16 [COS] show bus stop common name when showing arrivals board
-
-17 [COS] menu toggle for showing top left stuff. By this intend an encompassing div which
-would appear on top of the renderfield
-
-
 
 ----------------------------------------------------------
 
@@ -4852,8 +4851,6 @@ clear sessionStorage if more than 60 seconds since last update?
 
 remove arrivals board if bus stop itself has vanished
 
-I've been thinking about adding some kind of a menu system. Click button, menu appears, choices are made.
-
 Just noticed: iOS 10.3.2 and OSX 10.11.6 (Safari 10.1.1) do not support CSS clip-path so rotate arrows
 are missing in favour of unclipped div squares.
 
@@ -4869,8 +4866,6 @@ heavy lag when intercity. tfl throttle? processing of rectangler? profile of tim
 
 use the time since last update to draw a pattern that updates indiocation how long things are taking,
 similar to hearrbeat with tfl.
-
-menu | pause. menu temporarily stops, pause actually stops
 
 only show stops for specified directions ("I'm going south - don't show me stops going North")
 

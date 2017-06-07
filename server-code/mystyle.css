@@ -17,6 +17,16 @@ div#renderingField {
     height: 510px;
     background-color: #e7e7e7;
 }
+div#menuField {
+    background-color: lightgreen;
+    position: fixed;
+    display: none;
+    width: 16em;
+    left: 2em;
+    top: 3.5em;
+    z-index: 2;
+    border: 5px solid #f7ff00;
+}
 div#anti_and_clockwise {
     position: fixed;
     width: 360px;

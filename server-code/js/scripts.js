@@ -65,10 +65,10 @@ const RING0 = 0; // centre for bus stops
 const RING1 = 1; // middle for bus routes
 const RING2 = 2; // outside for near destinations
 const DEVICES_HEADING_NAME = 'devicesheading';
-const ID_FORCED_HEADING_NAME = 'reset_forced_heading';
+const ID_FORCED_HEADING_NAME = 'forced_heading';
 const FORCED_HEADING_NAME = 'forcedheading';
 const FORCED_HEADING_ZERO_TEXT = 'No forced heading';
-const FORCED_HEADING_NONZERO_TEXT = 'Reset: heading ';
+const FORCED_HEADING_NONZERO_TEXT = 'Heading: ';
 const FORCED_HEADING_UNIT_TEXT = '&deg;';
 const OLD_DEVICES_HEADING_NAME = 'old-rectangle-heading';
 const STATIONARY_MAX_HEADING_CHANGE = 18;
@@ -132,6 +132,15 @@ const DIR_BOTTOM = 'B';
 const LAT = 0;
 const LON = 1;
 
+const MENU_FIELD_NAME = 'menuField';
+const MENU_OPEN_NAME = 'menu_open_flag';
+const MENU_OPEN_DEFAULT_VALUE = false;
+
+const ID_TOGGLE_PAUSE_NAME = 'toggle_pause';
+const TOGGLE_PAUSE_NAME = 'pause_toggle';
+const TOGGLE_PAUSE_WHEN_PAUSED_TEXT = 'Continue';
+const TOGGLE_PAUSE_WHEN_PLAYING_TEXT = 'Pause';
+
 const FAKE_SRC_PECKHAM = 'peckham';
 const FAKE_SRC_PICCADILLY = 'piccadilly';
 const FAKE_SRC_TRAFALGAR = 'trafalgar';
@@ -141,7 +150,9 @@ const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 //
 // Globals (middle)
 //
-var tracked_positions = [];
+var eztflhtml5 = {};
+eztflhtml5.tracked_positions = [];
+eztflhtml5.menuObj = new MenuType();
 
 //
 // setup helpers (middle)
@@ -159,6 +170,7 @@ function eztflHtml5_setup(reset)
     getLocationSetup();
     setToggleNeardestCommonname(TOGGLE_SHOW_NEARDEST_COMMONNAME_BOTH);
     sessionStorage.setItem(OLD_DEVICES_HEADING_NAME, JSON.stringify(0));
+    togglePause();
 }
 
 //
@@ -1180,9 +1192,9 @@ function updateForNewPrediction(num_positions_tracked)
     if (num_positions_tracked < 2)
 	return [STR_GEOLOC_WAITING];
 
-    early_position = tracked_positions[NUM_TRACKED_POSITIONS -
+    early_position = eztflhtml5.tracked_positions[NUM_TRACKED_POSITIONS -
 				       num_positions_tracked];
-    latest_position = tracked_positions[NUM_TRACKED_POSITIONS - 1];
+    latest_position = eztflhtml5.tracked_positions[NUM_TRACKED_POSITIONS - 1];
 
     distance_in_metres = getDistanceInMetres(early_position, latest_position);
 
@@ -1271,12 +1283,81 @@ function updateForNewPredictionGenericRadius(num_positions_tracked, early_positi
 
 //-------------------------------------------------------------
 //
+// Objects!
+//
+function MenuType() {
+    'use strict';
+    this.status = null;
+
+    this.getOpenStatus = function() {
+	if (this.status === null) {
+	    if (sessionStorage.getItem(MENU_OPEN_NAME) === 'true') {
+		this.status = false;
+
+	    } else {
+		this.status = true;
+	    }
+	}
+	return this.status;
+    };
+
+    this.toggleOpenStatus = function() {
+	var el;
+	var vis;
+
+	if (this.status === null) {
+	    this.status = MENU_OPEN_DEFAULT_VALUE;
+	}
+	if (this.status === true) {
+	    vis = 'none';
+	    // alert('Was open so closing it!');
+	    this.status = false;
+
+	} else {
+	    vis = 'block';
+	    // alert('Not open, so opening it!');
+	    this.status = true;
+	}
+	el = document.getElementById(MENU_FIELD_NAME);
+	el.style.display = vis;
+	sessionStorage.setItem(MENU_OPEN_NAME, this.status);
+    };
+}
+
+//-------------------------------------------------------------
+//
 // User Interface helpers (front)
 //
+function togglePause()
+{
+    'use strict';
+    var pause;
+    var el;
+    var text;
+
+    pause = JSON.parse(sessionStorage.getItem(TOGGLE_PAUSE_NAME));
+    if (pause === null) {
+	pause = true;
+    }
+
+    if (pause === true) {
+	pause = false;
+	text = TOGGLE_PAUSE_WHEN_PLAYING_TEXT;
+
+    } else {
+	pause = true;
+	text = TOGGLE_PAUSE_WHEN_PAUSED_TEXT;
+    }
+    el = document.getElementById(ID_TOGGLE_PAUSE_NAME);
+    el.innerHTML = text;
+
+    sessionStorage.setItem(TOGGLE_PAUSE_NAME, JSON.stringify(pause));
+}
+
 function menuTouched()
 {
     'use strict';
-    alert("hello world");
+    eztflhtml5.menuObj.toggleOpenStatus();
 }
 
 function getDeletableForClass(classname)
@@ -2231,7 +2312,7 @@ function setup_tracked_positions(num_positions)
     var a;
 
     for (a = 0; a < num_positions; a++) {
-	tracked_positions[a] = null;
+	eztflhtml5.tracked_positions[a] = null;
     }
 }
 
@@ -2243,12 +2324,12 @@ function positionPush(num_positions, position)
 
     count = 0;
     for (a = 0; a < num_positions - 1; a++) {
-	tracked_positions[a] = tracked_positions[a + 1];
-	if (tracked_positions[a] !== null) {
+	eztflhtml5.tracked_positions[a] = eztflhtml5.tracked_positions[a + 1];
+	if (eztflhtml5.tracked_positions[a] !== null) {
 	    count++;
 	}
     }
-    tracked_positions[num_positions - 1] = position;
+    eztflhtml5.tracked_positions[num_positions - 1] = position;
 
     return ++count;
 }
@@ -2279,12 +2360,19 @@ function sendGetCore(url, handler)
 //
 // mainLoop (middle)
 //
-function mainLoop(position)
+function mainLoop(position_dirty)
 {
     'use strict';
-    var num_positions_tracked = 0;
+    var position_cleaned;
 
-    position = checkPositionValues(position);
-    num_positions_tracked = positionPush(NUM_TRACKED_POSITIONS, position);
-    updateForNewPrediction(num_positions_tracked);
+    if (eztflhtml5.menuObj.getOpenStatus() === true ||
+	JSON.parse(sessionStorage.getItem(TOGGLE_PAUSE_NAME)) === true) {
+	// don't conduct updates while menu is open or
+	// if the user as indicated pause should persist
+	// when menu closed
+
+    } else {
+	position_cleaned = checkPositionValues(position_dirty);
+	updateForNewPrediction(positionPush(NUM_TRACKED_POSITIONS, position_cleaned));
+    }
 }

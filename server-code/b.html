@@ -17,7 +17,13 @@
   <body onload="eztflHtml5_setup(false)" onkeypress="capturedKeypress(event)">
 
     <div id="renderingField">
-      <div id="reset_forced_heading" onclick="resetForcedHeading()"></div>
+      <div id="menuField">
+	<div id="toggle_pause" onclick="togglePause()"></div>
+	<div id="reset_forced_heading" onclick="resetForcedHeading()">Reset forced heading</div>
+	<div onclick="toggleNeardestCommonname()">Toggle neardest & commonname</div>
+	<div onclick="eztflHtml5_setup(true)">Full reset</div>
+      </div> <!-- menuField -->
+      <div id="forced_heading"></div>
       <div id="speed_mps"></div>
       <div id="location_accuracy"></div>
       <div id="guessed_transport_mode"></div>
@@ -45,8 +51,6 @@
 	    <td></td>
 	</tr></table>
       </div> <!-- radius_line -->
-      <div onclick="toggleNeardestCommonname()">Toggle neardest & commonname</div>
-      <div onclick="eztflHtml5_setup(true)">Full reset</div>
       <div id="div_table_routenos"></div>
     </div> <!-- renderingField -->
 

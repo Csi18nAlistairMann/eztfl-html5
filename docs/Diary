@@ -239,3 +239,7 @@ Cosmetic: Add full reset to clear both storages
 Cosmetic: Add location accuracy, inc enableHighAccuracy
 Cosmetic: Add indication if forced heading in use, and what actually is, to its reset
 	  text
+
+7 June 2017
+Cosmetic: implement that user can pause updates
+Cosmetic: move some settings to an onscreen menu
