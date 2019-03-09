@@ -27,6 +27,16 @@ div#menuField {
     z-index: 2;
     border: 5px solid #f7ff00;
 }
+div#arrivalsField {
+    background-color: lightgreen;
+    position: fixed;
+    display: none;
+    width: 16em;
+    left: 0em;
+    top: 3.5em;
+    z-index: 2;
+    border: 5px solid #f7ff00;
+}
 div#anti_and_clockwise {
     position: fixed;
     width: 360px;

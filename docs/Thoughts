@@ -4831,10 +4831,10 @@ would appear on top of the renderfield
 	Done. This also neatly adds in 17, a couple of the immediate todos below. And also starts along
 the "use objects" desire from the docs/Todo file
 
-
-
-
-16 [COS] show bus stop common name when showing arrivals board
+[ ] 16 [COS] show bus stop common name when showing arrivals board
+  There are several elements to this. 1: the arrivals board (ab) should be in its own div like the menu 2: the
+ab should have a higher zindex like the menu 3: there should be a means to close the menu (perhaps even 
+clicking anywhere but the menu?) and 4: Should see the common name at the top of the arrivals board.
 
 ----------------------------------------------------------
 
@@ -4871,3 +4871,9 @@ only show stops for specified directions ("I'm going south - don't show me stops
 
 when actually on a bus, option to brng up sequence of stops, with next stop described with code,
 5 letter, near dest, common name anmd directions, stops when clicked bring up arrivals board
+
+commentary on sequence of changes over multiple renders
+
+menu should have higher zindex
+
+waiting in device/waiting on tfl

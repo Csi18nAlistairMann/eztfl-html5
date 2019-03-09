@@ -136,6 +136,10 @@ const MENU_FIELD_NAME = 'menuField';
 const MENU_OPEN_NAME = 'menu_open_flag';
 const MENU_OPEN_DEFAULT_VALUE = false;
 
+const ARRIVALS_FIELD_NAME = 'arrivalsField'
+const ARRIVALS_OPEN_NAME = 'arrivals_open_flag';
+const ARRIVALS_OPEN_DEFAULT_VALUE = false;
+
 const ID_TOGGLE_PAUSE_NAME = 'toggle_pause';
 const TOGGLE_PAUSE_NAME = 'pause_toggle';
 const TOGGLE_PAUSE_WHEN_PAUSED_TEXT = 'Continue';
@@ -153,6 +157,7 @@ const FAKE_DATA_SOURCE = FAKE_SRC_TRAFALGAR;
 var eztflhtml5 = {};
 eztflhtml5.tracked_positions = [];
 eztflhtml5.menuObj = new MenuType();
+eztflhtml5.arrivalsObj = new ArrivalsType();
 
 //
 // setup helpers (middle)
@@ -821,7 +826,7 @@ function renderCountdown(naptan)
 
 	if (text !== '') {
 	    renderRemoveElementsById(id);
-	    renderGenericDivCore(RENDERING_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
+	    renderGenericDivCore(ARRIVALS_FIELD_NAME, id, text, null, CLASS_COUNTDOWN_NAME + ' busstop_' + naptan, null);
 	}
 
 	count++;
@@ -1324,6 +1329,45 @@ function MenuType() {
     };
 }
 
+function ArrivalsType() {
+    'use strict';
+    this.status = null;
+
+    this.getOpenStatus = function() {
+	if (this.status === null) {
+	    if (sessionStorage.getItem(ARRIVALS_OPEN_NAME) === 'true') {
+		this.status = false;
+
+	    } else {
+		this.status = true;
+	    }
+	}
+	return this.status;
+    };
+
+    this.toggleOpenStatus = function() {
+	var el;
+	var vis;
+
+	if (this.status === null) {
+	    this.status = ARRIVALS_OPEN_DEFAULT_VALUE;
+	}
+	if (this.status === true) {
+	    vis = 'none';
+	    // alert('Was open so closing it!');
+	    this.status = false;
+
+	} else {
+	    vis = 'block';
+	    // alert('Not open, so opening it!');
+	    this.status = true;
+	}
+	el = document.getElementById(ARRIVALS_FIELD_NAME);
+	el.style.display = vis;
+	sessionStorage.setItem(ARRIVALS_OPEN_NAME, this.status);
+    };
+}
+
 //-------------------------------------------------------------
 //
 // User Interface helpers (front)
@@ -1358,6 +1402,12 @@ function menuTouched()
 {
     'use strict';
     eztflhtml5.menuObj.toggleOpenStatus();
+}
+
+function arrivalsTouched()
+{
+    'use strict';
+    eztflhtml5.arrivalsObj.toggleOpenStatus();
 }
 
 function getDeletableForClass(classname)
@@ -1629,6 +1679,7 @@ function loadCountdown(naptan)
 {
     'use strict';
     getArrivalsFromTfl(naptan);
+    arrivalsTouched()
 }
 
 function capturedKeypress(evt)
