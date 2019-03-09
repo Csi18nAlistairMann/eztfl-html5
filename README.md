@@ -16,12 +16,13 @@ Have a look at The Egg https://eztfl-html5.mpsvr.com/egg.png. This perspective s
 phone, with the white dot representing roughly where the center is, some half a mile in front of you. The idea was for the 
 red circles of bus stops ("R" and "S" in this photo: https://trueform.co.uk/app/uploads/2013/11/bus-stop-1.jpg) near the 
 visitor to appear in the egg, and move left and right as the visitor turns round, and move nearer and farther as the
-visitor walks. Around the edges of the display would appear the destinations that could be obtained from the bus stops,
-and they too would move as the visitor moves. Originally I had intended that the bus numbers themselves would appear
-between the two, but it became more obvious to show them underneath. In addition, I have a accelerometry stats at the top
-left, a scale bar (the faster you move, the tighter the bar), manual rotation arrows, and a menu. Clicking on the bus stop
-will show the countdown schedule for it. Clicking on a bus number highlights the bus stops it visits. Clicking on the
-destination highlights bus stops that have it as a destination.
+visitor walks. (Also see: https://github.com/Csi18nAlistairMann/eztfl-html5/blob/master/docs/2017may04-swirling-screen.gif)
+Around the edges of the display would appear the destinations that could be obtained from the bus stops, and they too would
+move as the visitor moves. Originally I had intended that the bus numbers themselves would appear between the two, but it
+became more obvious to show them underneath. In addition, I have a accelerometry stats at the top left, a scale bar (the
+faster you move, the tighter the bar), manual rotation arrows, and a menu. Clicking on the bus stop will show the countdown
+schedule for it. Clicking on a bus number highlights the bus stops it visits. Clicking on the destination highlights bus
+stops that have it as a destination.
 
 This project was more demanding than the earlier one - I experimented with html5 and javascript, accelerometry, CORS and
 SSL and others. Unsatisfying is that as yet, html5+javascript can't get much better than a very few frames per second
